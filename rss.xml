@@ -326,46 +326,42 @@ draft: false
 ├── cover.png
 └── index.md
 &lt;/code&gt;&lt;/pre&gt;
-</content:encoded></item><item><title>Markdown Example</title><link>https://ac-db.github.io/posts/markdown/</link><guid isPermaLink="true">https://ac-db.github.io/posts/markdown/</guid><description>A simple example of a Markdown blog post.</description><pubDate>Sun, 01 Oct 2023 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;An h1 header&lt;/h1&gt;
-&lt;p&gt;Paragraphs are separated by a blank line.&lt;/p&gt;
-&lt;p&gt;2nd paragraph. &lt;em&gt;Italic&lt;/em&gt;, &lt;strong&gt;bold&lt;/strong&gt;, and &lt;code&gt;monospace&lt;/code&gt;. Itemized lists
-look like:&lt;/p&gt;
+</content:encoded></item><item><title>Markdown示例</title><link>https://ac-db.github.io/posts/markdown/</link><guid isPermaLink="true">https://ac-db.github.io/posts/markdown/</guid><description>Markdown 博客文章的一个简单示例。</description><pubDate>Sun, 01 Oct 2023 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;h1 标题&lt;/h1&gt;
+&lt;p&gt;段落之间以空行分隔。&lt;/p&gt;
+&lt;p&gt;第二段。斜体、&lt;strong&gt;粗体&lt;/strong&gt;和等宽字体。逐项列表
+如下所示：&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;this one&lt;/li&gt;
-&lt;li&gt;that one&lt;/li&gt;
-&lt;li&gt;the other one&lt;/li&gt;
+&lt;li&gt;这一项&lt;/li&gt;
+&lt;li&gt;那一项&lt;/li&gt;
+&lt;li&gt;另一项&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Note that --- not considering the asterisk --- the actual text
-content starts at 4-columns in.&lt;/p&gt;
+&lt;p&gt;请注意，--- 不考虑星号 --- 实际文本
+内容从第 4 列开始。&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;Block quotes are
-written like so.&lt;/p&gt;
-&lt;p&gt;They can span multiple paragraphs,
-if you like.&lt;/p&gt;
+&lt;p&gt;块引用
+的写法如下。&lt;/p&gt;
+&lt;p&gt;如果您愿意，它们可以跨越多个段落。&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;Use 3 dashes for an em-dash. Use 2 dashes for ranges (ex., &quot;it&apos;s all
-in chapters 12--14&quot;). Three dots ... will be converted to an ellipsis.
-Unicode is supported. ☺&lt;/p&gt;
-&lt;h2&gt;An h2 header&lt;/h2&gt;
-&lt;p&gt;Here&apos;s a numbered list:&lt;/p&gt;
+&lt;p&gt;使用 3 个破折号表示长破折号。使用 2 个破折号表示范围（例如，“全部
+在第 12-14 章”）。三个点...将转换为省略号。
+支持 Unicode。☺&lt;/p&gt;
+&lt;h2&gt;一个 h2 标题&lt;/h2&gt;
+&lt;p&gt;这是一个带编号的列表：&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;first item&lt;/li&gt;
-&lt;li&gt;second item&lt;/li&gt;
-&lt;li&gt;third item&lt;/li&gt;
+&lt;li&gt;第一项&lt;/li&gt;
+&lt;li&gt;第二项&lt;/li&gt;
+&lt;li&gt;第三项&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;Note again how the actual text starts at 4 columns in (4 characters
-from the left side). Here&apos;s a code sample:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# Let me re-iterate ...
-for i in 1 .. 10 { do-something(i) }
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;As you probably guessed, indented 4 spaces. By the way, instead of
-indenting the block, you can use delimited blocks, if you like:&lt;/p&gt;
+&lt;p&gt;再次注意，实际文本从第 4 列（从左侧算起 4 个字符）开始。以下是代码示例：&lt;/p&gt;
+&lt;h1&gt;让我再重复一遍……&lt;/h1&gt;
+&lt;p&gt;for i in 1 .. 10 { do-something(i) }&lt;/p&gt;
+&lt;p&gt;你可能已经猜到了，缩进 4 个空格。顺便说一句，除了缩进代码块之外，如果你愿意，也可以使用分隔块：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;define foobar() {
     print &quot;Welcome to flavor country!&quot;;
 }
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;(which makes copying &amp;amp; pasting easier). You can optionally mark the
-delimited block for Pandoc to syntax highlight it:&lt;/p&gt;
+&lt;p&gt;（这使得复制和粘贴更容易）。您可以选择标记
+分隔块，以便 Pandoc 对其进行语法高亮：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;import time
 # Quick, count to ten!
 for i in range(10):
@@ -455,9 +451,9 @@ math should get its own line and be put in in double-dollarsigns:&lt;/p&gt;
 $$&lt;/p&gt;
 &lt;p&gt;And note that you can backslash-escape any punctuation characters
 which you wish to be displayed literally, ex.: `foo`, *bar*, etc.&lt;/p&gt;
-</content:encoded></item><item><title>Include Video in the Posts</title><link>https://ac-db.github.io/posts/video/</link><guid isPermaLink="true">https://ac-db.github.io/posts/video/</guid><description>This post demonstrates how to include embedded video in a blog post.</description><pubDate>Tue, 01 Aug 2023 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;Just copy the embed code from YouTube or other platforms, and paste it in the markdown file.&lt;/p&gt;
+</content:encoded></item><item><title>在帖子中添加视频</title><link>https://ac-db.github.io/posts/video/</link><guid isPermaLink="true">https://ac-db.github.io/posts/video/</guid><description>这篇文章演示了如何在博客文章中嵌入视频。</description><pubDate>Tue, 01 Aug 2023 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;只需从 YouTube 或其他平台复制嵌入代码，然后将其粘贴到 markdown 文件中。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;---
-title: Include Video in the Post
+title: 在帖子中添加视频
 published: 2023-10-19
 // ...
 ---
