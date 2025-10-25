@@ -1,60 +1,59 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>次元裂隙</title><description>觉醒吧! 黑暗之魂</description><link>https://ac-db.github.io/</link><language>zh_CN</language><item><title>Markdown Extended Features</title><link>https://ac-db.github.io/posts/markdown-extended/</link><guid isPermaLink="true">https://ac-db.github.io/posts/markdown-extended/</guid><description>Read more about Markdown features in Fuwari</description><pubDate>Wed, 01 May 2024 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;GitHub Repository Cards&lt;/h2&gt;
-&lt;p&gt;You can add dynamic cards that link to GitHub repositories, on page load, the repository information is pulled from the GitHub API.&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>次元裂隙</title><description>觉醒吧! 黑暗之魂</description><link>https://ac-db.github.io/</link><language>zh_CN</language><item><title>Markdown 扩展功能</title><link>https://ac-db.github.io/posts/markdown-extended/</link><guid isPermaLink="true">https://ac-db.github.io/posts/markdown-extended/</guid><description>了解有关 Fuwari 中 Markdown 功能的更多信息</description><pubDate>Wed, 01 May 2024 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;GitHub 代码库卡片&lt;/h2&gt;
+&lt;p&gt;您可以添加链接到 GitHub 代码库的动态卡片，页面加载时，代码库信息将从 GitHub API 中提取。&lt;/p&gt;
 &lt;p&gt;::github{repo=&quot;Fabrizz/MMM-OnSpotify&quot;}&lt;/p&gt;
-&lt;p&gt;Create a GitHub repository card with the code &lt;code&gt;::github{repo=&quot;&amp;lt;owner&amp;gt;/&amp;lt;repo&amp;gt;&quot;}&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;使用代码创建 GitHub 存储库卡 &lt;code&gt;::github{repo=&quot;&amp;lt;owner&amp;gt;/&amp;lt;repo&amp;gt;&quot;}&lt;/code&gt;.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;::github{repo=&quot;saicaca/fuwari&quot;}
 &lt;/code&gt;&lt;/pre&gt;
-&lt;h2&gt;Admonitions&lt;/h2&gt;
-&lt;p&gt;Following types of admonitions are supported: &lt;code&gt;note&lt;/code&gt; &lt;code&gt;tip&lt;/code&gt; &lt;code&gt;important&lt;/code&gt; &lt;code&gt;warning&lt;/code&gt; &lt;code&gt;caution&lt;/code&gt;&lt;/p&gt;
+&lt;h2&gt;警告&lt;/h2&gt;
+&lt;p&gt;支持以下类型的警告： &lt;code&gt;note&lt;/code&gt; &lt;code&gt;tip&lt;/code&gt; &lt;code&gt;important&lt;/code&gt; &lt;code&gt;warning&lt;/code&gt; &lt;code&gt;caution&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;:::note
-Highlights information that users should take into account, even when skimming.
+突出显示用户应该考虑的信息，即使浏览时也是如此。
 :::&lt;/p&gt;
 &lt;p&gt;:::tip
-Optional information to help a user be more successful.
+帮助用户取得更大成功的可选信息。
 :::&lt;/p&gt;
 &lt;p&gt;:::important
-Crucial information necessary for users to succeed.
+用户成功所必需的关键信息。
 :::&lt;/p&gt;
 &lt;p&gt;:::warning
-Critical content demanding immediate user attention due to potential risks.
+由于存在潜在风险，需要用户立即关注的关键内容。
 :::&lt;/p&gt;
 &lt;p&gt;:::caution
-Negative potential consequences of an action.
+某一行为的潜在负面后果。
 :::&lt;/p&gt;
-&lt;h3&gt;Basic Syntax&lt;/h3&gt;
+&lt;h3&gt;基本语法&lt;/h3&gt;
 &lt;pre&gt;&lt;code&gt;:::note
-Highlights information that users should take into account, even when skimming.
+突出显示用户应该考虑的信息，即使浏览时也是如此。
 :::
 
 :::tip
-Optional information to help a user be more successful.
+帮助用户取得更大成功的可选信息。
 :::
 &lt;/code&gt;&lt;/pre&gt;
-&lt;h3&gt;Custom Titles&lt;/h3&gt;
-&lt;p&gt;The title of the admonition can be customized.&lt;/p&gt;
-&lt;p&gt;:::note[MY CUSTOM TITLE]
-This is a note with a custom title.
+&lt;h3&gt;自定义标题&lt;/h3&gt;
+&lt;p&gt;警告的标题可以自定义。&lt;/p&gt;
+&lt;p&gt;:::note[我的自定义标题]
+这是一条带有自定义标题的注释。
 :::&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;:::note[MY CUSTOM TITLE]
-This is a note with a custom title.
+&lt;pre&gt;&lt;code&gt;:::note[我的自定义标题]
+这是一条带有自定义标题的注释。
 :::
 &lt;/code&gt;&lt;/pre&gt;
-&lt;h3&gt;GitHub Syntax&lt;/h3&gt;
+&lt;h3&gt;GitHub 语法&lt;/h3&gt;
 &lt;blockquote&gt;
 &lt;p&gt;[!TIP]
-&lt;a href=&quot;https://github.com/orgs/community/discussions/16925&quot;&gt;The GitHub syntax&lt;/a&gt; is also supported.&lt;/p&gt;
+&lt;a href=&quot;https://github.com/orgs/community/discussions/16925&quot;&gt;GitHub 语法&lt;/a&gt; 也受支持。&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;pre&gt;&lt;code&gt;&amp;gt; [!NOTE]
-&amp;gt; The GitHub syntax is also supported.
+&amp;gt; GitHub 语法也受支持。
 
 &amp;gt; [!TIP]
-&amp;gt; The GitHub syntax is also supported.
+&amp;gt; GitHub 语法也受支持。
 &lt;/code&gt;&lt;/pre&gt;
-&lt;h3&gt;Spoiler&lt;/h3&gt;
-&lt;p&gt;You can add spoilers to your text. The text also supports &lt;strong&gt;Markdown&lt;/strong&gt; syntax.&lt;/p&gt;
-&lt;p&gt;The content :spoiler[is hidden &lt;strong&gt;ayyy&lt;/strong&gt;]!&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;The content :spoiler[is hidden **ayyy**]!
-
+&lt;h3&gt;剧透&lt;/h3&gt;
+&lt;p&gt;您可以在文本中添加剧透。文本也支持 &lt;strong&gt;Markdown&lt;/strong&gt; 语法。&lt;/p&gt;
+&lt;p&gt;内容 :spoiler[隐藏了 &lt;strong&gt;ayyy&lt;/strong&gt;]!&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;内容 :spoiler[隐藏了 **ayyy**]!
 &lt;/code&gt;&lt;/pre&gt;
 </content:encoded></item><item><title>富有表现力的代码示例</title><link>https://ac-db.github.io/posts/expressive-code/</link><guid isPermaLink="true">https://ac-db.github.io/posts/expressive-code/</guid><description>使用 Expressive Code 时代码块在 Markdown 中的外观。</description><pubDate>Wed, 10 Apr 2024 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;在这里，我们将探索使用 &lt;a href=&quot;https://expressive-code.com/&quot;&gt;Expressive Code&lt;/a&gt; 代码块的外观。提供的示例基于官方文档，您可以参考更多详细信息。&lt;/p&gt;
 &lt;h2&gt;Expressive Code&lt;/h2&gt;
@@ -328,118 +327,161 @@ draft: false
 &lt;/code&gt;&lt;/pre&gt;
 </content:encoded></item><item><title>Markdown示例</title><link>https://ac-db.github.io/posts/markdown/</link><guid isPermaLink="true">https://ac-db.github.io/posts/markdown/</guid><description>Markdown 博客文章的一个简单示例。</description><pubDate>Sun, 01 Oct 2023 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;h1 标题&lt;/h1&gt;
 &lt;p&gt;段落之间以空行分隔。&lt;/p&gt;
-&lt;p&gt;第二段。斜体、&lt;strong&gt;粗体&lt;/strong&gt;和等宽字体。逐项列表
-如下所示：&lt;/p&gt;
+&lt;p&gt;第二段. &lt;em&gt;斜体&lt;/em&gt; 、 &lt;strong&gt;粗体&lt;/strong&gt; 和 &lt;code&gt;等宽字体&lt;/code&gt; 。逐项列表
+如下所示:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;这一项&lt;/li&gt;
 &lt;li&gt;那一项&lt;/li&gt;
 &lt;li&gt;另一项&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;请注意，--- 不考虑星号 --- 实际文本
-内容从第 4 列开始。&lt;/p&gt;
+&lt;p&gt;请注意，--- 不考虑星号 --- 实际文本内容从第 4 列开始。&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;块引用
 的写法如下。&lt;/p&gt;
 &lt;p&gt;如果您愿意，它们可以跨越多个段落。&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;使用 3 个破折号表示长破折号。使用 2 个破折号表示范围（例如，“全部
-在第 12-14 章”）。三个点...将转换为省略号。
-支持 Unicode。☺&lt;/p&gt;
+&lt;p&gt;使用 3 个破折号表示长破折号。使用 2 个破折号表示范围（例如，“全部在第 12-14 章”）。三个点...将转换为省略号。支持 Unicode。☺&lt;/p&gt;
 &lt;h2&gt;一个 h2 标题&lt;/h2&gt;
-&lt;p&gt;这是一个带编号的列表：&lt;/p&gt;
+&lt;p&gt;这是一个带编号的列表:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;第一项&lt;/li&gt;
 &lt;li&gt;第二项&lt;/li&gt;
 &lt;li&gt;第三项&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;再次注意，实际文本从第 4 列（从左侧算起 4 个字符）开始。以下是代码示例：&lt;/p&gt;
-&lt;h1&gt;让我再重复一遍……&lt;/h1&gt;
-&lt;p&gt;for i in 1 .. 10 { do-something(i) }&lt;/p&gt;
-&lt;p&gt;你可能已经猜到了，缩进 4 个空格。顺便说一句，除了缩进代码块之外，如果你愿意，也可以使用分隔块：&lt;/p&gt;
+&lt;p&gt;再次注意，实际文本从第 4 列（从左侧算起 4 个字符）开始。以下是代码示例:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 让我再重复一遍……
+for i in 1 .. 10 { do-something(i) }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;你可能已经猜到了，缩进 4 个空格。顺便说一句，除了缩进代码块之外，如果你愿意，也可以使用分隔块:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;define foobar() {
     print &quot;Welcome to flavor country!&quot;;
 }
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;（这使得复制和粘贴更容易）。您可以选择标记
-分隔块，以便 Pandoc 对其进行语法高亮：&lt;/p&gt;
+&lt;p&gt;（这使得复制和粘贴更容易）。您可以选择标记分隔块，以便 Pandoc 对其进行语法高亮:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;import time
-# Quick, count to ten!
+# 快速数到 10
 for i in range(10):
-    # (but not *too* quick)
+    # 但是别太快
     time.sleep(0.5)
     print i
 &lt;/code&gt;&lt;/pre&gt;
-&lt;h3&gt;An h3 header&lt;/h3&gt;
-&lt;p&gt;Now a nested list:&lt;/p&gt;
+&lt;h3&gt;一个 h3 标题&lt;/h3&gt;
+&lt;p&gt;一个新的待办清单:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;
-&lt;p&gt;First, get these ingredients:&lt;/p&gt;
+&lt;p&gt;首先，准备好以下食材:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;carrots&lt;/li&gt;
-&lt;li&gt;celery&lt;/li&gt;
-&lt;li&gt;lentils&lt;/li&gt;
+&lt;li&gt;胡萝卜&lt;/li&gt;
+&lt;li&gt;芹菜&lt;/li&gt;
+&lt;li&gt;扁豆&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;Boil some water.&lt;/p&gt;
+&lt;p&gt;烧开水。&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;Dump everything in the pot and follow
-this algorithm:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; find wooden spoon
- uncover pot
- stir
- cover pot
- balance wooden spoon precariously on pot handle
- wait 10 minutes
- goto first step (or shut off burner when done)
+&lt;p&gt;将所有食材倒入锅中，并按照以下规则操作:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt; 找到木勺
+ 揭开锅盖
+ 搅拌
+ 盖上锅盖
+ 将木勺在锅柄上保持平衡
+ 等待10分钟
+ 转到第一步（完成后关火）
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Do not bump wooden spoon or it will fall.&lt;/p&gt;
+&lt;p&gt;不要碰到木勺，否则它会掉下来。&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;Notice again how text always lines up on 4-space indents (including
-that last line which continues item 3 above).&lt;/p&gt;
-&lt;p&gt;Here&apos;s a link to &lt;a href=&quot;http://foo.bar&quot;&gt;a website&lt;/a&gt;, to a &lt;a href=&quot;local-doc.html&quot;&gt;local
-doc&lt;/a&gt;, and to a &lt;a href=&quot;#an-h2-header&quot;&gt;section heading in the current
-doc&lt;/a&gt;. Here&apos;s a footnote [^1].&lt;/p&gt;
-&lt;p&gt;[^1]: Footnote text goes here.&lt;/p&gt;
-&lt;p&gt;Tables can look like this:&lt;/p&gt;
-&lt;p&gt;size material color&lt;/p&gt;
+&lt;p&gt;再次注意文本始终以4格缩进对齐（包括上面第3项的最后一行）。&lt;/p&gt;
+&lt;p&gt;这是指向&lt;a href=&quot;http://foo.bar&quot;&gt;一个网站&lt;/a&gt;、&lt;a href=&quot;local-doc.html&quot;&gt;本地文档&lt;/a&gt;和&lt;a href=&quot;#an-h2-header&quot;&gt;当前文档中的章节标题&lt;/a&gt;的链接。这是脚注&lt;a href=&quot;%E6%AD%A4%E5%A4%84%E4%B8%BA%E8%84%9A%E6%B3%A8%E6%96%87%E6%9C%AC%E3%80%82&quot;&gt;^1&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;表格可以像这样:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;尺寸&lt;/th&gt;
+&lt;th&gt;材质&lt;/th&gt;
+&lt;th&gt;颜色&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;9&lt;/td&gt;
+&lt;td&gt;皮革&lt;/td&gt;
+&lt;td&gt;棕色&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;10&lt;/td&gt;
+&lt;td&gt;麻 帆布&lt;/td&gt;
+&lt;td&gt;天然&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;11&lt;/td&gt;
+&lt;td&gt;玻璃&lt;/td&gt;
+&lt;td&gt;透明&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;表格: 鞋子、尺码及其材质&lt;/p&gt;
 &lt;hr /&gt;
-&lt;p&gt;9 leather brown
-10 hemp canvas natural
-11 glass transparent&lt;/p&gt;
-&lt;p&gt;Table: Shoes, their sizes, and what they&apos;re made of&lt;/p&gt;
-&lt;p&gt;(The above is the caption for the table.) Pandoc also supports
-multi-line tables:&lt;/p&gt;
+&lt;p&gt;Pandoc 还支持多行表格：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;关键字&lt;/th&gt;
+&lt;th&gt;文本&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;红色&lt;/td&gt;
+&lt;td&gt;日落、苹果和其他红色或略带红色的东西。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;绿色&lt;/td&gt;
+&lt;td&gt;树叶、草、青蛙以及其他不容易被感知到的事物。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 &lt;hr /&gt;
-&lt;p&gt;keyword text&lt;/p&gt;
+&lt;p&gt;（以上是表格的标题。）&lt;/p&gt;
+&lt;p&gt;Pandoc 还支持多行表格:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;关键字&lt;/th&gt;
+&lt;th&gt;文本&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;红色&lt;/td&gt;
+&lt;td&gt;日落、苹果和其他红色或略带红色的东西。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;绿色&lt;/td&gt;
+&lt;td&gt;树叶、草、青蛙以及其他不容易被感知到的事物。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 &lt;hr /&gt;
-&lt;p&gt;red Sunsets, apples, and
-other red or reddish
-things.&lt;/p&gt;
-&lt;p&gt;green Leaves, grass, frogs
-and other things it&apos;s
-not easy being.&lt;/p&gt;
+&lt;p&gt;以下是水平线。&lt;/p&gt;
 &lt;hr /&gt;
-&lt;p&gt;A horizontal rule follows.&lt;/p&gt;
+&lt;p&gt;以下是定义列表:&lt;/p&gt;
+&lt;p&gt;苹果&lt;br /&gt;
+: 适合制作苹果酱。&lt;/p&gt;
+&lt;p&gt;橙子&lt;br /&gt;
+: 柑橘！&lt;/p&gt;
+&lt;p&gt;西红柿&lt;br /&gt;
+: 西红柿中没有“e”。&lt;/p&gt;
+&lt;p&gt;同样，文本缩进 4 个空格。（每个术语/定义对之间空一行，以便更清晰地展开。）&lt;/p&gt;
 &lt;hr /&gt;
-&lt;p&gt;Here&apos;s a definition list:&lt;/p&gt;
-&lt;p&gt;apples
-: Good for making applesauce.
-oranges
-: Citrus!
-tomatoes
-: There&apos;s no &quot;e&quot; in tomatoe.&lt;/p&gt;
-&lt;p&gt;Again, text is indented 4 spaces. (Put a blank line between each
-term/definition pair to spread things out more.)&lt;/p&gt;
-&lt;p&gt;Here&apos;s a &quot;line block&quot;:&lt;/p&gt;
-&lt;p&gt;| Line one
-| Line too
-| Line tree&lt;/p&gt;
-&lt;p&gt;and images can be specified like so:&lt;/p&gt;
-&lt;p&gt;Inline math equations go in like so: $\omega = d\phi / dt$. Display
-math should get its own line and be put in in double-dollarsigns:&lt;/p&gt;
+&lt;p&gt;这是一个“行块”:&lt;/p&gt;
+&lt;p&gt;| 第一行&lt;br /&gt;
+| 第二行&lt;br /&gt;
+| 行三&lt;/p&gt;
+&lt;p&gt;图像可以像这样指定:&lt;/p&gt;
+&lt;p&gt;内联数学方程式如下: $\omega = d\phi / dt$。显示
+数学公式应单独一行，并以双美元符号形式输入:&lt;/p&gt;
 &lt;p&gt;$$I = \int \rho R^{2} dV$$&lt;/p&gt;
 &lt;p&gt;$$
 \begin{equation*}
@@ -449,8 +491,8 @@ math should get its own line and be put in in double-dollarsigns:&lt;/p&gt;
 ;5923078164;0628620899;8628034825;3421170679;\ldots
 \end{equation*}
 $$&lt;/p&gt;
-&lt;p&gt;And note that you can backslash-escape any punctuation characters
-which you wish to be displayed literally, ex.: `foo`, *bar*, etc.&lt;/p&gt;
+&lt;p&gt;请注意，您可以使用反斜杠转义任何标点符号
+希望按字面显示，例如: `foo`、*bar* 等。&lt;/p&gt;
 </content:encoded></item><item><title>在帖子中添加视频</title><link>https://ac-db.github.io/posts/video/</link><guid isPermaLink="true">https://ac-db.github.io/posts/video/</guid><description>这篇文章演示了如何在博客文章中嵌入视频。</description><pubDate>Tue, 01 Aug 2023 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;只需从 YouTube 或其他平台复制嵌入代码，然后将其粘贴到 markdown 文件中。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;---
 title: 在帖子中添加视频
