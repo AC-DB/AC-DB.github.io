@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>英语单词</title><link>https://www.atsuko.top/posts/english-learn/word-13/</link><guid isPermaLink="true">https://www.atsuko.top/posts/english-learn/word-13/</guid><description>英语学习第13</description><pubDate>Mon, 12 Jan 2026 00:00:00 GMT</pubDate><content:encoded/></item><item><title>Markdown 扩展功能</title><link>https://www.atsuko.top/posts/markdown-extended/</link><guid isPermaLink="true">https://www.atsuko.top/posts/markdown-extended/</guid><description>了解有关 Fuwari 中 Markdown 功能的更多信息</description><pubDate>Wed, 01 May 2024 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;GitHub 代码库卡片&lt;/h2&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>Markdown 扩展功能</title><link>https://www.atsuko.top/posts/demo/markdown-extended/</link><guid isPermaLink="true">https://www.atsuko.top/posts/demo/markdown-extended/</guid><description>了解有关 Fuwari 中 Markdown 功能的更多信息</description><pubDate>Wed, 01 May 2024 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;GitHub 代码库卡片&lt;/h2&gt;
 &lt;p&gt;您可以添加链接到 GitHub 代码库的动态卡片，页面加载时，代码库信息将从 GitHub API 中提取。&lt;/p&gt;
 &lt;p&gt;::github{repo=&quot;Fabrizz/MMM-OnSpotify&quot;}&lt;/p&gt;
 &lt;p&gt;使用代码创建 GitHub 存储库卡 &lt;code&gt;::github{repo=&quot;&amp;lt;owner&amp;gt;/&amp;lt;repo&amp;gt;&quot;}&lt;/code&gt;.&lt;/p&gt;
@@ -55,7 +55,7 @@
 &lt;p&gt;内容 :spoiler[隐藏了 &lt;strong&gt;ayyy&lt;/strong&gt;]!&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;内容 :spoiler[隐藏了 **ayyy**]!
 &lt;/code&gt;&lt;/pre&gt;
-</content:encoded></item><item><title>富有表现力的代码示例</title><link>https://www.atsuko.top/posts/expressive-code/</link><guid isPermaLink="true">https://www.atsuko.top/posts/expressive-code/</guid><description>使用 Expressive Code 时代码块在 Markdown 中的外观。</description><pubDate>Wed, 10 Apr 2024 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;在这里，我们将探索使用 &lt;a href=&quot;https://expressive-code.com/&quot;&gt;Expressive Code&lt;/a&gt; 代码块的外观。提供的示例基于官方文档，您可以参考更多详细信息。&lt;/p&gt;
+</content:encoded></item><item><title>富有表现力的代码示例</title><link>https://www.atsuko.top/posts/demo/expressive-code/</link><guid isPermaLink="true">https://www.atsuko.top/posts/demo/expressive-code/</guid><description>使用 Expressive Code 时代码块在 Markdown 中的外观。</description><pubDate>Wed, 10 Apr 2024 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;在这里，我们将探索使用 &lt;a href=&quot;https://expressive-code.com/&quot;&gt;Expressive Code&lt;/a&gt; 代码块的外观。提供的示例基于官方文档，您可以参考更多详细信息。&lt;/p&gt;
 &lt;h2&gt;Expressive Code&lt;/h2&gt;
 &lt;h3&gt;语法高亮&lt;/h3&gt;
 &lt;p&gt;&lt;a href=&quot;https://expressive-code.com/key-features/syntax-highlighting/&quot;&gt;语法高亮&lt;/a&gt;&lt;/p&gt;
@@ -63,20 +63,32 @@
 &lt;pre&gt;&lt;code&gt;console.log(&apos;此代码已语法高亮！&apos;)
 &lt;/code&gt;&lt;/pre&gt;
 &lt;h4&gt;渲染 ANSI 转义序列&lt;/h4&gt;
-&lt;pre&gt;&lt;code&gt;ANSI colors:
-- Regular: [31mRed[0m [32mGreen[0m [33mYellow[0m [34mBlue[0m [35mMagenta[0m [36mCyan[0m
-- Bold:    [1;31mRed[0m [1;32mGreen[0m [1;33mYellow[0m [1;34mBlue[0m [1;35mMagenta[0m [1;36mCyan[0m
-- Dimmed:  [2;31mRed[0m [2;32mGreen[0m [2;33mYellow[0m [2;34mBlue[0m [2;35mMagenta[0m [2;36mCyan[0m
+&lt;pre&gt;&lt;code&gt;[1;4mStandard ANSI colors:[0m
+- Dimmed:     [2;30m Black [2;31m Red [2;32m Green [2;33m Yellow [2;34m Blue [2;35m Magenta [2;36m Cyan [2;37m White [0m
+- Foreground: [30m Black [31m Red [32m Green [33m Yellow [34m Blue [35m Magenta [36m Cyan [37m White [0m
+- Background: [40m Black [41m Red [42m Green [43m Yellow [44m Blue [45m Magenta [46m Cyan [47m White [0m
+- Reversed:   [7;30m Black [7;31m Red [7;32m Green [7;33m Yellow [7;34m Blue [7;35m Magenta [7;36m Cyan [7;37m White [0m
 
-256 colors (showing colors 160-177):
-[38;5;160m160 [38;5;161m161 [38;5;162m162 [38;5;163m163 [38;5;164m164 [38;5;165m165[0m
-[38;5;166m166 [38;5;167m167 [38;5;168m168 [38;5;169m169 [38;5;170m170 [38;5;171m171[0m
-[38;5;172m172 [38;5;173m173 [38;5;174m174 [38;5;175m175 [38;5;176m176 [38;5;177m177[0m
+[1;4m8-bit colors (showing colors 160-171 as an example):[0m
+- Dimmed:     [2;38;5;160m 160 [2;38;5;161m 161 [2;38;5;162m 162 [2;38;5;163m 163 [2;38;5;164m 164 [2;38;5;165m 165 [2;38;5;166m 166 [2;38;5;167m 167 [2;38;5;168m 168 [2;38;5;169m 169 [2;38;5;170m 170 [2;38;5;171m 171 [0m
+- Foreground: [38;5;160m 160 [38;5;161m 161 [38;5;162m 162 [38;5;163m 163 [38;5;164m 164 [38;5;165m 165 [38;5;166m 166 [38;5;167m 167 [38;5;168m 168 [38;5;169m 169 [38;5;170m 170 [38;5;171m 171 [0m
+- Background: [48;5;160m 160 [48;5;161m 161 [48;5;162m 162 [48;5;163m 163 [48;5;164m 164 [48;5;165m 165 [48;5;166m 166 [48;5;167m 167 [48;5;168m 168 [48;5;169m 169 [48;5;170m 170 [48;5;171m 171 [0m
+- Reversed:   [7;38;5;160m 160 [7;38;5;161m 161 [7;38;5;162m 162 [7;38;5;163m 163 [7;38;5;164m 164 [7;38;5;165m 165 [7;38;5;166m 166 [7;38;5;167m 167 [7;38;5;168m 168 [7;38;5;169m 169 [7;38;5;170m 170 [7;38;5;171m 171 [0m
 
-Full RGB colors:
-[38;2;34;139;34mForestGreen - RGB(34, 139, 34)[0m
+[1;4m24-bit colors (full RGB):[0m
+- Dimmed:     [2;38;2;34;139;34m ForestGreen - RGB(34,139,34) [2;38;2;102;51;153m RebeccaPurple - RGB(102,51,153) [0m
+- Foreground: [38;2;34;139;34m ForestGreen - RGB(34,139,34) [38;2;102;51;153m RebeccaPurple - RGB(102,51,153) [0m
+- Background: [48;2;34;139;34m ForestGreen - RGB(34,139,34) [48;2;102;51;153m RebeccaPurple - RGB(102,51,153) [0m
+- Reversed:   [7;38;2;34;139;34m ForestGreen - RGB(34,139,34) [7;38;2;102;51;153m RebeccaPurple - RGB(102,51,153) [0m
 
-Text formatting: [1mBold[0m [2mDimmed[0m [3mItalic[0m [4mUnderline[0m
+[1;4mFont styles:[0m
+- Default
+- [1mBold[0m
+- [2mDimmed[0m
+- [3mItalic[0m
+- [4mUnderline[0m
+- [7mReversed[0m
+- [9mStrikethrough[0m
 &lt;/code&gt;&lt;/pre&gt;
 &lt;h3&gt;编辑器和终端框架&lt;/h3&gt;
 &lt;p&gt;&lt;a href=&quot;https://expressive-code.com/key-features/frames/&quot;&gt;编辑器和终端框架&lt;/a&gt;&lt;/p&gt;
@@ -264,7 +276,7 @@ console.log(&apos;Sorry, do you know what line I am on?&apos;)
 &lt;pre&gt;&lt;code&gt;console.log(&apos;Greetings from line 5!&apos;)
 console.log(&apos;I am on line 6&apos;)
 &lt;/code&gt;&lt;/pre&gt;
-</content:encoded></item><item><title>Fuwari 简易指南</title><link>https://www.atsuko.top/posts/guide/</link><guid isPermaLink="true">https://www.atsuko.top/posts/guide/</guid><description>如何使用此博客模板。</description><pubDate>Mon, 01 Apr 2024 00:00:00 GMT</pubDate><content:encoded>&lt;blockquote&gt;
+</content:encoded></item><item><title>Fuwari 简易指南</title><link>https://www.atsuko.top/posts/demo/guide/</link><guid isPermaLink="true">https://www.atsuko.top/posts/demo/guide/</guid><description>如何使用此博客模板。</description><pubDate>Mon, 01 Apr 2024 00:00:00 GMT</pubDate><content:encoded>&lt;blockquote&gt;
 &lt;p&gt;封面图片来源：&lt;a href=&quot;https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/208fc754-890d-4adb-9753-2c963332675d/width=2048/01651-1456859105-(colour_1.5),girl,_Blue,yellow,green,cyan,purple,red,pink,_best,8k,UHD,masterpiece,male%20focus,%201boy,gloves,%20ponytail,%20long%20hair,.jpeg&quot;&gt;Source&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;此博客模板使用 &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt; 构建。对于本指南中未提及的内容，您可以在 &lt;a href=&quot;https://docs.astro.build/&quot;&gt;Astro 文档&lt;/a&gt; 中找到答案。&lt;/p&gt;
@@ -325,7 +337,7 @@ draft: false
 ├── cover.png
 └── index.md
 &lt;/code&gt;&lt;/pre&gt;
-</content:encoded></item><item><title>Markdown示例</title><link>https://www.atsuko.top/posts/markdown/</link><guid isPermaLink="true">https://www.atsuko.top/posts/markdown/</guid><description>Markdown 博客文章的一个简单示例。</description><pubDate>Sun, 01 Oct 2023 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;h1 标题&lt;/h1&gt;
+</content:encoded></item><item><title>Markdown示例</title><link>https://www.atsuko.top/posts/demo/markdown/</link><guid isPermaLink="true">https://www.atsuko.top/posts/demo/markdown/</guid><description>Markdown 博客文章的一个简单示例。</description><pubDate>Sun, 01 Oct 2023 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;h1 标题&lt;/h1&gt;
 &lt;p&gt;段落之间以空行分隔。&lt;/p&gt;
 &lt;p&gt;第二段. &lt;em&gt;斜体&lt;/em&gt; 、 &lt;strong&gt;粗体&lt;/strong&gt; 和 &lt;code&gt;等宽字体&lt;/code&gt; 。逐项列表
 如下所示:&lt;/p&gt;
@@ -493,7 +505,7 @@ for i in range(10):
 $$&lt;/p&gt;
 &lt;p&gt;请注意，您可以使用反斜杠转义任何标点符号
 希望按字面显示，例如: `foo`、*bar* 等。&lt;/p&gt;
-</content:encoded></item><item><title>在帖子中添加视频</title><link>https://www.atsuko.top/posts/video/</link><guid isPermaLink="true">https://www.atsuko.top/posts/video/</guid><description>这篇文章演示了如何在博客文章中嵌入视频。</description><pubDate>Tue, 01 Aug 2023 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;只需从 YouTube 或其他平台复制嵌入代码，然后将其粘贴到 markdown 文件中。&lt;/p&gt;
+</content:encoded></item><item><title>在帖子中添加视频</title><link>https://www.atsuko.top/posts/demo/video/</link><guid isPermaLink="true">https://www.atsuko.top/posts/demo/video/</guid><description>这篇文章演示了如何在博客文章中嵌入视频。</description><pubDate>Tue, 01 Aug 2023 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;只需从 YouTube 或其他平台复制嵌入代码，然后将其粘贴到 markdown 文件中。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;---
 title: 在帖子中添加视频
 published: 2023-10-19
