@@ -1,4 +1,63 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>Markdown 扩展功能</title><link>https://www.atsuko.top/posts/demo/markdown-extended/</link><guid isPermaLink="true">https://www.atsuko.top/posts/demo/markdown-extended/</guid><description>了解有关 Fuwari 中 Markdown 功能的更多信息</description><pubDate>Wed, 01 May 2024 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;GitHub 代码库卡片&lt;/h2&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>积分计算</title><link>https://www.atsuko.top/posts/mathematics-for-postgraduate-entrance-examination/advanced-mathematics/univariate-integral-calculus/integral-calculation/</link><guid isPermaLink="true">https://www.atsuko.top/posts/mathematics-for-postgraduate-entrance-examination/advanced-mathematics/univariate-integral-calculus/integral-calculation/</guid><pubDate>Mon, 20 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;基础知识结构&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;mindmap
+  root((积分计算))
+    基本积分公式
+    不定积分的积分法
+      凑微分法
+      换元法
+      分部积分法
+      有理函数的积分
+    定积分计算
+    变限积分的计算
+      求导公式
+      重要结论
+    反常积分的计算
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;1. 基本积分公式&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;$\int x^{k} dx = \frac{ 1 }{ k+1} x^{k+1} +C,k\ne -1;$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$\int \frac{1}{x} dx=\ln_{}{\left | x \right | } + C$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$\int e^{x} dx=e^{x}+C$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$\int \sin x dx=-\cos x +C$; $\int \cos x dx=\sin x + C$;&lt;/p&gt;
+&lt;p&gt;$\int \tan x dx=-\ln_{}{\left | \cos x \right | } + C$; $\int \cot x dx=\ln_{}{\left | \sin x \right | } + C$;&lt;/p&gt;
+&lt;p&gt;$\int \frac{dx}{\cos x}=\int \sec xdx= \ln \left | \sec x +\tan x \right | + C$;&lt;/p&gt;
+&lt;p&gt;$\int \frac{dx}{\sin x}=\int \csc x dx= \ln \left | \csc x - \cot x \right | + C$;&lt;/p&gt;
+&lt;p&gt;$\int \sec^{2} xdx=\tan x +C$; $\int \csc^{2} xdx=-\cot x +C$&lt;/p&gt;
+&lt;p&gt;$\int \sec x \tan xdx=\sec x +C$; $\int \csc x \cot xdx=-\csc x +C$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$\int \frac{1}{1+x^{2} } dx=\arctan x+C$&lt;/p&gt;
+&lt;p&gt;$\int \frac{1}{a^{2}+x^{2} } dx= \frac{1}{a} \arctan \frac {x}{a} +C \left ( a &amp;gt; 0 \right )$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$\int  \frac{1}{\sqrt{1-x^{2}} } dx= \arcsin x +C$&lt;/p&gt;
+&lt;p&gt;$\int  \frac{1}{\sqrt{a^{2}-x^{2}} } dx= \arcsin \frac{x}{a} +C \left ( a &amp;gt; 0 \right )$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$\int  \frac{1}{\sqrt{x^{2}+a^{2}} } dx= \ln(x+\sqrt{x^{2}+a^{2}})+C$ (常见a =1)&lt;/p&gt;
+&lt;p&gt;$\int  \frac{1}{\sqrt{x^{2}-a^{2}} } dx= \ln\left | x+\sqrt{x^{2}-a^{2}} \right | +C \left ( \left | x \right | &amp;gt; \left | a \right |  \right )$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$\int \dfrac {1}{{x}^{2}-{a}^{2}}dx=\dfrac {1}{2a}\ln \left | \dfrac {x-a}{x+a} \right |+C \left ( \int \dfrac {1}{{a}^{2}-{x}^{2}}dx=\dfrac {1}{2a}\ln \left |\dfrac {x+a}{x-a} \right | +c\right )$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$\int \sqrt {{a}^{2}-{x}^{2}}dx=\dfrac {{a}^{2}}{2}\arcsin \dfrac {x}{a}+\dfrac {x}{2}\sqrt {{a}^{2}-{x}^{2}}+C(a\gt |x|\geqslant 0)$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$\int {\sin }^{2}xdx=\dfrac {x}{2}-\dfrac {\sin 2x}{4}+C \left({\sin }^{2}x=\dfrac {1-\cos 2x}{2}\right)$&lt;/p&gt;
+&lt;p&gt;$\int {\cos }^{2}xdx=\dfrac {x}{2}+\dfrac {\sin 2x}{4}+C \left ({\cos }^{2}x=\dfrac {1+\cos 2x}{2}\right )$&lt;/p&gt;
+&lt;p&gt;$\int {\tan }^{2}xdx=\tan x-x+C\left({\tan }^{2}x={\sec }^{2}x-1 \right )$&lt;/p&gt;
+&lt;p&gt;$\int {\cot }^{2}xdx=-\cot x-x+C \left ({\cot }^{2}x={\csc }^{2}x-1\right )$&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</content:encoded></item><item><title>Markdown 扩展功能</title><link>https://www.atsuko.top/posts/demo/markdown-extended/</link><guid isPermaLink="true">https://www.atsuko.top/posts/demo/markdown-extended/</guid><description>了解有关 Fuwari 中 Markdown 功能的更多信息</description><pubDate>Wed, 01 May 2024 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;GitHub 代码库卡片&lt;/h2&gt;
 &lt;p&gt;您可以添加链接到 GitHub 代码库的动态卡片，页面加载时，代码库信息将从 GitHub API 中提取。&lt;/p&gt;
 &lt;p&gt;::github{repo=&quot;Fabrizz/MMM-OnSpotify&quot;}&lt;/p&gt;
 &lt;p&gt;使用代码创建 GitHub 存储库卡 &lt;code&gt;::github{repo=&quot;&amp;lt;owner&amp;gt;/&amp;lt;repo&amp;gt;&quot;}&lt;/code&gt;.&lt;/p&gt;
