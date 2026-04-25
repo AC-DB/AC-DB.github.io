@@ -209,15 +209,15 @@ $$&lt;/p&gt;
 &lt;p&gt;例如，4位无符号数0001(+1)左移一位变为0010(+2)，相当于乘以2，未溢出；0001(+1)右移一位变为0000(0)，相当于除以2并舍弃小数部分。又如，1000(+8)左移一位变为0000(0)，相当于乘以2，但结果超出了4位无符号数的表示范围，发生溢出。&lt;/p&gt;
 &lt;h4&gt;2. 算术移位&lt;/h4&gt;
 &lt;p&gt;算术移位需要考虑符号位的问题，即将操作数视为&lt;code&gt;有符号整数&lt;/code&gt;。有符号整数采用补码表示，因此对于有符号整数的移位操作应采用&lt;code&gt;补码算术移位方式&lt;/code&gt;。算术移位的规则：&lt;strong&gt;左移时&lt;/strong&gt;，高位移出，低位补0。若移出的高位与原符号位不同（左移后符号位改变），则发生溢出。&lt;strong&gt;右移时&lt;/strong&gt;，低位移出，高位补符号位。若低位的1移出，则影响精度。&lt;/p&gt;
-&lt;p&gt;例如，4位补码0010(+2)左移一位变为0100(+4)，未溢出；1001(-7)左移一位变为0010 $[OCR存疑]$，符号由负变正，表明发生溢出（因为-14超出了4位补码的表示范围）。又如，1001(-7)右移一位变为1100(-4)，保留了符号位，但丢失了最低有效位，影响精度。&lt;/p&gt;
+&lt;p&gt;例如，4位补码0010(+2)左移一位变为0100(+4)，未溢出；1001(-7)左移一位变为0010，符号由负变正，表明发生溢出（因为-14超出了4位补码的表示范围）。又如，1001(-7)右移一位变为1100(-4)，保留了符号位，但丢失了最低有效位，影响精度。&lt;/p&gt;
 &lt;h3&gt;2.2.3 定点数的加减运算&lt;/h3&gt;
 &lt;h4&gt;1. 补码加减运算&lt;/h4&gt;
 &lt;p&gt;补码加减运算规则简单，易于硬件实现。补码加减运算的公式如下（设字长为 $n+1$）。&lt;/p&gt;
 &lt;p&gt;$$
-[A+B]&lt;em&gt;{补} = [A]&lt;/em&gt;{补} + [B]_{补}
+[A+B]&lt;em&gt;{\text{补}} = [A]&lt;/em&gt;{\text{补}} + [B]_{\text{补}}
 $$&lt;/p&gt;
 &lt;p&gt;$$
-[A-B]&lt;em&gt;{补} = [A]&lt;/em&gt;{补} + [-B]_{补}
+[A-B]&lt;em&gt;{\text{补}} = [A]&lt;/em&gt;{\text{补}} + [-B]_{\text{补}}
 $$&lt;/p&gt;
 &lt;p&gt;补码运算具有以下特点：&lt;/p&gt;
 &lt;ol&gt;
@@ -227,11 +227,11 @@ $$&lt;/p&gt;
 &lt;li&gt;运算结果自动截断为 $n+1$ 位（模 $2^{n+1}$ 运算），高位进位被丢弃。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;blockquote&gt;
-&lt;p&gt;&lt;strong&gt;【例2.3】&lt;/strong&gt; 设字长为8位（含1位符号位），$A=15$，$B=24$，求 $[A+B]&lt;em&gt;{补}$ 和 $[A-B]&lt;/em&gt;{补}$。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;【例2.3】&lt;/strong&gt; 设字长为8位（含1位符号位），$A=15$，$B=24$，求 $[A+B]&lt;em&gt;{\text{补}}$ 和 $[A-B]&lt;/em&gt;{\text{补}}$。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;解：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;$A=+0001111$，$B=+0011000$；求得 $[A]&lt;em&gt;{补}=00001111$，$[B]&lt;/em&gt;{补}=00011000$，$[-B]_{补}=11101000$。则：&lt;/p&gt;
-&lt;p&gt;$[A+B]&lt;em&gt;{补}=[A]&lt;/em&gt;{补}+[B]_{补}=00001111+00011000=00100111$ 符号位为0，真值为+39。&lt;/p&gt;
-&lt;p&gt;$[A-B]&lt;em&gt;{补}=[A]&lt;/em&gt;{补}+[-B]_{补}=00001111+11101000=11110111$ 符号位为1，真值为-9。&lt;/p&gt;
+&lt;p&gt;$A=+0001111$，$B=+0011000$；求得 $[A]&lt;em&gt;{\text{补}}=00001111$，$[B]&lt;/em&gt;{\text{补}}=00011000$，$[-B]_{\text{补}}=11101000$。则：&lt;/p&gt;
+&lt;p&gt;$[A+B]&lt;em&gt;{\text{补}}=[A]&lt;/em&gt;{\text{补}}+[B]_{\text{补}}=00001111+00011000=00100111$ 符号位为0，真值为+39。&lt;/p&gt;
+&lt;p&gt;$[A-B]&lt;em&gt;{\text{补}}=[A]&lt;/em&gt;{\text{补}}+[-B]_{\text{补}}=00001111+11101000=11110111$ 符号位为1，真值为-9。&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;h4&gt;2. 溢出判别方法&lt;/h4&gt;
 &lt;p&gt;补码加减运算仅在&lt;strong&gt;同号相加&lt;/strong&gt;或&lt;strong&gt;异号相减&lt;/strong&gt;时可能发生溢出。例如，两个正数相加结果为负，或一个负数减去一个正数结果为正。常用的溢出判别方法有以下三种。&lt;/p&gt;
@@ -271,7 +271,7 @@ $$&lt;/p&gt;
 &lt;p&gt;若X、Y被视为无符号数，则结果 $F=(X+Y) \bmod 2^n$。当 $X+Y \ge 2^n$ 时，产生进位 $C_{out}=1$，表示发生无符号溢出；此时，标志 $CF=C_{out}$ 反映进位状态。&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;若X、Y被视为有符号数($[X]&lt;em&gt;{补}$、$[Y]&lt;/em&gt;{补}$)，则结果 $F=[X+Y]_{补}$。此时，若两个操作数同号而结果异号（如正+正 $\to$ 负），则表示有符号溢出，由溢出标志OF指示。&lt;/p&gt;
+&lt;p&gt;若X、Y被视为有符号数($[X]&lt;em&gt;{\text{补}}$、$[Y]&lt;/em&gt;{\text{补}}$)，则结果 $F=[X+Y]_{\text{补}}$。此时，若两个操作数同号而结果异号（如正+正 $\to$ 负），则表示有符号溢出，由溢出标志OF指示。&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;h5&gt;(2) 减法运算的工作原理&lt;/h5&gt;
@@ -289,9 +289,9 @@ $$&lt;/p&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;若X、Y被视为有符号数 ($[X]&lt;em&gt;{补}$、$[Y]&lt;/em&gt;{补}$)，则该运算等价于 $[X-Y]&lt;em&gt;{补} = [X]&lt;/em&gt;{补} + [-Y]_{补}$：&lt;/p&gt;
+&lt;p&gt;若X、Y被视为有符号数 ($[X]&lt;em&gt;{\text{补}}$、$[Y]&lt;/em&gt;{\text{补}}$)，则该运算等价于 $[X-Y]&lt;em&gt;{\text{补}} = [X]&lt;/em&gt;{\text{补}} + [-Y]_{\text{补}}$：&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;结果F即为 $[X-Y]_{补}$。&lt;/li&gt;
+&lt;li&gt;结果F即为 $[X-Y]_{\text{补}}$。&lt;/li&gt;
 &lt;li&gt;若运算导致结果超出 $n$ 位补码表示范围（例如，正减负得负，或负减正得正），则发生有符号溢出，由溢出标志OF指示。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
@@ -314,11 +314,11 @@ $$&lt;/p&gt;
 &lt;/ul&gt;
 &lt;p&gt;综上&lt;strong&gt;判断规则如下&lt;/strong&gt;：当 $ZF=1$ 时（无须检查CF），说明 $A=B$；当 $ZF=0$ 且 $CF=0$ 时，说明 $A&amp;gt;B$；当 $CF=1$ 时（此时ZF必为0，无须额外检查），说明 $A&amp;lt;B$。&lt;/p&gt;
 &lt;h5&gt;(5) 有符号数大小的比较&lt;/h5&gt;
-&lt;p&gt;在有符号数运算中，&lt;strong&gt;零标志ZF、溢出标志OF和符号标志SF共同用于判断大小关系&lt;/strong&gt;。设A和B为两个有符号数，执行 $[A]&lt;em&gt;{补}-[B]&lt;/em&gt;{补}$，根据ZF、OF和SF的值可判断A和B的大小。&lt;/p&gt;
+&lt;p&gt;在有符号数运算中，&lt;strong&gt;零标志ZF、溢出标志OF和符号标志SF共同用于判断大小关系&lt;/strong&gt;。设A和B为两个有符号数，执行 $[A]&lt;em&gt;{\text{补}}-[B]&lt;/em&gt;{\text{补}}$，根据ZF、OF和SF的值可判断A和B的大小。&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;若 $A=B$。如 $[A]&lt;em&gt;{补}-[B]&lt;/em&gt;{补}=011-011=011+101=(1)000$，得 $ZF=1$, $OF = C_{3} \oplus C_{2} = 0$, $SF = 0$。&lt;/li&gt;
-&lt;li&gt;若 $A&amp;gt;B$。无溢出示例：$[A]&lt;em&gt;{补}-[B]&lt;/em&gt;{补}=010-001=010+111=(1)001$，得 $ZF=0$，$OF=0$，$SF=0$；有溢出示例：$[A]&lt;em&gt;{补}-[B]&lt;/em&gt;{补}=011-101=011+011=110$，得 $ZF=0$，$OF=1$，$SF=1$。&lt;/li&gt;
-&lt;li&gt;若 $A&amp;lt;B$。无溢出示例：$[A]&lt;em&gt;{补}-[B]&lt;/em&gt;{补}=000-001=000+111=111$，得 $ZF=0$，$OF=0$，$SF=1$；有溢出示例：$[A]&lt;em&gt;{补}-[B]&lt;/em&gt;{补}=101-011=101+101=(1)010$，得 $ZF=0$，$OF=1$，$SF=0$。&lt;/li&gt;
+&lt;li&gt;若 $A=B$。如 $[A]&lt;em&gt;{\text{补}}-[B]&lt;/em&gt;{\text{补}}=011-011=011+101=(1)000$，得 $ZF=1$, $OF = C_{3} \oplus C_{2} = 0$, $SF = 0$。&lt;/li&gt;
+&lt;li&gt;若 $A&amp;gt;B$。无溢出示例：$[A]&lt;em&gt;{\text{补}}-[B]&lt;/em&gt;{\text{补}}=010-001=010+111=(1)001$，得 $ZF=0$，$OF=0$，$SF=0$；有溢出示例：$[A]&lt;em&gt;{\text{补}}-[B]&lt;/em&gt;{\text{补}}=011-101=011+011=110$，得 $ZF=0$，$OF=1$，$SF=1$。&lt;/li&gt;
+&lt;li&gt;若 $A&amp;lt;B$。无溢出示例：$[A]&lt;em&gt;{\text{补}}-[B]&lt;/em&gt;{\text{补}}=000-001=000+111=111$，得 $ZF=0$，$OF=0$，$SF=1$；有溢出示例：$[A]&lt;em&gt;{\text{补}}-[B]&lt;/em&gt;{\text{补}}=101-011=101+101=(1)010$，得 $ZF=0$，$OF=1$，$SF=0$。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;综上，&lt;strong&gt;判断规则如下&lt;/strong&gt;：当 $ZF=1$ 时，说明 $A=B$；当 $ZF=0$ 且 $OF=SF$ (或 $OF \oplus SF = 0$) 时，说明 $A&amp;gt;B$；当 $ZF=0$ 且 $OF \neq SF$ (或 $OF \oplus SF = 1$) 时，说明 $A&amp;lt;B$。&lt;/p&gt;
 &lt;p&gt;:::note
