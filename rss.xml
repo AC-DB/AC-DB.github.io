@@ -104,6 +104,302 @@
 &lt;li&gt;不命中时的性能影响不同：Cache不命中需访问主存，延迟增加数十倍；而虚拟存储系统缺页需访问磁盘，延迟增加可达十万倍，对系统性能影响更为严重。&lt;/li&gt;
 &lt;li&gt;CPU可直接访问Cache和主存，Cache不命中时，硬件自动从主存取数据并装入Cache。辅存与CPU无直接通路，缺页时必须先将数据从辅存调入主存，之后CPU才能访问。&lt;/li&gt;
 &lt;/ol&gt;
+</content:encoded></item><item><title>4.1指令系统</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/41-instruction-system/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/41-instruction-system/</guid><pubDate>Sun, 03 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;4.1.1 指令集体系结构&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;机器指令&lt;/code&gt;（简称&lt;code&gt;指令&lt;/code&gt;）是指示计算机执行某种操作的命令。一台计算机的所有指令的集合构成该机的&lt;code&gt;指令系统&lt;/code&gt;，也称&lt;code&gt;指令集&lt;/code&gt;。指令系统是&lt;code&gt;指令集体系结构&lt;/code&gt;(ISA)中最核心的部分。ISA完整定义了软件与硬件之间的接口，是机器语言或汇编语言程序员必须掌握的基础。&lt;/p&gt;
+&lt;p&gt;ISA规定的内容主要包括：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;指令格式、寻址方式、操作类型，以及各操作所需操作数的个数、类型和寻址约束。&lt;/li&gt;
+&lt;li&gt;操作数的数据类型，以及是按大端还是小端方式存放。&lt;/li&gt;
+&lt;li&gt;程序可访问的寄存器编号、数量和位数，存储空间的大小及编址方式。&lt;/li&gt;
+&lt;li&gt;程序员可见的控制状态，如程序计数器、条件码的定义与行为等。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;ISA规定了机器级程序的格式，因此机器语言或汇编语言程序员必须熟悉所用机器的ISA。然而，大多数程序员使用高级语言（如C/C++/Java）编程，因其开发效率高且不易出错。但高级语言的抽象层较高，隐藏了许多机器级细节，导致程序员难以利用与硬件结构相关的优化手段提升性能。若能充分理解ISA及底层硬件特性，则能开发出性能更优的程序。&lt;/p&gt;
+&lt;h3&gt;4.1.2 指令的基本格式&lt;/h3&gt;
+&lt;p&gt;一条指令是机器语言的一个语句，由一组有意义的二进制代码组成。其基本格式如下：&lt;/p&gt;
+&lt;p&gt;| 操作码字段 | 地址码字段 |&lt;/p&gt;
+&lt;p&gt;其中，&lt;code&gt;操作码&lt;/code&gt;指明指令应执行的操作及功能，是识别指令、理解其作用以及确定地址码含义的关键，例如指示算术加法或减法、程序转移或返回等。&lt;code&gt;地址码&lt;/code&gt;给出被操作信息（指令或数据）的地址，包括源操作数地址、目的操作数地址、转移目标地址或子程序入口地址等。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;指令字长&lt;/code&gt;是指一条指令所包含的二进制位数，取决于操作码长度、地址码长度及地址码个数。在一个指令系统中，若所有指令字长相等，则称为&lt;code&gt;定长指令字结构&lt;/code&gt;。定长指令取指和译码简单，有利于流水线实现。若指令字长随功能而异，则称为&lt;code&gt;变长指令字结构&lt;/code&gt;。由于主存通常按字节编址，指令字长通常为字节的整数倍。&lt;/p&gt;
+&lt;p&gt;根据指令中操作数地址码数目的不同，可将指令分为以下几种格式。&lt;/p&gt;
+&lt;h4&gt;1. 零地址指令&lt;/h4&gt;
+&lt;p&gt;零地址：&lt;/p&gt;
+&lt;p&gt;| OP |&lt;/p&gt;
+&lt;p&gt;仅包含操作码，无显式地址。此类指令有两种情况：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;无须操作数的指令，如空操作、停机、关中断等。&lt;/li&gt;
+&lt;li&gt;用于堆栈计算机的运算指令，其操作数隐含从栈顶和次栈顶弹出，运算结果压回栈顶。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;2. 一地址指令&lt;/h4&gt;
+&lt;p&gt;一地址：&lt;/p&gt;
+&lt;p&gt;| OP | $A_1$ |&lt;/p&gt;
+&lt;p&gt;其具体形式由操作码决定，常见有两种：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;单操作数指令：按 $A_1$ 地址读取操作数，执行OP操作后结果存回 $A_1$。&lt;/p&gt;
+&lt;p&gt;指令含义：$\text{OP}(A_1) \to A_1$&lt;/p&gt;
+&lt;p&gt;如加1、减1、求反、求补、移位等。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;累加器型双操作数指令：$A_1$ 为源操作数地址，另一操作数隐含在ACC，结果存入ACC。&lt;/p&gt;
+&lt;p&gt;指令含义：$(\text{ACC}) \ \text{OP} \ (A_1) \to \text{ACC}$&lt;/p&gt;
+&lt;p&gt;若地址码为主存地址，完成一条一地址指令需3次访存（取指1次，取数1次，存结果1次）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;3. 二地址指令&lt;/h4&gt;
+&lt;p&gt;二地址：&lt;/p&gt;
+&lt;p&gt;| OP | $A_1$ | $A_2$ |&lt;/p&gt;
+&lt;p&gt;指令含义：$(A_1) \ \text{OP} \ (A_2) \to A_1$&lt;/p&gt;
+&lt;p&gt;二地址指令中，$A_1$ 为目的操作数地址（兼结果地址），$A_2$ 为源操作数地址。若地址码均为主存地址，完成一条二地址指令需4次访存（取指1次，取两个操作数2次，存结果1次）。&lt;/p&gt;
+&lt;h4&gt;4. 三地址指令&lt;/h4&gt;
+&lt;p&gt;三地址：&lt;/p&gt;
+&lt;p&gt;| OP | $A_1$ | $A_2$ | $A_3$ (结果) |&lt;/p&gt;
+&lt;p&gt;指令含义：$(A_1) \ \text{OP} \ (A_2) \to A_3$。&lt;/p&gt;
+&lt;p&gt;在三地址指令中，$A_1$ 和 $A_2$ 为两个源操作数地址，$A_3$ 为结果地址。若地址码均为主存地址，完成一条三地址指令需4次访存（取指1次，取两个操作数2次，存结果1次）。&lt;/p&gt;
+&lt;h3&gt;4.1.3 定长操作码指令格式&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;定长操作码指令&lt;/code&gt;在指令字的最高位部分分配&lt;strong&gt;固定位数&lt;/strong&gt;表示操作码。一个 $n$ 位操作码字段的指令系统&lt;strong&gt;最多可表示 $2^n$ 条指令&lt;/strong&gt;。定长操作码有利于简化硬件设计并提高译码速度。在字长为32位或更长的系统中，这种格式是常规用法。&lt;/p&gt;
+&lt;h3&gt;4.1.4 扩展操作码指令格式&lt;/h3&gt;
+&lt;p&gt;为在有限的指令字长内支持丰富的指令种类，常采用&lt;code&gt;可变长度操作码&lt;/code&gt;，即指令的操作码字段位数不固定，且分散在指令的不同位置。这增加了指令译码和分析的难度，使控制器设计更加复杂。最常见的变长操作码方法是&lt;code&gt;扩展操作码&lt;/code&gt;（见图4.1），它使&lt;strong&gt;操作码长度随地址码减少而增加&lt;/strong&gt;，不同地址数的指令有不同长度的操作码，从而有效缩短指令字长。&lt;/p&gt;
+&lt;p&gt;操作码的位数随地址数的减少而增加&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;OP&lt;/th&gt;
+&lt;th&gt;$A_1$&lt;/th&gt;
+&lt;th&gt;$A_2$&lt;/th&gt;
+&lt;th&gt;$A_3$&lt;/th&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;0000&lt;/td&gt;
+&lt;td&gt;$A_1$&lt;/td&gt;
+&lt;td&gt;$A_2$&lt;/td&gt;
+&lt;td&gt;$A_3$&lt;/td&gt;
+&lt;td&gt;4位操作码&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;0001&lt;/td&gt;
+&lt;td&gt;$A_1$&lt;/td&gt;
+&lt;td&gt;$A_2$&lt;/td&gt;
+&lt;td&gt;$A_3$&lt;/td&gt;
+&lt;td&gt;15条三地址指令&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1110&lt;/td&gt;
+&lt;td&gt;$A_1$&lt;/td&gt;
+&lt;td&gt;$A_2$&lt;/td&gt;
+&lt;td&gt;$A_3$&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;0000&lt;/td&gt;
+&lt;td&gt;$A_2$&lt;/td&gt;
+&lt;td&gt;$A_3$&lt;/td&gt;
+&lt;td&gt;8位操作码&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;0001&lt;/td&gt;
+&lt;td&gt;$A_2$&lt;/td&gt;
+&lt;td&gt;$A_3$&lt;/td&gt;
+&lt;td&gt;15条二地址指令&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;1110&lt;/td&gt;
+&lt;td&gt;$A_2$&lt;/td&gt;
+&lt;td&gt;$A_3$&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;0000&lt;/td&gt;
+&lt;td&gt;$A_3$&lt;/td&gt;
+&lt;td&gt;12位操作码&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;0001&lt;/td&gt;
+&lt;td&gt;$A_3$&lt;/td&gt;
+&lt;td&gt;15条一地址指令&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;1110&lt;/td&gt;
+&lt;td&gt;$A_3$&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;0000&lt;/td&gt;
+&lt;td&gt;16位操作码&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;0001&lt;/td&gt;
+&lt;td&gt;16条零地址指令&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;1111&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;图4.1 一种扩展操作码的安排方式&lt;/p&gt;
+&lt;p&gt;指令字长为16位，其中4位为基本操作码字段OP，另有3个4位长的地址字段 $A_1$、$A_2$和 $A_3$。若4位基本操作码全部用于三地址指令，则最多支持16条指令。实际使用了15条三地址指令，保留1111作为扩展操作码；对于二地址指令，保留1111 1111作为扩展操作码，共15条；对于一地址指令，保留1111 1111 1111作为扩展操作码，共15条；零地址指令共16条。&lt;/p&gt;
+&lt;p&gt;除这种安排外，还有其他多种扩展方法，例如形成15条三地址指令、12条二地址指令、63条一地址指令和16条零地址指令，共106条指令，请读者自行分析。&lt;/p&gt;
+&lt;p&gt;在设计扩展操作码指令格式时，必须注意以下两点：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;不允许短操作码成为长操作码的前缀&lt;/strong&gt;，即短操作码不能与长操作码的前面部分相同。&lt;/li&gt;
+&lt;li&gt;各指令的操作码一定不能重复。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;通常情况下，对使用频率较高的指令分配较短的操作码，对使用频率较低的指令分配较长的操作码，从而尽可能减少指令译码和分析的时间。&lt;/p&gt;
+&lt;h3&gt;4.1.5 指令的类型&lt;/h3&gt;
+&lt;p&gt;设计指令系统时必须考虑应提供哪些操作类型，指令按功能可分为以下几种。&lt;/p&gt;
+&lt;h4&gt;1. 数据传送指令&lt;/h4&gt;
+&lt;p&gt;传送指令主要有寄存器之间的传送(MOV)、从内存单元读取数据到CPU寄存器(LOAD)、从CPU寄存器写数据到内存单元(STORE)、进栈操作(PUSH)、出栈操作(POP)等。&lt;/p&gt;
+&lt;h4&gt;2. 算术和逻辑运算指令&lt;/h4&gt;
+&lt;p&gt;算术和逻辑运算指令主要有加(ADD)、减(SUB)、乘(MUL)、除(DIV)、加1(INC)、减1(DEC)、与(AND)、或(OR)、取反(NOT)、异或(XOR)等。&lt;/p&gt;
+&lt;h4&gt;3. 移位操作指令&lt;/h4&gt;
+&lt;p&gt;移位指令主要有算术移位、逻辑移位、循环移位等。&lt;/p&gt;
+&lt;h4&gt;4. 顺序控制指令&lt;/h4&gt;
+&lt;p&gt;顺序控制指令主要有无条件转移(JMP)、条件转移(BRANCH)、调用(CALL)、返回(RET)、陷阱(TRAP)等。无条件转移指令在任何情况下都执行转移操作，而条件转移指令仅在特定条件满足时执行转移操作，转移条件通常是某个标志位的值或多个标志位的组合。&lt;/p&gt;
+&lt;p&gt;调用指令与转移指令的区别在于：调用指令会保存下一条指令的地址（返回地址），以便子程序执行结束后能返回到主程序继续执行；而转移指令则不返回。&lt;/p&gt;
+&lt;h4&gt;5. 输入输出指令&lt;/h4&gt;
+&lt;p&gt;输入输出指令用于完成CPU与外部设备交换数据或传送控制命令及状态信息。&lt;/p&gt;
+&lt;h4&gt;6. CPU控制指令&lt;/h4&gt;
+&lt;p&gt;CPU控制指令主要有停机、开中断、关中断、系统模式切换以及进入特殊处理程序等。这类指令只能在操作系统内核代码中使用，以防止用户误用，对系统运行造成危害。&lt;/p&gt;
+</content:encoded></item><item><title>4.2寻址方式</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/42-addressing-method/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/42-addressing-method/</guid><pubDate>Sun, 03 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;&lt;code&gt;寻址方式&lt;/code&gt;是指确定指令或操作数有效地址的方法，包括确定下一条待执行指令的地址以及本条指令所需操作数的地址。寻址方式分为&lt;strong&gt;指令寻址&lt;/strong&gt;和&lt;strong&gt;数据寻址&lt;/strong&gt;两大类。&lt;/p&gt;
+&lt;h3&gt;4.2.1 指令寻址和数据寻址&lt;/h3&gt;
+&lt;p&gt;确定下一条将要执行的指令地址称为&lt;code&gt;指令寻址&lt;/code&gt;；确定本条指令操作数地址称为&lt;code&gt;数据寻址&lt;/code&gt;。&lt;/p&gt;
+&lt;h4&gt;1. 指令寻址&lt;/h4&gt;
+&lt;p&gt;指令寻址有两种方式：&lt;strong&gt;顺序寻址&lt;/strong&gt;和&lt;strong&gt;跳跃寻址&lt;/strong&gt;。&lt;/p&gt;
+&lt;h5&gt;(1) 顺序寻址&lt;/h5&gt;
+&lt;p&gt;通过&lt;strong&gt;程序计数器(PC)加上当前指令的字节长度&lt;/strong&gt;，自动形成下一条指令地址。&lt;/p&gt;
+&lt;p&gt;:::note
+PC自增的大小与编址方式和指令字长有关。现代计算机通常按字节编址，若指令字长为16位(2字节)，则PC自增为(PC)+2；若指令字长为32位(4字节)，则PC自增为(PC)+4。
+:::&lt;/p&gt;
+&lt;h5&gt;(2) 跳跃寻址&lt;/h5&gt;
+&lt;p&gt;通过转移类指令实现。是否发生转移通常由状态寄存器中的条件码决定，&lt;strong&gt;转移目标地址由指令给出&lt;/strong&gt;。转移方式分为：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;绝对转移&lt;/code&gt;，地址码直接给出目标地址；&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;相对转移&lt;/code&gt;，地址码给出相对于当前PC值的偏移量。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;无论何种方式，转移指令的执行结果都是修改PC的值，CPU随后根据新的PC从主存取出下一条指令。&lt;/p&gt;
+&lt;h4&gt;2. 数据寻址&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;数据寻址&lt;/code&gt;指如何在指令中表示或计算操作数的地址。为区分不同寻址方式，指令字中通常设有&lt;code&gt;寻址特征&lt;/code&gt;字段，其位数决定了可支持的寻址方式种类。典型指令格式如下：&lt;/p&gt;
+&lt;p&gt;| 操作码 | 寻址特征 | 形式地址A |&lt;/p&gt;
+&lt;p&gt;指令中的地址码字段所包含的地址称为&lt;code&gt;形式地址&lt;/code&gt;(A)，它不代表操作数的真实地址；真实地址需通过寻址方式由形式地址计算得出，称为&lt;code&gt;有效地址&lt;/code&gt;(EA)。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;若为&lt;code&gt;立即寻址&lt;/code&gt;，则形式地址的位数决定了操作数的取值范围。&lt;/li&gt;
+&lt;li&gt;若为&lt;code&gt;直接寻址&lt;/code&gt;，则形式地址的位数决定了可寻址的存储空间大小。&lt;/li&gt;
+&lt;li&gt;若为&lt;code&gt;寄存器寻址&lt;/code&gt;，则形式地址的位数决定了通用寄存器的最大数量。&lt;/li&gt;
+&lt;li&gt;若为&lt;code&gt;寄存器间接寻址&lt;/code&gt;，则寄存器的位数决定了可寻址空间大小。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;:::note
+(A)表示地址A处所存放的内容，A可以是寄存器编号或内存地址。
+:::&lt;/p&gt;
+&lt;h3&gt;4.2.2 常见的数据寻址方式&lt;/h3&gt;
+&lt;h4&gt;1. 隐含寻址&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;隐含寻址&lt;/code&gt;是指指令中不显式给出操作数地址，而将操作数地址隐含在特定寄存器中。例如，在累加器型结构中，单地址指令仅显式指定一个操作数地址，另一个操作数默认来自累加器(ACC)，运算结果也通常存回ACC。&lt;/p&gt;
+&lt;p&gt;优点是可有效缩短指令字长；缺点是依赖存储隐含操作数的硬件（如ACC）。&lt;/p&gt;
+&lt;h4&gt;2. 立即（数）寻址&lt;/h4&gt;
+&lt;p&gt;在立即寻址中，指令的形式地址字段并不表示操作数的地址，而是直接存放操作数本身，称为立即数，通常以&lt;strong&gt;补码&lt;/strong&gt;形式表示。#表示立即寻址特征，A即为立即数。&lt;/p&gt;
+&lt;p&gt;优点是操作数已包含在指令中，执行阶段无须访问存储器，&lt;strong&gt;指令执行速度最快&lt;/strong&gt;；缺点是立即数的大小受限于形式地址字段的位数，寻址范围非常有限。&lt;/p&gt;
+&lt;h4&gt;3. 直接寻址&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;直接寻址&lt;/code&gt;是指指令中的形式地址A就是操作数的真实地址EA，即EA=A。&lt;/p&gt;
+&lt;p&gt;优点是&lt;strong&gt;实现简单&lt;/strong&gt;，无须额外计算操作数地址，执行阶段只需访存一次；缺点是形式地址A的位数限制了寻址范围，且地址固定，难以动态修改。&lt;/p&gt;
+&lt;p&gt;例如，若形式地址字段占24位，则直接寻址范围为 $2^{24}=16\text{M}$。&lt;/p&gt;
+&lt;h4&gt;4. 间接寻址&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;间接寻址&lt;/code&gt;是相对于直接寻址而言的，指令中的形式地址A并不直接给出操作数的有效地址，而是指向一个主存单元，该单元中存放操作数的有效地址，即EA=(A)。&lt;/p&gt;
+&lt;p&gt;优点是&lt;strong&gt;可扩大寻址范围&lt;/strong&gt;(有效地址EA的位数通常大于形式地址A的位数，由存储字长决定)，并支持地址动态生成(如实现指针和转移表)；缺点是指令执行阶段需&lt;strong&gt;多次访存&lt;/strong&gt;(一次间址需2次访存)。由于访存开销较大，若需兼顾寻址范围与执行效率，通常采用寄存器间接寻址。&lt;/p&gt;
+&lt;h4&gt;5. 寄存器寻址&lt;/h4&gt;
+&lt;p&gt;与直接寻址类似，&lt;code&gt;寄存器寻址&lt;/code&gt;将操作数存放在寄存器中，指令的地址字段给出的是操作数所在寄存器的编号，即 $EA=R_i$，操作数位于由 $R_i$ 指定的寄存器内。例如，若CPU有32个通用寄存器，则寄存器编号需5位，形式地址字段仅需5位即可寻址全部寄存器。&lt;/p&gt;
+&lt;p&gt;优点是执行阶段&lt;strong&gt;无须访存&lt;/strong&gt;，仅访问寄存器，&lt;strong&gt;执行速度快&lt;/strong&gt;；且因寄存器数量远少于内存单元，地址码位数较少，有助于缩短指令字长；缺点是寄存器成本高，CPU中可用寄存器数量有限。&lt;/p&gt;
+&lt;h4&gt;6. 寄存器间接寻址&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;寄存器间接寻址&lt;/code&gt;结合了间接寻址和寄存器寻址的特点，指令中的 $R_i$ 所指寄存器中存放的不是一个操作数，而是操作数所在主存单元的地址，即 $EA=(R_i)$。&lt;/p&gt;
+&lt;p&gt;相比间接寻址，寄存器间接寻址在执行阶段&lt;strong&gt;只需一次访存&lt;/strong&gt;，减少了访存开销；同时，由于该方式使用寄存器来存储有效地址，其寻址范围不受形式地址字段位数限制，从而扩大了寻址范围。相比寄存器寻址，这种方式在执行阶段需要从主存获取操作数，增加了访存需求。&lt;/p&gt;
+&lt;h4&gt;7. 相对寻址&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;相对寻址&lt;/code&gt;是指将程序计数器(PC)的内容与指令中的形式地址A相加，形成转移目标地址，即EA=(PC)+A。其中，PC为取指完成后自动更新的值，指向下一条指令的地址；A是相对于该PC值的&lt;code&gt;偏移量&lt;/code&gt;，可正可负，通常以&lt;strong&gt;补码&lt;/strong&gt;表示。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;相对寻址主要用于转移类指令&lt;/strong&gt;，形式地址A的位数决定了转移范围。例如，假设某机器按字节编址，指令长度为2B。一条相对转移指令(JMP A)位于地址1000H，其形式地址A=0005H(补码表示)，则取指完成后PC=1002H，实际转移目标地址为1002H+0005H=1007H。&lt;/p&gt;
+&lt;p&gt;优点是目标地址不固定，而是相对于当前指令位置偏移，因此程序可在内存中任意浮动而不影响转移正确性，便于实现重定位和共享代码。&lt;/p&gt;
+&lt;h4&gt;8. 基址寻址&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;基址寻址&lt;/code&gt;是指将基址寄存器(BR)的内容与指令中的形式地址A相加，形成操作数的有效地址，即EA=(BR)+A，如图4.9所示。BR可以是专用基址寄存器或指定的通用寄存器。&lt;/p&gt;
+&lt;p&gt;在多道程序环境下，&lt;strong&gt;基址寄存器的内容由操作系统设定&lt;/strong&gt;，在程序执行期间保持不变(作为基地址)，而形式地址A作为偏移量，由用户程序指定并可根据需要变化。当使用通用寄存器作为基址寄存器时，尽管用户可选择哪个寄存器扮演此角色，但其内容仍由操作系统控制。&lt;/p&gt;
+&lt;p&gt;优点是：可扩大寻址范围（因基址寄存器位数通常大于形式地址A），能访问更大的地址空间；简化编程，用户无须关注程序在主存的具体位置，有利于多道程序设计和浮动程序的实现。缺点是：形式地址A的位数较短，限制了偏移量的范围。&lt;/p&gt;
+&lt;h4&gt;9. 变址寻址&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;变址寻址&lt;/code&gt;是指将变址寄存器(IX)的内容与指令中的形式地址A相加，形成操作数的有效地址，即EA=(IX)+A。IX可以是专用变址寄存器或指定的通用寄存器。&lt;/p&gt;
+&lt;p&gt;变址寄存器面向用户，其内容（作为偏移量）可以在程序执行中&lt;strong&gt;由用户动态修改&lt;/strong&gt;，而形式地址A(作为基地址)保持不变。该方式不仅扩大了寻址范围，还特别适用于数组等数据结构的处理——通过调整IX的值，可高效访问数组中任意元素，非常适合编写循环程序。例如，假设数组B首地址为1000H，存储在形式地址A中；变址寄存器IX初始为0。要访问B[3]元素（每个元素占4B），可将IX置为 $0\text{CH}(3\times4=12)$，则该元素 $EA=(IX)+A = 0\text{CH} + 1000\text{H} = 100\text{CH}$。&lt;/p&gt;
+&lt;p&gt;尽管变址寻址与基址寻址均通过“&lt;strong&gt;寄存器内容+形式地址&lt;/strong&gt;”生成有效地址，但二者&lt;strong&gt;本质不同&lt;/strong&gt;：基址寻址&lt;strong&gt;面向系统&lt;/strong&gt;，基址寄存器(BR)的内容由操作系统设定且运行时不可变，用于支持多道程序和存储分配；而变址寻址&lt;strong&gt;面向用户&lt;/strong&gt;，IX的值可由程序动态调整，用于灵活的数据访问。&lt;/p&gt;
+&lt;p&gt;相对寻址、基址寻址和变址寻址均属于&lt;code&gt;偏移寻址&lt;/code&gt;，其共同特点是通过某个寄存器的值与形式地址相加来确定操作数的有效地址，便于统一理解和应用。&lt;/p&gt;
+&lt;h4&gt;10. 堆栈寻址&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;堆栈&lt;/code&gt;是存储器（或寄存器组）中一块按后进先出原则管理的特定存储区，其读/写单元的地址由一个称为&lt;code&gt;堆栈指针&lt;/code&gt;(SP)的特定寄存器给出。堆栈可分为两类：&lt;code&gt;硬堆栈&lt;/code&gt;由高速寄存器构成，成本较高，容量较小；&lt;code&gt;软堆栈&lt;/code&gt;则是从主存中划分一段区域实现，更为经济实用。&lt;/p&gt;
+&lt;p&gt;在采用堆栈结构的计算机中，多数指令表面上表现为无操作数形式，因为其操作数地址由SP隐含指定。在访问堆栈时，SP会自动更新以指向新的栈顶位置。&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;上述各寻址方式的有效地址计算方法及访存次数（不含取本条指令）的总结见表4.1。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;表4.1 寻址方式、有效地址及访存次数&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;寻址方式&lt;/th&gt;
+&lt;th&gt;有效地址&lt;/th&gt;
+&lt;th&gt;访存次数&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;立即寻址&lt;/td&gt;
+&lt;td&gt;A即是操作数&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;直接寻址&lt;/td&gt;
+&lt;td&gt;EA=A&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;一次间接寻址&lt;/td&gt;
+&lt;td&gt;EA=(A)&lt;/td&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;寄存器寻址&lt;/td&gt;
+&lt;td&gt;EA=$R_i$&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;寄存器间接一次寻址&lt;/td&gt;
+&lt;td&gt;EA=($R_i$)&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;相对寻址&lt;/td&gt;
+&lt;td&gt;EA=(PC)+A&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;基址寻址&lt;/td&gt;
+&lt;td&gt;EA=(BR)+A&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;变址寻址&lt;/td&gt;
+&lt;td&gt;EA=(IX)+A&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 </content:encoded></item><item><title>3.7第三章总结</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/chapter-3-summary/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/chapter-3-summary/</guid><pubDate>Sun, 03 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;3.7 本章小结&lt;/h2&gt;
 &lt;p&gt;本章开头提出的问题的参考答案如下。&lt;/p&gt;
 &lt;ol&gt;
@@ -800,17 +1096,21 @@ $$&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：利用sizeof关键字可以&lt;code&gt;统计数据类型所占内存大小&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;语法&lt;/strong&gt;： &lt;code&gt;sizeof( 数据类型 / 变量)&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;int main() {
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
 
-	cout &amp;lt;&amp;lt; &quot;short 类型所占内存空间为： &quot; &amp;lt;&amp;lt; sizeof(short) &amp;lt;&amp;lt; endl;
+int main() {
 
-	cout &amp;lt;&amp;lt; &quot;int 类型所占内存空间为： &quot; &amp;lt;&amp;lt; sizeof(int) &amp;lt;&amp;lt; endl;
+	// 整型： short(2) int(4) long(4) long long(8)
+	// 使用sizeof求数据类型占用内存大小
+	// 语法：sizeof（数据类型/变量）
 
-	cout &amp;lt;&amp;lt; &quot;long 类型所占内存空间为： &quot; &amp;lt;&amp;lt; sizeof(long) &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;short 类型所占内存空间为： &quot; &amp;lt;&amp;lt; sizeof(short) &amp;lt;&amp;lt; std::endl;
 
-	cout &amp;lt;&amp;lt; &quot;long long 类型所占内存空间为： &quot; &amp;lt;&amp;lt; sizeof(long long) &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;int 类型所占内存空间为： &quot; &amp;lt;&amp;lt; sizeof(int) &amp;lt;&amp;lt; std::endl;
 
-	system(&quot;pause&quot;);
+	std::cout &amp;lt;&amp;lt; &quot;long 类型所占内存空间为： &quot; &amp;lt;&amp;lt; sizeof(long) &amp;lt;&amp;lt; std::endl;
+
+	std::cout &amp;lt;&amp;lt; &quot;long long 类型所占内存空间为： &quot; &amp;lt;&amp;lt; sizeof(long long) &amp;lt;&amp;lt; std::endl;
 
 	return 0;
 }
@@ -846,25 +1146,27 @@ $$&lt;/p&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;int main() {
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
 
+int main() {
+
+	// 1.单精度 float
+	// 2.双精度 double
 	float f1 = 3.14f;
 	double d1 = 3.14;
 
-	cout &amp;lt;&amp;lt; f1 &amp;lt;&amp;lt; endl;
-	cout &amp;lt;&amp;lt; d1&amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;f1=&quot; &amp;lt;&amp;lt; f1 &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;d1=&quot; &amp;lt;&amp;lt; d1 &amp;lt;&amp;lt; std::endl;
 
-	cout &amp;lt;&amp;lt; &quot;float  sizeof = &quot; &amp;lt;&amp;lt; sizeof(f1) &amp;lt;&amp;lt; endl;
-	cout &amp;lt;&amp;lt; &quot;double sizeof = &quot; &amp;lt;&amp;lt; sizeof(d1) &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;float  sizeof = &quot; &amp;lt;&amp;lt; sizeof(f1) &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;double sizeof = &quot; &amp;lt;&amp;lt; sizeof(d1) &amp;lt;&amp;lt; std::endl;
 
 	//科学计数法
 	float f2 = 3e2; // 3 * 10 ^ 2 
-	cout &amp;lt;&amp;lt; &quot;f2 = &quot; &amp;lt;&amp;lt; f2 &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;f2 = &quot; &amp;lt;&amp;lt; f2 &amp;lt;&amp;lt; std::endl;
 
 	float f3 = 3e-2;  // 3 * 0.1 ^ 2
-	cout &amp;lt;&amp;lt; &quot;f3 = &quot; &amp;lt;&amp;lt; f3 &amp;lt;&amp;lt; endl;
-
-	system(&quot;pause&quot;);
+	std::cout &amp;lt;&amp;lt; &quot;f3 = &quot; &amp;lt;&amp;lt; f3 &amp;lt;&amp;lt; std::endl;
 
 	return 0;
 }
@@ -883,20 +1185,27 @@ $$&lt;/p&gt;
 &lt;li&gt;字符型变量并不是把字符本身放到内存中存储，而是将对应的ASCII编码放入到存储单元&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;示例：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;int main() {
-	
-	char ch = &apos;a&apos;;
-	cout &amp;lt;&amp;lt; ch &amp;lt;&amp;lt; endl;
-	cout &amp;lt;&amp;lt; sizeof(char) &amp;lt;&amp;lt; endl;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
 
+int main() {
+
+	//1.创建方式
+	char ch = &apos;a&apos;;
+	std::cout &amp;lt;&amp;lt; ch &amp;lt;&amp;lt; std::endl;
+
+	//2.内存大小
+	std::cout &amp;lt;&amp;lt; sizeof(char) &amp;lt;&amp;lt; std::endl;
+
+	//3.常见错误
 	//ch = &quot;abcde&quot;; //错误，不可以用双引号
 	//ch = &apos;abcde&apos;; //错误，单引号内只能引用一个字符
 
-	cout &amp;lt;&amp;lt; (int)ch &amp;lt;&amp;lt; endl;  //查看字符a对应的ASCII码
+	//4.对应的ASCII码 
+	// a - 97
+	// A - 65
+	std::cout &amp;lt;&amp;lt; (int)ch &amp;lt;&amp;lt; std::endl;  //查看字符a对应的ASCII码
 	ch = 97; //可以直接用ASCII给字符型变量赋值
-	cout &amp;lt;&amp;lt; ch &amp;lt;&amp;lt; endl;
-
-	system(&quot;pause&quot;);
+	std::cout &amp;lt;&amp;lt; ch &amp;lt;&amp;lt; std::endl;
 
 	return 0;
 }
@@ -1328,20 +1637,25 @@ $$&lt;/p&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;示例：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;int main() {
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
 
-	// 打印反斜杠
-	cout &amp;lt;&amp;lt; &quot;\\&quot; &amp;lt;&amp;lt; endl;
+int main() {
 
-	// 水平制表符
-	cout &amp;lt;&amp;lt; &quot;aa\tHello&quot; &amp;lt;&amp;lt; endl;
-	cout &amp;lt;&amp;lt; &quot;aaaa\tHello&quot; &amp;lt;&amp;lt; endl;
-	cout &amp;lt;&amp;lt; &quot;a\tHello&quot; &amp;lt;&amp;lt; endl;
+	// 转义字符
 
 	// 换行
-	cout &amp;lt;&amp;lt; &quot;\n&quot; &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;\n&quot; &amp;lt;&amp;lt; std::endl;
 
-	system(&quot;pause&quot;);
+	// 打印反斜杠
+	std::cout &amp;lt;&amp;lt; &quot;\\&quot; &amp;lt;&amp;lt; std::endl;
+
+	// 水平制表符 （8个空格）
+	std::cout &amp;lt;&amp;lt; &quot;aa\tHello&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;aaaa\tHello&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;a\tHello&quot; &amp;lt;&amp;lt; std::endl;
+
+	// 换行
+	std::cout &amp;lt;&amp;lt; &quot;\n&quot; &amp;lt;&amp;lt; std::endl;
 
 	return 0;
 }
@@ -1349,44 +1663,26 @@ $$&lt;/p&gt;
 &lt;h3&gt;2.6 字符串型&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：用于表示一串字符&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;两种风格&lt;/strong&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;C风格字符串&lt;/strong&gt;： &lt;code&gt;char 变量名[] = &quot;字符串值&quot;&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;示例：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;int main() {
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
 
-	char str1[] = &quot;hello world&quot;;
-	cout &amp;lt;&amp;lt; str1 &amp;lt;&amp;lt; endl;
-    
-	system(&quot;pause&quot;);
+int main() {
 
-	return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;注意：C风格的字符串要用双引号括起来&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;C++风格字符串&lt;/strong&gt;：  &lt;code&gt;string  变量名 = &quot;字符串值&quot;&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;示例：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;int main() {
+	// 1.C语言风格
+	// 注意 char 字符串名 []
+	// 注意 等号后面要双引号
+	char str[] = &quot;hello world&quot;;
+	std::cout &amp;lt;&amp;lt; str &amp;lt;&amp;lt; std::endl;
 
-	string str = &quot;hello world&quot;;
-	cout &amp;lt;&amp;lt; str &amp;lt;&amp;lt; endl;
-	
-	system(&quot;pause&quot;);
+	// 2.C++风格
+	// 包含头文件 &amp;lt;string&amp;gt;
+	// 注意string要使用 std::string 
+	std::string str2 = &quot;hello world&quot;;
+	std::cout &amp;lt;&amp;lt; str2 &amp;lt;&amp;lt; std::endl;
 
 	return 0;
 }
 &lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;注意：C++风格字符串，需要加入头文件&lt;code&gt;#include\&amp;lt;string&amp;gt;&lt;/code&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
 &lt;h3&gt;2.7 布尔类型 bool&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：布尔数据类型代表真或假的值&lt;/p&gt;
 &lt;p&gt;bool类型只有两个值：&lt;/p&gt;
@@ -1396,17 +1692,19 @@ $$&lt;/p&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;strong&gt;bool类型占&lt;code&gt;1个字节&lt;/code&gt;大小&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;示例：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;int main() {
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
 
-	bool flag = true;
-	cout &amp;lt;&amp;lt; flag &amp;lt;&amp;lt; endl; // 1
+int main() {
+
+	// 1. 创建bool型数据
+	bool flag = true; 
+	std::cout &amp;lt;&amp;lt; flag &amp;lt;&amp;lt; std::endl; // 1
 
 	flag = false;
-	cout &amp;lt;&amp;lt; flag &amp;lt;&amp;lt; endl; // 0
+	std::cout &amp;lt;&amp;lt; flag &amp;lt;&amp;lt; std::endl; // 0
 
-	cout &amp;lt;&amp;lt; &quot;size of bool = &quot; &amp;lt;&amp;lt; sizeof(bool) &amp;lt;&amp;lt; endl; //1
-	
-	system(&quot;pause&quot;);
+	// 2. bool类型占用空间
+	std::cout &amp;lt;&amp;lt; &quot;size of bool = &quot; &amp;lt;&amp;lt; sizeof(bool) &amp;lt;&amp;lt; std::endl; //1
 
 	return 0;
 }
@@ -1416,39 +1714,42 @@ $$&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;关键字&lt;/strong&gt;：cin&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;语法&lt;/strong&gt;： &lt;code&gt;cin &amp;gt;&amp;gt; 变量 &lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;示例：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;int main(){
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+int main() {
 
 	//整型输入
 	int a = 0;
-	cout &amp;lt;&amp;lt; &quot;请输入整型变量：&quot; &amp;lt;&amp;lt; endl;
-	cin &amp;gt;&amp;gt; a;
-	cout &amp;lt;&amp;lt; a &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;请输入整型变量：&quot; &amp;lt;&amp;lt; std::endl;
+	std::cin &amp;gt;&amp;gt; a;
+	std::cout &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
 
 	//浮点型输入
 	double d = 0;
-	cout &amp;lt;&amp;lt; &quot;请输入浮点型变量：&quot; &amp;lt;&amp;lt; endl;
-	cin &amp;gt;&amp;gt; d;
-	cout &amp;lt;&amp;lt; d &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;请输入浮点型变量：&quot; &amp;lt;&amp;lt; std::endl;
+	std::cin &amp;gt;&amp;gt; d;
+	std::cout &amp;lt;&amp;lt; d &amp;lt;&amp;lt; std::endl;
 
 	//字符型输入
 	char ch = 0;
-	cout &amp;lt;&amp;lt; &quot;请输入字符型变量：&quot; &amp;lt;&amp;lt; endl;
-	cin &amp;gt;&amp;gt; ch;
-	cout &amp;lt;&amp;lt; ch &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;请输入字符型变量：&quot; &amp;lt;&amp;lt; std::endl;
+	std::cin &amp;gt;&amp;gt; ch;
+	std::cout &amp;lt;&amp;lt; ch &amp;lt;&amp;lt; std::endl;
 
 	//字符串型输入
-	string str;
-	cout &amp;lt;&amp;lt; &quot;请输入字符串型变量：&quot; &amp;lt;&amp;lt; endl;
-	cin &amp;gt;&amp;gt; str;
-	cout &amp;lt;&amp;lt; str &amp;lt;&amp;lt; endl;
+	std::string str;
+	std::cout &amp;lt;&amp;lt; &quot;请输入字符串型变量：&quot; &amp;lt;&amp;lt; std::endl;
+	std::cin &amp;gt;&amp;gt; str;
+	std::cout &amp;lt;&amp;lt; str &amp;lt;&amp;lt; std::endl;
 
 	//布尔类型输入
 	bool flag = true;
-	cout &amp;lt;&amp;lt; &quot;请输入布尔型变量：&quot; &amp;lt;&amp;lt; endl;
-	cin &amp;gt;&amp;gt; flag;
-	cout &amp;lt;&amp;lt; flag &amp;lt;&amp;lt; endl;
-	system(&quot;pause&quot;);
-	return EXIT_SUCCESS;
+	std::cout &amp;lt;&amp;lt; &quot;请输入布尔型变量：&quot; &amp;lt;&amp;lt; std::endl;
+	std::cin &amp;gt;&amp;gt; flag;
+	std::cout &amp;lt;&amp;lt; flag &amp;lt;&amp;lt; std::endl;
+
+	return 0;
 }
 &lt;/code&gt;&lt;/pre&gt;
 </content:encoded></item><item><title>1.3运算符</title><link>https://www.atsuko.top/posts/dark-horse/c/introduction/13-operator/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c/introduction/13-operator/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：用于执行代码的运算&lt;/p&gt;
@@ -2419,13 +2720,10 @@ $$&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;assets/1541384140042.png&quot; alt=&quot;1541384140042&quot; /&gt;&lt;/p&gt;
 &lt;h4&gt;1.1.3 编写代码&lt;/h4&gt;
 &lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
-using namespace std;
 
 int main() {
 
-	cout &amp;lt;&amp;lt; &quot;Hello world&quot; &amp;lt;&amp;lt; endl;
-
-	system(&quot;pause&quot;);
+	std::cout &amp;lt;&amp;lt; &quot;Hello World&quot; &amp;lt;&amp;lt; std::endl;
 
 	return 0;
 }
@@ -2455,18 +2753,20 @@ int main() {
 &lt;p&gt;&lt;strong&gt;语法&lt;/strong&gt;：&lt;code&gt;数据类型 变量名 = 初始值;&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
-using namespace std;
 
 int main() {
+
+	//单行注释
+	/*
+		多行注释
+	*/
 
 	//变量的定义
 	//语法：数据类型  变量名 = 初始值
 
 	int a = 10;
 
-	cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; endl;
-	
-	system(&quot;pause&quot;);
+	std::cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
 
 	return 0;
 }
@@ -2492,21 +2792,21 @@ int main() {
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;//1、宏常量
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//1、宏常量
 #define day 7
 
 int main() {
 
-	cout &amp;lt;&amp;lt; &quot;一周里总共有 &quot; &amp;lt;&amp;lt; day &amp;lt;&amp;lt; &quot; 天&quot; &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;一周里总共有 &quot; &amp;lt;&amp;lt; day &amp;lt;&amp;lt; &quot; 天&quot; &amp;lt;&amp;lt; std::endl;
 	//day = 8;  //报错，宏常量不可以修改
 
 	//2、const修饰变量
 	const int month = 12;
-	cout &amp;lt;&amp;lt; &quot;一年里总共有 &quot; &amp;lt;&amp;lt; month &amp;lt;&amp;lt; &quot; 个月份&quot; &amp;lt;&amp;lt; endl;
+
+	std::cout &amp;lt;&amp;lt; &quot;一年里总共有 &quot; &amp;lt;&amp;lt; month &amp;lt;&amp;lt; &quot; 个月份&quot; &amp;lt;&amp;lt; std::endl;
 	//month = 24; //报错，常量是不可以修改的
-	
-	
-	system(&quot;pause&quot;);
 
 	return 0;
 }
