@@ -1861,33 +1861,32 @@ int main() {
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;p&gt;&lt;strong&gt;示例1&lt;/strong&gt;：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;//加减乘除
+&lt;p&gt;&lt;strong&gt;示例1: 加减乘除&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
 int main() {
 
 	int a1 = 10;
 	int b1 = 3;
 
-	cout &amp;lt;&amp;lt; a1 + b1 &amp;lt;&amp;lt; endl;
-	cout &amp;lt;&amp;lt; a1 - b1 &amp;lt;&amp;lt; endl;
-	cout &amp;lt;&amp;lt; a1 * b1 &amp;lt;&amp;lt; endl;
-	cout &amp;lt;&amp;lt; a1 / b1 &amp;lt;&amp;lt; endl;  //两个整数相除结果依然是整数
+	std::cout &amp;lt;&amp;lt; a1 + b1 &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; a1 - b1 &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; a1 * b1 &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; a1 / b1 &amp;lt;&amp;lt; std::endl;  //两个整数相除结果依然是整数
 
 	int a2 = 10;
 	int b2 = 20;
-	cout &amp;lt;&amp;lt; a2 / b2 &amp;lt;&amp;lt; endl; 
+	std::cout &amp;lt;&amp;lt; a2 / b2 &amp;lt;&amp;lt; std::endl;
 
 	int a3 = 10;
 	int b3 = 0;
-	//cout &amp;lt;&amp;lt; a3 / b3 &amp;lt;&amp;lt; endl; //报错，除数不可以为0
+	//std::cout &amp;lt;&amp;lt; a3 / b3 &amp;lt;&amp;lt; std::endl; //报错，除数不可以为0
 
 
 	//两个小数可以相除
 	double d1 = 0.5;
 	double d2 = 0.25;
-	cout &amp;lt;&amp;lt; d1 / d2 &amp;lt;&amp;lt; endl;
-
-	system(&quot;pause&quot;);
+	std::cout &amp;lt;&amp;lt; d1 / d2 &amp;lt;&amp;lt; std::endl;
 
 	return 0;
 }
@@ -1895,66 +1894,66 @@ int main() {
 &lt;blockquote&gt;
 &lt;p&gt;总结：在除法运算中，除数不能为0&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;strong&gt;示例2&lt;/strong&gt;：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;//取模
+&lt;p&gt;&lt;strong&gt;示例2: 取模&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
 int main() {
 
+	// 取模运算本质  求余数 
 	int a1 = 10;
 	int b1 = 3;
 
-	cout &amp;lt;&amp;lt; 10 % 3 &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; 10 % 3 &amp;lt;&amp;lt; std::endl;
 
 	int a2 = 10;
 	int b2 = 20;
 
-	cout &amp;lt;&amp;lt; a2 % b2 &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; a2 % b2 &amp;lt;&amp;lt; std::endl;
 
 	int a3 = 10;
 	int b3 = 0;
 
-	//cout &amp;lt;&amp;lt; a3 % b3 &amp;lt;&amp;lt; endl; //取模运算时，除数也不能为0
+	//std::cout &amp;lt;&amp;lt; a3 % b3 &amp;lt;&amp;lt; std::endl; //取模运算时，除数也不能为0
 
 	//两个小数不可以取模
 	double d1 = 3.14;
 	double d2 = 1.1;
 
-	//cout &amp;lt;&amp;lt; d1 % d2 &amp;lt;&amp;lt; endl;
-
-	system(&quot;pause&quot;);
+	//std::cout &amp;lt;&amp;lt; d1 % d2 &amp;lt;&amp;lt; std::endl;
 
 	return 0;
 }
-
 &lt;/code&gt;&lt;/pre&gt;
 &lt;blockquote&gt;
 &lt;p&gt;总结：只有整型变量可以进行取模运算&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;strong&gt;示例3&lt;/strong&gt;：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;//递增
+&lt;p&gt;&lt;strong&gt;示例3：递增&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
 int main() {
 
-	//后置递增
-	int a = 10;
-	a++; //等价于a = a + 1
-	cout &amp;lt;&amp;lt; a &amp;lt;&amp;lt; endl; // 11
-
 	//前置递增
+	int a = 10;
+	++a;
+	std::cout &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl; // 11
+
+	//后置递增
 	int b = 10;
-	++b;
-	cout &amp;lt;&amp;lt; b &amp;lt;&amp;lt; endl; // 11
+	b++; //等价于b = b + 1
+	std::cout &amp;lt;&amp;lt; b &amp;lt;&amp;lt; std::endl; // 11
 
 	//区别
 	//前置递增先对变量进行++，再计算表达式
 	int a2 = 10;
 	int b2 = ++a2 * 10;
-	cout &amp;lt;&amp;lt; b2 &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; a2 &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; b2 &amp;lt;&amp;lt; std::endl;
 
 	//后置递增先计算表达式，后对变量进行++
 	int a3 = 10;
 	int b3 = a3++ * 10;
-	cout &amp;lt;&amp;lt; b3 &amp;lt;&amp;lt; endl;
-
-	system(&quot;pause&quot;);
+	std::cout &amp;lt;&amp;lt; a3 &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; b3 &amp;lt;&amp;lt; std::endl;
 
 	return 0;
 }
@@ -2014,41 +2013,41 @@ int main() {
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;int main() {
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
 
 	//赋值运算符
 
 	// =
 	int a = 10;
 	a = 100;
-	cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
 
 	// +=
 	a = 10;
 	a += 2; // a = a + 2;
-	cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
 
 	// -=
 	a = 10;
 	a -= 2; // a = a - 2
-	cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
 
 	// *=
 	a = 10;
 	a *= 2; // a = a * 2
-	cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
 
 	// /=
 	a = 10;
 	a /= 2;  // a = a / 2;
-	cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; endl;
+	std::cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
 
 	// %=
 	a = 10;
 	a %= 2;  // a = a % 2;
-	cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; endl;
-
-	system(&quot;pause&quot;);
+	std::cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
 
 	return 0;
 }
@@ -2105,24 +2104,31 @@ int main() {
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;示例：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;int main() {
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
 
+int main() {
+
+	// 比较运算符
 	int a = 10;
 	int b = 20;
 
-	cout &amp;lt;&amp;lt; (a == b) &amp;lt;&amp;lt; endl; // 0 
+	// ==
+	std::cout &amp;lt;&amp;lt; (a == b) &amp;lt;&amp;lt; std::endl; // 0 
 
-	cout &amp;lt;&amp;lt; (a != b) &amp;lt;&amp;lt; endl; // 1
+	// !=
+	std::cout &amp;lt;&amp;lt; (a != b) &amp;lt;&amp;lt; std::endl; // 1
 
-	cout &amp;lt;&amp;lt; (a &amp;gt; b) &amp;lt;&amp;lt; endl; // 0
+	// &amp;gt;
+	std::cout &amp;lt;&amp;lt; (a &amp;gt; b) &amp;lt;&amp;lt; std::endl; // 0
 
-	cout &amp;lt;&amp;lt; (a &amp;lt; b) &amp;lt;&amp;lt; endl; // 1
+	// &amp;lt;
+	std::cout &amp;lt;&amp;lt; (a &amp;lt; b) &amp;lt;&amp;lt; std::endl; // 1
 
-	cout &amp;lt;&amp;lt; (a &amp;gt;= b) &amp;lt;&amp;lt; endl; // 0
+	// &amp;gt;=
+	std::cout &amp;lt;&amp;lt; (a &amp;gt;= b) &amp;lt;&amp;lt; std::endl; // 0
 
-	cout &amp;lt;&amp;lt; (a &amp;lt;= b) &amp;lt;&amp;lt; endl; // 1
-	
-	system(&quot;pause&quot;);
+	// &amp;lt;=
+	std::cout &amp;lt;&amp;lt; (a &amp;lt;= b) &amp;lt;&amp;lt; std::endl; // 1
 
 	return 0;
 }
@@ -2164,16 +2170,17 @@ int main() {
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;&lt;strong&gt;示例1&lt;/strong&gt;：逻辑非&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;//逻辑运算符  --- 非
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
 int main() {
 
+	//逻辑运算符  --- 非 ！
 	int a = 10;
 
-	cout &amp;lt;&amp;lt; !a &amp;lt;&amp;lt; endl; // 0
+	// C++ 中除了0全是真
+	std::cout &amp;lt;&amp;lt; !a &amp;lt;&amp;lt; std::endl; // 0
 
-	cout &amp;lt;&amp;lt; !!a &amp;lt;&amp;lt; endl; // 1
-
-	system(&quot;pause&quot;);
+	std::cout &amp;lt;&amp;lt; !!a &amp;lt;&amp;lt; std::endl; // 1
 
 	return 0;
 }
@@ -2182,53 +2189,52 @@ int main() {
 &lt;p&gt;总结： 真变假，假变真&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;&lt;strong&gt;示例2&lt;/strong&gt;：逻辑与&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;//逻辑运算符  --- 与
-int main() {
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
 
+int main() {
+	
+	//逻辑运算符  --- 与 &amp;amp;&amp;amp;
 	int a = 10;
 	int b = 10;
 
-	cout &amp;lt;&amp;lt; (a &amp;amp;&amp;amp; b) &amp;lt;&amp;lt; endl;// 1
+	std::cout &amp;lt;&amp;lt; (a &amp;amp;&amp;amp; b) &amp;lt;&amp;lt; std::endl;// 1
 
 	a = 10;
 	b = 0;
 
-	cout &amp;lt;&amp;lt; (a &amp;amp;&amp;amp; b) &amp;lt;&amp;lt; endl;// 0 
+	std::cout &amp;lt;&amp;lt; (a &amp;amp;&amp;amp; b) &amp;lt;&amp;lt; std::endl;// 0 
 
 	a = 0;
 	b = 0;
 
-	cout &amp;lt;&amp;lt; (a &amp;amp;&amp;amp; b) &amp;lt;&amp;lt; endl;// 0
-
-	system(&quot;pause&quot;);
+	std::cout &amp;lt;&amp;lt; (a &amp;amp;&amp;amp; b) &amp;lt;&amp;lt; std::endl;// 0
 
 	return 0;
 }
-
 &lt;/code&gt;&lt;/pre&gt;
 &lt;blockquote&gt;
 &lt;p&gt;总结：逻辑&lt;code&gt;与&lt;/code&gt;运算符总结： &lt;strong&gt;同真为真，其余为假&lt;/strong&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;&lt;strong&gt;示例3&lt;/strong&gt;：逻辑或&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;//逻辑运算符  --- 或
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
 int main() {
 
+	//逻辑运算符  --- 或 ||
 	int a = 10;
 	int b = 10;
 
-	cout &amp;lt;&amp;lt; (a || b) &amp;lt;&amp;lt; endl;// 1
+	std::cout &amp;lt;&amp;lt; (a || b) &amp;lt;&amp;lt; std::endl;// 1
 
 	a = 10;
 	b = 0;
 
-	cout &amp;lt;&amp;lt; (a || b) &amp;lt;&amp;lt; endl;// 1 
+	std::cout &amp;lt;&amp;lt; (a || b) &amp;lt;&amp;lt; std::endl;// 1 
 
 	a = 0;
 	b = 0;
 
-	cout &amp;lt;&amp;lt; (a || b) &amp;lt;&amp;lt; endl;// 0
-
-	system(&quot;pause&quot;);
+	std::cout &amp;lt;&amp;lt; (a || b) &amp;lt;&amp;lt; std::endl;// 0
 
 	return 0;
 }
