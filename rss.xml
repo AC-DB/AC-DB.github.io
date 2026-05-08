@@ -1,4 +1,38 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>4.4CISC和RISC的基本概念</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/44-basic-concepts-of-cisc-and-risc/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/44-basic-concepts-of-cisc-and-risc/</guid><pubDate>Thu, 07 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;指令系统朝着两个截然不同的方向发展：一是通过增强原有指令功能、引入更复杂的指令，将部分软件功能固化到硬件中，这类机器称为&lt;code&gt;复杂指令系统计算机&lt;/code&gt;(CISC)，典型代表包括采用x86架构的处理器；二是通过精简指令集、简化指令功能，以提升指令执行效率，这类机器称为&lt;code&gt;精简指令系统计算机&lt;/code&gt;(RISC)，典型代表包括ARM、MIPS等架构的处理器。&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>5.1CPU的功能和基本结构</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/51-functions-and-basic-structure-of-cpu/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/51-functions-and-basic-structure-of-cpu/</guid><pubDate>Fri, 08 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;5.1.1 CPU的功能&lt;/h3&gt;
+&lt;p&gt;CPU的核心功能是执行程序。在程序运行过程中，可能会遇到各类异常或外中断事件，如译码阶段发现非法操作码、外部设备发出中断请求等。因此，CPU不仅需要高效执行指令，还要具备检测并响应各类异常与中断的能力。其基本功能包括：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;取指令并译码&lt;/code&gt;：从主存中取出指令，解析操作码，并生成相应的控制信号。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;更新程序计数器(PC)&lt;/code&gt;：确定下一条指令地址，以支持顺序执行或程序转移。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;执行算术与逻辑运算&lt;/code&gt;：通过ALU对操作数进行算术或逻辑运算。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;取操作数或写结果&lt;/code&gt;：访问主存或I/O接口，读取操作数或将运算结果写回。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;处理异常或中断&lt;/code&gt;：检测异常或中断请求，并在必要时转入相应的处理程序。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;时序控制&lt;/code&gt;：通过时钟信号协调各操作的执行顺序和持续时间，确保指令按序执行。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;5.1.2 CPU的基本结构&lt;/h3&gt;
+&lt;p&gt;上述功能需求决定了CPU的内部结构组成。为实现完整的指令执行流程，CPU必须包含若干关键功能部件：为支持&lt;strong&gt;指令控制&lt;/strong&gt;，需要设置&lt;code&gt;程序计数器&lt;/code&gt;(PC)，用于存放即将执行指令的地址；为完成&lt;strong&gt;指令译码&lt;/strong&gt;，需要配备&lt;code&gt;指令寄存器&lt;/code&gt;(IR)暂存当前指令，并由&lt;code&gt;指令译码器&lt;/code&gt;(ID)解析操作码；&lt;code&gt;控制单元&lt;/code&gt;(CU)综合译码结果、时序信号与状态标志，生成微操作控制信号序列，驱动各部件协同工作；&lt;code&gt;算术逻辑单元&lt;/code&gt;(ALU)和&lt;code&gt;通用寄存器组&lt;/code&gt;(GPRs)共同构成数据通路，负责操作数的暂存与运算；&lt;code&gt;中断机构&lt;/code&gt;用于响应异常与外部中断请求；此外，为协调CPU与主存之间的数据交换，还需要设置&lt;code&gt;存储器地址寄存器&lt;/code&gt;(MAR)和&lt;code&gt;存储器数据寄存器&lt;/code&gt;(MDR)。&lt;/p&gt;
+&lt;p&gt;CPU中各种寄存器的作用与特点&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;程序计数器&lt;/code&gt;(PC)。存放即将执行的指令地址。顺序执行时自动递增（增量为当前指令所占的字节数)；遇到转移类指令时，更新为目标地址。程序启动前，首条指令地址被装入PC。其位数由地址总线宽度决定，反映了CPU可直接寻址的内存空间大小。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;指令寄存器&lt;/code&gt;(IR)。暂存当前正在执行的指令。指令从主存取出后首先送入IR，供指令译码器使用。其位数等于指令字长。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;通用寄存器组&lt;/code&gt;(GPRs)。供用户程序灵活使用，用于暂存操作数、中间结果或地址指针，减少对主存的频繁访问，提升执行效率。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;标志寄存器&lt;/code&gt;(FR)，也称&lt;code&gt;程序状态字寄存器&lt;/code&gt;(PSWR)。保存ALU运算产生的状态信息，用于条件判断与转移控制。这些标志位通常由触发器实现，整体构成程序状态字。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;存储器地址寄存器&lt;/code&gt;(MAR)。存放当前要访问的主存地址。取指或数据读/写时，地址先送入MAR，再通过地址总线传至存储器。其位数同样由地址总线宽度决定。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;存储器数据寄存器&lt;/code&gt;(MDR)。暂存从主存读出的数据或将要写入主存的数据，起到缓冲与同步作用，缓解CPU与主存之间的速度差异。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;指令译码器&lt;/code&gt;(ID)。对IR中的操作码进行分析，识别指令类型，并输出对应的译码信号。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;算术逻辑单元&lt;/code&gt;(ALU)。执行数据运算的核心部件，完成算术与逻辑运算。运算结果送回寄存器，状态标志则写入标志寄存器，供后续条件转移指令使用。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;时序信号产生部件&lt;/code&gt;。以系统时钟为基础，生成指令执行所需的周期、节拍和工作脉冲，为整个CPU提供时序基准。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;操作控制信号形成部件&lt;/code&gt;。综合译码信号、时序信号和状态标志，生成微操作控制信号。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;总线控制逻辑&lt;/code&gt;。实现对总线传输的控制，包括对数据和地址信息的缓冲与控制。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;中断机构&lt;/code&gt;。实现对异常情况和外部中断请求的处理。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;5.1.3 CPU中的寄存器&lt;/h3&gt;
+&lt;p&gt;CPU中的寄存器可根据汇编语言（或机器语言）程序是否能够直接访问，分为两类。&lt;/p&gt;
+&lt;h4&gt;1. 用户可见寄存器&lt;/h4&gt;
+&lt;p&gt;这类寄存器可被用户程序直接读取或修改，用于暂存数据、地址或状态信息，从而减少对主存的访问次数，提高程序执行效率。这类寄存器主要包括&lt;code&gt;通用寄存器组&lt;/code&gt;(GPRs)、&lt;code&gt;专用地址寄存器&lt;/code&gt;（如&lt;code&gt;基址寄存器&lt;/code&gt;、&lt;code&gt;变址寄存器&lt;/code&gt;、&lt;code&gt;堆栈指针&lt;/code&gt;等）、&lt;code&gt;程序计数器&lt;/code&gt;(PC)。&lt;/p&gt;
+&lt;p&gt;此外，还有一类&lt;strong&gt;只读型用户可见寄存器&lt;/strong&gt;，即&lt;code&gt;标志寄存器&lt;/code&gt;(FR)，其内容由ALU运算结果自动生成，用户程序不能直接修改其值。&lt;/p&gt;
+&lt;h4&gt;2. 用户不可见寄存器&lt;/h4&gt;
+&lt;p&gt;这类寄存器对用户程序完全透明，既不能被读取，又不能被修改，仅由CPU硬件或操作系统内核在特权模式下使用，如&lt;code&gt;指令寄存器&lt;/code&gt;(IR)、&lt;code&gt;存储器地址寄存器&lt;/code&gt;(MAR)、&lt;code&gt;存储器数据寄存器&lt;/code&gt;(MDR)、&lt;code&gt;页表基址寄存器&lt;/code&gt;等。&lt;/p&gt;
+</content:encoded></item><item><title>4.4CISC和RISC的基本概念</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/44-basic-concepts-of-cisc-and-risc/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/44-basic-concepts-of-cisc-and-risc/</guid><pubDate>Thu, 07 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;指令系统朝着两个截然不同的方向发展：一是通过增强原有指令功能、引入更复杂的指令，将部分软件功能固化到硬件中，这类机器称为&lt;code&gt;复杂指令系统计算机&lt;/code&gt;(CISC)，典型代表包括采用x86架构的处理器；二是通过精简指令集、简化指令功能，以提升指令执行效率，这类机器称为&lt;code&gt;精简指令系统计算机&lt;/code&gt;(RISC)，典型代表包括ARM、MIPS等架构的处理器。&lt;/p&gt;
 &lt;h3&gt;4.4.1 复杂指令系统计算机(CISC)&lt;/h3&gt;
 &lt;p&gt;随着集成电路技术的发展，软件开发成本不断上升，促使设计者在指令系统中加入更多、更复杂的指令，以适应多样化的应用需求，从而形成了CISC架构。&lt;/p&gt;
 &lt;p&gt;CISC的主要特点如下：&lt;/p&gt;
@@ -144,6 +178,112 @@
 &lt;li&gt;&lt;strong&gt;利于流水线执行&lt;/strong&gt;：统一的指令长度和访存边界，使取指、译码、执行等阶段易于并行化。&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;潜在缺点&lt;/strong&gt;：频繁的数据搬移可能导致程序中LOAD/STORE指令比例较高，增加指令条数；但现代编译器优化和高速缓存机制可有效缓解此问题。&lt;/li&gt;
 &lt;/ul&gt;
+</content:encoded></item><item><title>0.零基础入门</title><link>https://www.atsuko.top/posts/mathematics-for-postgraduate-entrance-examination/linear-algebra/0-beginner-with-zero-foundation/</link><guid isPermaLink="true">https://www.atsuko.top/posts/mathematics-for-postgraduate-entrance-examination/linear-algebra/0-beginner-with-zero-foundation/</guid><pubDate>Tue, 05 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;本书共分为6讲，可以按以下三大版块进行学习：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;行列式 (基础版块)&lt;/li&gt;
+&lt;li&gt;矩阵   (基础版块)&lt;/li&gt;
+&lt;li&gt;向量组 (主题版块)&lt;/li&gt;
+&lt;li&gt;方程组 (主题版块)&lt;/li&gt;
+&lt;li&gt;特征值 (应用版块)&lt;/li&gt;
+&lt;li&gt;二次型 (应用版块)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;对象（元素）：向量&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;定义&lt;/strong&gt;：拼在一起的有序数组，如 $[-1, 1]$。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;维数&lt;/strong&gt;：向量中数的个数，如 $[-1, 1]$ 是 $2$ 维向量。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;意义&lt;/strong&gt;：数据可以表达信息。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;运算&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;线性运算：加法，数乘&lt;/li&gt;
+&lt;li&gt;点积运算
+&lt;ul&gt;
+&lt;li&gt;一行乘一列&lt;/li&gt;
+&lt;li&gt;一行乘多列&lt;/li&gt;
+&lt;li&gt;多行乘一列&lt;/li&gt;
+&lt;li&gt;多行乘多列&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;线性变换&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;线性运算&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;加法&lt;/strong&gt;：$\vec{a} + \vec{b}$&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;数乘&lt;/strong&gt;：$k\vec{a}$&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;点积运算&lt;/h3&gt;
+&lt;h4&gt;多行乘多列&lt;/h4&gt;
+&lt;p&gt;如 $\begin{bmatrix} a_1 &amp;amp; a_2 \ b_1 &amp;amp; b_2 \end{bmatrix} \begin{bmatrix} c_1 &amp;amp; d_1 \ c_2 &amp;amp; d_2 \end{bmatrix} = \begin{bmatrix} a_{11} &amp;amp; a_{12} \ a_{21} &amp;amp; a_{22} \end{bmatrix},$&lt;/p&gt;
+&lt;p&gt;其中，$a_{11}=a_1c_1 + a_2c_2$，$a_{12}=a_1d_1 + a_2d_2$，$a_{21}=b_1c_1 + b_2c_2$，$a_{22}=b_1d_1 + b_2d_2$，&lt;/p&gt;
+&lt;p&gt;$$
+a_{ij}=(\text{第}i\text{行}, \text{第}j\text{列}).
+$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;练习&lt;/strong&gt;：计算如下式子。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;$\begin{bmatrix} 1 &amp;amp; 0 \end{bmatrix} \begin{bmatrix} 0 \ 1 \end{bmatrix} =$ :spoiler[$0$]&lt;/li&gt;
+&lt;li&gt;$\begin{bmatrix} 0 &amp;amp; 1 \end{bmatrix} \begin{bmatrix} 1 \ 0 \end{bmatrix} =$ :spoiler[$0$]&lt;/li&gt;
+&lt;li&gt;$\begin{bmatrix} 1 &amp;amp; -1 \ -2 &amp;amp; 4 \end{bmatrix} \begin{bmatrix} 1 \ -2 \end{bmatrix} =$ :spoiler[$\begin{bmatrix} 3 \ -2 \end{bmatrix}$]&lt;/li&gt;
+&lt;li&gt;$\begin{bmatrix} 1 &amp;amp; 2 \end{bmatrix} \begin{bmatrix} 0 &amp;amp; -1 \ 1 &amp;amp; 0 \end{bmatrix} =$ :spoiler[$\begin{bmatrix} 2 &amp;amp; -1 \end{bmatrix}$]&lt;/li&gt;
+&lt;li&gt;$\begin{bmatrix} 1 &amp;amp; 0 \ 0 &amp;amp; -1 \end{bmatrix} \begin{bmatrix} 1 &amp;amp; 1 \ 0 &amp;amp; 1 \end{bmatrix} =$ :spoiler[$\begin{bmatrix} 1 &amp;amp; 1 \ 0 &amp;amp; -1 \end{bmatrix}$]&lt;/li&gt;
+&lt;li&gt;$\begin{bmatrix} 1 &amp;amp; 1 \ 0 &amp;amp; 1 \end{bmatrix} \begin{bmatrix} 0 &amp;amp; 2 &amp;amp; -1 \ 1 &amp;amp; 0 &amp;amp; 0 \end{bmatrix} =$ :spoiler[$\begin{bmatrix} 1 &amp;amp; 2 &amp;amp; -1 \ 1 &amp;amp; 0 &amp;amp; 0 \end{bmatrix}$]&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;线性变换&lt;/h2&gt;
+&lt;p&gt;$$
+A\vec{a} = \vec{\beta}
+$$&lt;/p&gt;
+&lt;p&gt;理解为：把 $A$ 作用在 $\vec{a}$ 上，输出一个 $\vec{\beta}$。矩阵 $\times$ 向量 = 向量。$A$ 对应法则就是 $f( )$ ，$\vec{a}$ 自变量就是 $x$ ，$\vec{\beta}$ 输出就是 $y$ 。&lt;/p&gt;
+&lt;h4&gt;1.对称变换&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;a. 关于 $x$ 轴对称&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;变换矩阵： $\begin{bmatrix} 1 &amp;amp; 0 \ 0 &amp;amp; -1 \end{bmatrix}$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;b. 关于 $y$ 轴对称&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;变换矩阵： $\begin{bmatrix} -1 &amp;amp; 0 \ 0 &amp;amp; 1 \end{bmatrix}$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;c. 关于原点对称&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;变换矩阵： $\begin{bmatrix} -1 &amp;amp; 0 \ 0 &amp;amp; -1 \end{bmatrix}$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;d. 关于 $y=x$ 对称&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;变换矩阵： $\begin{bmatrix} 0 &amp;amp; 1 \ 1 &amp;amp; 0 \end{bmatrix}$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;e. 关于 $y=-x$ 对称&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;变换矩阵： $\begin{bmatrix} 0 &amp;amp; -1 \ -1 &amp;amp; 0 \end{bmatrix}$&lt;/p&gt;
+&lt;h4&gt;2.伸缩变换&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;a. 拉伸变换(横向放大2倍)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;变换矩阵： $\begin{bmatrix} 2 &amp;amp; 0 \ 0 &amp;amp; 1 \end{bmatrix}$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;b. 拉伸变换(纵向放大2倍)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;变换矩阵： $\begin{bmatrix} 1 &amp;amp; 0 \ 0 &amp;amp; 2 \end{bmatrix}$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;c. 压缩变换(横向缩小2倍)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;变换矩阵： $\begin{bmatrix} 1/2 &amp;amp; 0 \ 0 &amp;amp; 1 \end{bmatrix}$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;d. 压缩变换(纵向缩小2倍)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;变换矩阵： $\begin{bmatrix} 1 &amp;amp; 0 \ 0 &amp;amp; 1/2 \end{bmatrix}$&lt;/p&gt;
+&lt;h4&gt;3.剪切变换&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;a. 剪切变换(上边左移)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;变换矩阵： $\begin{bmatrix} 1 &amp;amp; 1 \ 0 &amp;amp; 1 \end{bmatrix}$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;b. 剪切变换(右边下移)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;变换矩阵： $\begin{bmatrix} 1 &amp;amp; 0 \ -1 &amp;amp; 1 \end{bmatrix}$&lt;/p&gt;
+&lt;h4&gt;4.旋转变换(逆时针绕原点45度)&lt;/h4&gt;
+&lt;p&gt;变换矩阵： $\begin{bmatrix} \frac{\sqrt{2} }{2} &amp;amp; - \frac{\sqrt{2} }{2} \ \frac{\sqrt{2} }{2} &amp;amp; \frac{\sqrt{2} }{2} \end{bmatrix}$&lt;/p&gt;
+&lt;h2&gt;方程组求解&lt;/h2&gt;
+&lt;p&gt;前提 $A$ 矩阵可逆&lt;/p&gt;
+&lt;p&gt;线性代数主要是运用了线性变换这样一个对应法则来作运算。事实上，线性变换相当于高等数学中的对应法则，即函数 $f$，对应到线性代数里就是矩阵 $A$。&lt;/p&gt;
+&lt;p&gt;例如，对于一个方程组&lt;/p&gt;
+&lt;p&gt;$$
+\begin{cases} x_1 + 2x_2 = 3 \ 4x_1 + 7x_2 = 10 \end{cases}
+$$&lt;/p&gt;
+&lt;p&gt;中学阶段的解法为高斯消元法，大学阶段的解法为线性变换法。
+线性变换法中，把 $x_1+2x_2$、$4x_1+7x_2$ 写为向量点积形式 $1 \cdot x_1 + 2 \cdot x_2$、$4 \cdot x_1 + 7 \cdot x_2$，则方程改写为：&lt;/p&gt;
+&lt;p&gt;$$
+\begin{bmatrix} 1 &amp;amp; 2 \ 4 &amp;amp; 7 \end{bmatrix} \begin{bmatrix} x_1 \ x_2 \end{bmatrix} = \begin{bmatrix} 3 \ 10 \end{bmatrix}
+$$&lt;/p&gt;
+&lt;p&gt;$$
+A\vec{x} = \vec{\beta}
+$$&lt;/p&gt;
+&lt;p&gt;等式两端同时左边乘“$A^{-1}$”，得 $A^{-1}A\vec{x} = A^{-1}\vec{\beta}$，即 $\vec{x} = A^{-1}\vec{\beta}$。&lt;/p&gt;
+&lt;p&gt;记 $E_1 = 1, E_2 = \begin{bmatrix} 1 &amp;amp; 0 \ 0 &amp;amp; 1 \end{bmatrix}$&lt;/p&gt;
+&lt;p&gt;计算可知，$\begin{bmatrix} 1 &amp;amp; 2 \ 4 &amp;amp; 7 \end{bmatrix} \begin{bmatrix} -7 &amp;amp; 2 \ 4 &amp;amp; -1 \end{bmatrix} = \begin{bmatrix} -7 &amp;amp; 2 \ 4 &amp;amp; -1 \end{bmatrix} \begin{bmatrix} 1 &amp;amp; 2 \ 4 &amp;amp; 7 \end{bmatrix} = \begin{bmatrix} 1 &amp;amp; 0 \ 0 &amp;amp; 1 \end{bmatrix}$，即 $AA^{-1} = E_2$。&lt;/p&gt;
+&lt;p&gt;此时 $A^{-1} = \begin{bmatrix} -7 &amp;amp; 2 \ 4 &amp;amp; -1 \end{bmatrix}$ 。于是在下式两端同时乘以 $A^{-1}$，有&lt;/p&gt;
+&lt;p&gt;$$
+\begin{bmatrix} -7 &amp;amp; 2 \ 4 &amp;amp; -1 \end{bmatrix} \begin{bmatrix} 1 &amp;amp; 2 \ 4 &amp;amp; 7 \end{bmatrix} \begin{bmatrix} x_1 \ x_2 \end{bmatrix} = \begin{bmatrix} -7 &amp;amp; 2 \ 4 &amp;amp; -1 \end{bmatrix} \begin{bmatrix} 3 \ 10 \end{bmatrix}
+$$&lt;/p&gt;
+&lt;p&gt;于是 $\begin{bmatrix} x_1 \ x_2 \end{bmatrix} = \begin{bmatrix} -1 \ 2 \end{bmatrix}$，即方程 $\begin{cases} x_1+2x_2=3 \ 4x_1+7x_2=10 \end{cases}$ 的解为 $x_1=-1$，$x_2=2$。&lt;/p&gt;
+&lt;p&gt;用 $A^{-1}$ 求解方程组可称为“逆矩阵解法”。&lt;/p&gt;
+&lt;p&gt;当方程组未知数和方程个数越来越多时，高斯消元法将越来越难以求解。而逆矩阵解法则越来越体现其优越性。在现代科技中，“大型”方程组的求解越来越普遍且实用。学习线性代数，可以为学好现代科技打下良好的基础。&lt;/p&gt;
 </content:encoded></item><item><title>4.3程序的机器级代码表示</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/43-machine-level-code-representation-of-programs/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/43-machine-level-code-representation-of-programs/</guid><pubDate>Mon, 04 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;本节是2022年新增考点，但相关知识早已多次以综合题形式出现在历年真题中，难度较大，不少跨考生感到无从下手。通过本节学习后，考生应能从容应对此类问题。统考大纲未指定具体指令集，但历年真题主要考查x86和MIPS汇编指令。其中，MIPS指令通常会在试题中附带功能说明，而x86指令则更常作为默认考查对象。因此，本节重点介绍x86汇编指令。&lt;/p&gt;
 &lt;h3&gt;4.3.1 常用汇编指令介绍&lt;/h3&gt;
 &lt;h4&gt;1. 相关寄存器&lt;/h4&gt;
@@ -2863,6 +3003,480 @@ int main() {
 &lt;/code&gt;&lt;/pre&gt;
 &lt;blockquote&gt;
 &lt;p&gt;逻辑&lt;strong&gt;或&lt;/strong&gt;运算符总结： &lt;strong&gt;同假为假，其余为真&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+</content:encoded></item><item><title>1.4程序流程结构</title><link>https://www.atsuko.top/posts/dark-horse/c/introduction/14-program-flow-structure/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c/introduction/14-program-flow-structure/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;C/C++支持最基本的三种程序运行结构：&lt;strong&gt;顺序结构、选择结构、循环结构&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;顺序结构：程序按顺序执行，不发生跳转&lt;/li&gt;
+&lt;li&gt;选择结构：依据条件是否满足，有选择的执行相应功能&lt;/li&gt;
+&lt;li&gt;循环结构：依据条件是否满足，循环多次执行某段代码&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;4.1 选择结构&lt;/h3&gt;
+&lt;h4&gt;4.1.1 if语句&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：执行满足条件的语句&lt;/p&gt;
+&lt;p&gt;if语句的三种形式&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;单行格式if语句&lt;/li&gt;
+&lt;li&gt;多行格式if语句&lt;/li&gt;
+&lt;li&gt;多条件的if语句&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;单行格式if语句：&lt;code&gt;if(条件){ 条件满足执行的语句 }&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&quot;assets/clip_image002.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;示例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	//选择结构-单行if语句
+	//输入一个分数，如果分数大于600分，视为考上一本大学，并在屏幕上打印
+
+	int score = 0;
+	std::cout &amp;lt;&amp;lt; &quot;请输入一个分数：&quot; &amp;lt;&amp;lt; std::endl;
+	std::cin &amp;gt;&amp;gt; score;
+
+	std::cout &amp;lt;&amp;lt; &quot;您输入的分数为： &quot; &amp;lt;&amp;lt; score &amp;lt;&amp;lt; std::endl;
+
+	//if语句
+	//注意事项，在if判断语句后面，不要加分号
+	if (score &amp;gt; 600)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;我考上了一本大学！！！&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注意：if条件表达式后不要加分号&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;多行格式if语句：&lt;code&gt;if(条件){ 条件满足执行的语句 }else{ 条件不满足执行的语句 };&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&quot;assets/clip_image002-1541662519170.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;示例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	// 选择结构 - 多行 if 语句
+	int score = 0;
+
+	// 输入分数
+	std::cout &amp;lt;&amp;lt; &quot;请输入考试分数：&quot; &amp;lt;&amp;lt; std::endl;
+	std::cin &amp;gt;&amp;gt; score;
+
+	// 提示输入分数
+	std::cout &amp;lt;&amp;lt; &quot;您输入的分数为：&quot; &amp;lt;&amp;lt; score &amp;lt;&amp;lt; std::endl;
+
+	// 判断分数
+	if (score &amp;gt; 600)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;我考上了一本大学&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	else
+	{
+		std::cout &amp;lt;&amp;lt; &quot;我未考上一本大学&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol&gt;
+&lt;li&gt;多条件的if语句：&lt;code&gt;if(条件1){ 条件1满足执行的语句 }else if(条件2){条件2满足执行的语句}... else{ 都不满足执行的语句}&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&quot;assets/clip_image002-1541662566808.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;示例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main3() {
+
+	int score = 0;
+
+	std::cout &amp;lt;&amp;lt; &quot;请输入考试分数：&quot; &amp;lt;&amp;lt; std::endl;
+
+	std::cin &amp;gt;&amp;gt; score;
+
+	if (score &amp;gt; 600)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;我考上了一本大学&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	else if (score &amp;gt; 500)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;我考上了二本大学&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	else if (score &amp;gt; 400)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;我考上了三本大学&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	else
+	{
+		std::cout &amp;lt;&amp;lt; &quot;我未考上本科&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;嵌套if语句&lt;/strong&gt;：在if语句中，可以嵌套使用if语句，达到更精确的条件判断&lt;/p&gt;
+&lt;p&gt;案例需求：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;提示用户输入一个高考考试分数，根据分数做如下判断&lt;/li&gt;
+&lt;li&gt;分数如果大于600分视为考上一本，大于500分考上二本，大于400考上三本，其余视为未考上本科；&lt;/li&gt;
+&lt;li&gt;在一本分数中，如果大于700分，考入北大，大于650分，考入清华，大于600考入人大。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	int score = 0;
+
+	std::cout &amp;lt;&amp;lt; &quot;请输入考试分数：&quot; &amp;lt;&amp;lt; std::endl;
+
+	std::cin &amp;gt;&amp;gt; score;
+
+	if (score &amp;gt; 600)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;我考上了一本大学&quot; &amp;lt;&amp;lt; std::endl;
+		if (score &amp;gt; 700)
+		{
+			std::cout &amp;lt;&amp;lt; &quot;我考上了北大&quot; &amp;lt;&amp;lt; std::endl;
+		}
+		else if (score &amp;gt; 650)
+		{
+			std::cout &amp;lt;&amp;lt; &quot;我考上了清华&quot; &amp;lt;&amp;lt; std::endl;
+		}
+		else
+		{
+			std::cout &amp;lt;&amp;lt; &quot;我考上了人大&quot; &amp;lt;&amp;lt; std::endl;
+		}
+	}
+	else if (score &amp;gt; 500)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;我考上了二本大学&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	else if (score &amp;gt; 400)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;我考上了三本大学&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	else
+	{
+		std::cout &amp;lt;&amp;lt; &quot;我未考上本科&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;练习案例&lt;/strong&gt;： 三只小猪称体重&lt;/p&gt;
+&lt;p&gt;有三只小猪ABC，请分别输入三只小猪的体重，并且判断哪只小猪最重？&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/%E4%B8%89%E5%8F%AA%E5%B0%8F%E7%8C%AA.jpg&quot; alt=&quot;三只小猪&quot; /&gt;&lt;/p&gt;
+&lt;h4&gt;4.1.2 三目运算符&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;： 通过三目运算符实现简单的判断&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;语法&lt;/strong&gt;：&lt;code&gt;表达式1 ? 表达式2 ：表达式3&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;解释&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;如果表达式1的值为真，执行表达式2，并返回表达式2的结果；&lt;/p&gt;
+&lt;p&gt;如果表达式1的值为假，执行表达式3，并返回表达式3的结果。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	// 三目运算符
+	int a = 10;
+	int b = 20;
+	int c = 0;
+
+	c = a &amp;gt; b ? a : b;
+	std::cout &amp;lt;&amp;lt; &quot;c = &quot; &amp;lt;&amp;lt; c &amp;lt;&amp;lt; std::endl;
+
+	//C++中三目运算符返回的是变量,可以继续赋值
+
+	(a &amp;gt; b ? a : b) = 100;
+
+	std::cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;b = &quot; &amp;lt;&amp;lt; b &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;c = &quot; &amp;lt;&amp;lt; c &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：和if语句比较，三目运算符优点是短小整洁，缺点是如果用嵌套，结构不清晰&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;4.1.3 switch语句&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：执行多条件分支语句&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;语法&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;switch(表达式)
+{
+	case 结果1：执行语句;break;
+	case 结果2：执行语句;break;
+	...
+	default:执行语句;break;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	//请给电影评分 
+	//10 ~ 9   经典   
+	// 8 ~ 7   非常好
+	// 6 ~ 5   一般
+	// 5分以下 烂片
+
+	int score = 0;
+	std::cout &amp;lt;&amp;lt; &quot;请给电影打分&quot; &amp;lt;&amp;lt; std::endl;
+	std::cin &amp;gt;&amp;gt; score;
+
+	switch (score)
+	{
+	case 10:
+	case 9:
+		std::cout &amp;lt;&amp;lt; &quot;经典&quot; &amp;lt;&amp;lt; std::endl;
+		break;
+	case 8:
+		std::cout &amp;lt;&amp;lt; &quot;非常好&quot; &amp;lt;&amp;lt; std::endl;
+		break;
+	case 7:
+	case 6:
+		std::cout &amp;lt;&amp;lt; &quot;一般&quot; &amp;lt;&amp;lt; std::endl;
+		break;
+	default:
+		std::cout &amp;lt;&amp;lt; &quot;烂片&quot; &amp;lt;&amp;lt; std::endl;
+		break;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注意1：switch语句中表达式类型只能是整型或者字符型&lt;/p&gt;
+&lt;p&gt;注意2：case里如果没有break，那么程序会一直向下执行&lt;/p&gt;
+&lt;p&gt;总结：与if语句比，对于多条件判断时，switch的结构清晰，执行效率高，缺点是switch不可以判断区间&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;4.2 循环结构&lt;/h3&gt;
+&lt;h4&gt;4.2.1 while循环语句&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：满足循环条件，执行循环语句&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;语法&lt;/strong&gt;： &lt;code&gt;while(循环条件){ 循环语句 }&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;解释&lt;/strong&gt;：&lt;code&gt;只要循环条件的结果为真，就执行循环语句&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/clip_image002-1541668640382.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	int num = 0;
+
+	// (填入循环条件)
+	while (num &amp;lt; 10)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;num = &quot; &amp;lt;&amp;lt; num &amp;lt;&amp;lt; std::endl;
+		num++;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注意：在执行循环语句时候，程序必须提供跳出循环的出口，否则出现死循环&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;while循环练习案例&lt;/strong&gt;： &lt;code&gt;猜数字&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;案例描述&lt;/strong&gt;：系统随机生成一个1到100之间的数字，玩家进行猜测，如果猜错，提示玩家数字过大或过小，如果猜对恭喜玩家胜利，并且退出游戏。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/%E7%8C%9C%E6%95%B0%E5%AD%97.jpg&quot; alt=&quot;猜数字&quot; /&gt;&lt;/p&gt;
+&lt;h4&gt;4.2.2 do...while循环语句&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;： 满足循环条件，执行循环语句&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;语法&lt;/strong&gt;：&lt;code&gt;do{ 循环语句 } while(循环条件);&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;：与while的区别在于==do...while会先执行一次循环语句==，再判断循环条件&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/clip_image002-1541671163478.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	int num = 0;
+
+	do
+	{
+		std::cout &amp;lt;&amp;lt; num &amp;lt;&amp;lt; std::endl;
+		num++;
+
+	} while (num &amp;lt; 10);
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：与while循环区别在于，do...while先执行一次循环语句，再判断循环条件&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;练习案例：水仙花数&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;案例描述&lt;/strong&gt;：水仙花数是指一个 3 位数，它的每个位上的数字的 3次幂之和等于它本身&lt;/p&gt;
+&lt;p&gt;例如：1^3 + 5^3+ 3^3 = 153&lt;/p&gt;
+&lt;p&gt;请利用do...while语句，求出所有3位数中的水仙花数&lt;/p&gt;
+&lt;h4&gt;4.2.3 for循环语句&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;： 满足循环条件，执行循环语句&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;语法&lt;/strong&gt;：&lt;code&gt; for(起始表达式;条件表达式;末尾循环体) { 循环语句; }&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	// 起始语句，判断条件，循环语句
+	for (int i = 0; i &amp;lt; 10; i++)
+	{
+		std::cout &amp;lt;&amp;lt; i &amp;lt;&amp;lt; std::endl;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;详解：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1541673704101.png&quot; alt=&quot;1541673704101&quot; /&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注意：for循环中的表达式，要用分号进行分隔&lt;/p&gt;
+&lt;p&gt;总结：while , do...while, for都是开发中常用的循环语句，for循环结构比较清晰，比较常用&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;练习案例：敲桌子&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;案例描述：从1开始数到数字100， 如果数字个位含有7，或者数字十位含有7，或者该数字是7的倍数，我们打印敲桌子，其余数字直接打印输出。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/timg.gif&quot; alt=&quot;timg&quot; /&gt;&lt;/p&gt;
+&lt;h4&gt;4.2.4 嵌套循环&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;： 在循环体中再嵌套一层循环，解决一些实际问题&lt;/p&gt;
+&lt;p&gt;例如我们想在屏幕中打印如下图片，就需要利用嵌套循环&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1541676003486.png&quot; alt=&quot;1541676003486&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	//外层循环执行1次，内层循环执行1轮
+	for (int i = 0; i &amp;lt; 10; i++)
+	{
+		for (int j = 0; j &amp;lt; 10; j++)
+		{
+			std::cout &amp;lt;&amp;lt; &quot;*&quot; &amp;lt;&amp;lt; &quot; &quot;;
+		}
+		std::cout &amp;lt;&amp;lt; std::endl;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;练习案例&lt;/strong&gt;：乘法口诀表&lt;/p&gt;
+&lt;p&gt;案例描述：利用嵌套循环，实现九九乘法表&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/0006018857256120_b.jpg&quot; alt=&quot;0006018857256120_b&quot; /&gt;&lt;/p&gt;
+&lt;h3&gt;4.3 跳转语句&lt;/h3&gt;
+&lt;h4&gt;4.3.1 break语句&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;: 用于跳出&lt;code&gt;选择结构&lt;/code&gt;或者&lt;code&gt;循环结构&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;break使用的时机：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;出现在switch条件语句中，作用是终止case并跳出switch&lt;/li&gt;
+&lt;li&gt;出现在循环语句中，作用是跳出当前的循环语句&lt;/li&gt;
+&lt;li&gt;出现在嵌套循环中，跳出最近的内层循环语句&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	//1.在switch 语句中使用break
+	std::cout &amp;lt;&amp;lt; &quot;请选择您挑战副本的难度：&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;1、普通&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;2、中等&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;3、困难&quot; &amp;lt;&amp;lt; std::endl;
+
+	int num = 0;
+
+	std::cin &amp;gt;&amp;gt; num;
+
+	switch (num)
+	{
+	case 1:
+		std::cout &amp;lt;&amp;lt; &quot;您选择的是普通难度&quot; &amp;lt;&amp;lt; std::endl;
+		break;
+	case 2:
+		std::cout &amp;lt;&amp;lt; &quot;您选择的是中等难度&quot; &amp;lt;&amp;lt; std::endl;
+		break;
+	case 3:
+		std::cout &amp;lt;&amp;lt; &quot;您选择的是困难难度&quot; &amp;lt;&amp;lt; std::endl;
+		break;
+	}
+
+
+	//2.在循环语句中用break
+	for (int i = 0; i &amp;lt; 10; i++)
+	{
+		if (i == 5)
+		{
+			break; //跳出循环语句
+		}
+		std::cout &amp;lt;&amp;lt; i &amp;lt;&amp;lt; std::endl;
+	}
+
+	//3.在嵌套循环语句中使用break，退出内层循环
+	for (int i = 0; i &amp;lt; 10; i++)
+	{
+		for (int j = 0; j &amp;lt; 10; j++)
+		{
+			if (j == 5)
+			{
+				break;
+			}
+			std::cout &amp;lt;&amp;lt; &quot;*&quot; &amp;lt;&amp;lt; &quot; &quot;;
+		}
+		std::cout &amp;lt;&amp;lt; std::endl;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.3.2 continue语句&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：在&lt;code&gt;循环语句&lt;/code&gt;中，跳过本次循环中余下尚未执行的语句，继续执行下一次循环&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	for (int i = 0; i &amp;lt; 100; i++)
+	{
+		if (i % 2 == 0)
+		{
+			continue;
+		}
+		std::cout &amp;lt;&amp;lt; i &amp;lt;&amp;lt; std::endl;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注意：continue并没有使整个循环终止，而break会跳出循环&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;4.3.3 goto语句&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：可以无条件跳转语句&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;语法&lt;/strong&gt;： &lt;code&gt;goto 标记;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;解释&lt;/strong&gt;：如果标记的名称存在，执行到goto语句时，会跳转到标记的位置&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	std::cout &amp;lt;&amp;lt; &quot;1&quot; &amp;lt;&amp;lt; std::endl;
+
+	goto FLAG;
+
+	std::cout &amp;lt;&amp;lt; &quot;2&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;3&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;4&quot; &amp;lt;&amp;lt; std::endl;
+
+FLAG:
+
+	std::cout &amp;lt;&amp;lt; &quot;5&quot; &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注意：在程序中不建议使用goto语句，以免造成程序流程混乱&lt;/p&gt;
 &lt;/blockquote&gt;
 </content:encoded></item><item><title>2.3浮点数的表示和运算</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/23-representation-and-operations-of-floating-point-numbers/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/23-representation-and-operations-of-floating-point-numbers/</guid><pubDate>Sun, 26 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;浮点数表示法通过将比例因子嵌入数据中，使小数点位置可根据需要浮动。这样，在有限位数下，既能扩大数值的表示范围，又能保持较高的有效精度。例如，用定点数表示电子质量($9\times10^{-28}$g) 或太阳质量 ($2\times10^{33}$g) 极为不便，而浮点数则能高效处理此类极大或极小的数值。&lt;/p&gt;
 &lt;p&gt;通常，浮点数表示为&lt;/p&gt;
