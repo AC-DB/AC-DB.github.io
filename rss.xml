@@ -32,6 +32,350 @@
 &lt;p&gt;此外，还有一类&lt;strong&gt;只读型用户可见寄存器&lt;/strong&gt;，即&lt;code&gt;标志寄存器&lt;/code&gt;(FR)，其内容由ALU运算结果自动生成，用户程序不能直接修改其值。&lt;/p&gt;
 &lt;h4&gt;2. 用户不可见寄存器&lt;/h4&gt;
 &lt;p&gt;这类寄存器对用户程序完全透明，既不能被读取，又不能被修改，仅由CPU硬件或操作系统内核在特权模式下使用，如&lt;code&gt;指令寄存器&lt;/code&gt;(IR)、&lt;code&gt;存储器地址寄存器&lt;/code&gt;(MAR)、&lt;code&gt;存储器数据寄存器&lt;/code&gt;(MDR)、&lt;code&gt;页表基址寄存器&lt;/code&gt;等。&lt;/p&gt;
+</content:encoded></item><item><title>5.2指令执行过程</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/52-instruction-execution-process/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/52-instruction-execution-process/</guid><pubDate>Fri, 08 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;5.2.1 指令执行的一般流程&lt;/h3&gt;
+&lt;p&gt;计算机执行程序的本质，是控制器依据指令序列协调各功能部件协同工作的过程。CPU启动后，将持续循环执行“取指令”与“执行指令”两个基本操作。每条指令执行完毕后，还要进行中断与异常检测，以确保系统能够及时响应外部事件或内部异常。指令执行的一般流程如图5.2所示。&lt;/p&gt;
+&lt;p&gt;指令执行的基本流程如下：&lt;/p&gt;
+&lt;p&gt;首先，CPU以程序计数器(PC)的当前值为地址，从主存中取出下一条指令；与此同时，PC通常被自动更新为下一条顺序指令的地址（增量等于当前指令的长度），为后续取指做准备。&lt;/p&gt;
+&lt;p&gt;随后，进入译码与执行阶段：CPU对指令进行译码，识别其类型，并据此确定执行路径。为简化分析，可将指令分为&lt;strong&gt;分支指令&lt;/strong&gt;与&lt;strong&gt;非分支指令&lt;/strong&gt;两类：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;为&lt;code&gt;分支指令&lt;/code&gt;时，在执行阶段判断分支条件；条件满足时，PC将被更新为分支目标地址。&lt;/li&gt;
+&lt;li&gt;为&lt;code&gt;非分支指令&lt;/code&gt;时，依次完成取操作数、执行运算、写回结果等基本操作。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;无论执行哪类指令，执行完成后，CPU均需要进行中断与异常检测：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;检测到中断或异常时，进入中断响应阶段：屏蔽可屏蔽中断，保存返回地址（通常为下一条指令地址或当前指令地址，具体取决于中断/异常的类型），并将PC设置为对应中断服务程序的入口地址，随后转移执行该服务程序。关于中断机制的介绍，见5.5节。&lt;/li&gt;
+&lt;li&gt;未检测到中断或异常时，继续以更新后的PC地址取指，进入下一条指令的执行阶段。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;5.2.2 CPU的时序控制&lt;/h3&gt;
+&lt;p&gt;计算机的时序控制用于协调指令执行过程中各操作的先后顺序。CPU必须按照精确的时序产生控制信号，以适应不同指令在操作步骤和执行时间上的差异。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;时钟信号&lt;/code&gt;是时序控制的基础，通常由机器内部的脉冲源（如晶振）产生，经整形和分频后形成供全机同步使用的节拍信号。&lt;code&gt;时钟周期的长度&lt;/code&gt;由数据通路中相邻状态单元之间组合逻辑的最大传播延迟决定，以确保信号在下一个时钟边沿到来前稳定。关于数据通路的介绍，见5.3节。&lt;/p&gt;
+&lt;p&gt;早期计算机采用“机器周期—节拍—脉冲”三级时序系统：一个指令周期被划分为若干机器周期（如取指、取操作数、执行、中断响应等），每个机器周期又细分为多个节拍，必要时在节拍内插入工作脉冲，以实现更精细的时序控制。由于不同指令的功能复杂度各异，其所需的机器周期数及各周期内的节拍数均可不同，从而支持多样化的需求。&lt;/p&gt;
+&lt;p&gt;随着高速缓存的广泛应用和芯片集成度的显著提升，现代处理器已大幅简化时序结构，“机器周期”这一概念逐渐淡化。CPU内部由统一的系统时钟直接驱动，&lt;strong&gt;一个时钟周期即对应一个节拍&lt;/strong&gt;，绝大多数指令可在若干时钟周期内高效完成。&lt;/p&gt;
+&lt;h3&gt;5.2.3 指令周期的基本概念&lt;/h3&gt;
+&lt;p&gt;指令周期是指一条指令从主存读出到执行完成所经历的全部时间。为便于分析，可将其划分为若干阶段。最简单的划分方法是将指令周期分为&lt;strong&gt;取指&lt;/strong&gt;和&lt;strong&gt;执行&lt;/strong&gt;两个阶段；更细致的划分则可将其细分为&lt;strong&gt;取指&lt;/strong&gt;、&lt;strong&gt;译码/读寄存器&lt;/strong&gt;、&lt;strong&gt;执行/计算地址&lt;/strong&gt;、&lt;strong&gt;访存&lt;/strong&gt;和&lt;strong&gt;写回&lt;/strong&gt;五个阶段。&lt;/p&gt;
+&lt;h4&gt;1. 取指（IF）&lt;/h4&gt;
+&lt;p&gt;CPU根据PC的值，从主存（或指令Cache）中读取下一条指令，并将其送入IR。同时，PC被更新为下一条指令的地址：顺序执行时，PC增加当前指令的长度；若为变长指令，则需要在取指阶段初步解析其格式，以确定长度；若发生分支，则其目标地址将在后续阶段计算，并据此更新PC。&lt;/p&gt;
+&lt;h4&gt;2. 译码/读寄存器(ID)&lt;/h4&gt;
+&lt;p&gt;对IR中的指令进行译码，识别操作码和寻址方式，并从寄存器堆中读取所需的操作数。此阶段还可能组合基址寄存器与偏移量，为后续地址计算做准备。立即数也在本阶段提取。&lt;/p&gt;
+&lt;h4&gt;3. 执行/计算地址(EX)&lt;/h4&gt;
+&lt;p&gt;根据指令类型执行相应的操作：&lt;strong&gt;算术或逻辑指令&lt;/strong&gt;，由ALU完成运算；&lt;strong&gt;访存类指令&lt;/strong&gt;（如LOAD/STORE），计算操作数在主存中的有效地址；&lt;strong&gt;分支指令&lt;/strong&gt;，计算目标地址并判断是否转移。此外，运算结果的状态（如零标志、进位等）通常在此阶段生成并暂存。&lt;/p&gt;
+&lt;h4&gt;4. 访存（MEM）&lt;/h4&gt;
+&lt;p&gt;若指令需要访问主存储器（如加载数据或存储结果），则在此阶段通过数据Cache或主存完成读/写操作。寄存器-寄存器类指令不涉及此阶段。&lt;/p&gt;
+&lt;h4&gt;5. 写回（WB）&lt;/h4&gt;
+&lt;p&gt;将最终结果写回寄存器堆。结果可能来自ALU的运算输出（执行阶段）或从存储器读取的数据（访存阶段）。写回完成后，该指令的执行即告结束。&lt;/p&gt;
+&lt;p&gt;需要注意的是，指令周期的具体划分因处理器架构而异，上述划分仅为一种典型示例。实际系统还可能包含中断响应等阶段，此时CPU会保存断点并转移至服务程序。&lt;/p&gt;
+&lt;p&gt;由于指令功能和寻址方式的不同，不同指令的指令周期长度并不固定。根据实现方式，可分为&lt;strong&gt;定长指令周期&lt;/strong&gt;（所有指令的周期长度相同）和&lt;strong&gt;变长指令周期&lt;/strong&gt;（不同指令包含的时钟周期数可变）。现代计算机普遍采用基于时钟信号定时的变长指令周期，以提高执行效率。&lt;/p&gt;
+&lt;h3&gt;5.2.4 处理器指令执行模型&lt;/h3&gt;
+&lt;p&gt;一个指令周期通常由若干依次执行的步骤组成，各步骤协同完成指令的全部功能。不同处理器对这些步骤的组织方式存在显著差异，主要可分为以下三类模型。&lt;/p&gt;
+&lt;h4&gt;1. 单周期处理器&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;单周期处理器&lt;/code&gt;为所有指令分配相同的执行时间，每条指令在一个时钟周期内完成(CPI=1)。指令之间严格串行执行，即下一条指令必须等待前一条指令完全结束后才能启动。因此，时钟周期的长度由执行时间最长的指令决定。对于原本可在更短时间内完成的指令，也要占用整个周期，导致硬件资源在部分时间内空闲，限制了系统的整体性能。&lt;/p&gt;
+&lt;h4&gt;2. 多周期处理器&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;多周期处理器&lt;/code&gt;根据指令类型动态分配执行周期数，不同指令可占用不同数量的时钟周期（各指令的CPI不同，平均CPI通常大于1）。该方案不再要求所有指令具有相同的执行时间，从而提高了时钟频率和资源利用效率。但是，指令之间仍是串行执行的，无法实现重叠处理。&lt;/p&gt;
+&lt;h4&gt;3. 流水线处理器&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;流水线处理器&lt;/code&gt;采用指令级并行策略，目标是在每个时钟周期完成一条指令的吞吐（理想情况下CPI=1）。其实现机制是：每个时钟周期启动一条新指令，使多条指令在流水线中重叠执行，各自处于不同的执行阶段（如取指、译码、执行、写回等）。尽管单条指令从开始到完成仍需要多个周期（执行延迟未减少），但整体吞吐率显著提高，大幅提升了处理器效率。&lt;/p&gt;
+</content:encoded></item><item><title>5.3数据通路的功能和基本结构</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/53-function-and-basic-structure-of-data-path/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/53-function-and-basic-structure-of-data-path/</guid><pubDate>Fri, 08 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;5.3.1 数据通路的功能&lt;/h3&gt;
+&lt;p&gt;随着技术的发展，越来越多的功能逻辑被集成到CPU芯片中，但不论CPU的内部结构多么复杂，它都可视为由&lt;code&gt;数据通路&lt;/code&gt;(Data Path)和&lt;code&gt;控制部件&lt;/code&gt;(Control Unit)两大部分组成。&lt;/p&gt;
+&lt;p&gt;数据在指令执行过程中所经过的路径，以及路径上涉及的硬件部件，称为&lt;code&gt;数据通路&lt;/code&gt;。ALU、通用寄存器、状态寄存器等，都是指令执行时数据流经的部件，属于数据通路的一部分。数据通路描述了数据从何处开始，中间经过哪些部件，最终被传送到哪里。整个数据通路由&lt;code&gt;控制部件&lt;/code&gt;控制，后者根据每条指令的功能，生成相应的控制信号，以驱动数据通路完成指定操作。&lt;/p&gt;
+&lt;h3&gt;5.3.2 数据通路的组成&lt;/h3&gt;
+&lt;p&gt;数据通路的基本构成元件可分为&lt;strong&gt;组合逻辑元件&lt;/strong&gt;和&lt;strong&gt;时序逻辑元件&lt;/strong&gt;两大类。&lt;/p&gt;
+&lt;h4&gt;1. 组合逻辑元件（操作元件）&lt;/h4&gt;
+&lt;p&gt;组合逻辑元件主要用于执行数据运算与路径选择，也称&lt;code&gt;操作元件&lt;/code&gt;。其特征是：任意时刻的输出&lt;strong&gt;仅由当前输入决定&lt;/strong&gt;，不依赖历史状态；内部不含记忆单元，不受时钟控制，且无输出到输入的反馈通路，因而具有确定性和即时响应性。数据通路中常用的组合逻辑元件包括加法器、算术逻辑单元(ALU)、译码器、多路选择器(MUX)和三态门等。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;译码器&lt;/code&gt;常用于操作码译码或地址码译码，对于 $n$ 位输入，可产生 $2^n$ 个互斥输出。&lt;code&gt;多路选择器&lt;/code&gt;（MUX）根据控制信号Select 从多路输入中选择一路输出，若输入路数为 $N$，则需 $\lceil \log_2 N \rceil$ 位控制信号。&lt;code&gt;三态门&lt;/code&gt;可视为一种受控的总线开关，由控制信号EN决定信号线的通断，当EN=1时，三态门被打开，输出(out)信号等于输入（in）信号；当EN=0时，输出端呈高阻态（隔断态），所连寄存器与总线断开。&lt;/p&gt;
+&lt;h4&gt;2. 时序逻辑元件（状态元件）&lt;/h4&gt;
+&lt;p&gt;时序逻辑元件的输出不仅取决于当前输入，还依赖于电路的历史状态，因此其内部&lt;strong&gt;必然包含用于存储信息的记忆单元&lt;/strong&gt;。此外，这类元件必须在时钟的同步控制下工作。常见的时序逻辑元件包括各类寄存器和存储器，例如通用寄存器组、程序计数器(PC)、状态/暂存寄存器等。&lt;/p&gt;
+&lt;p&gt;数据通路的基本结构可抽象为时序逻辑元件与组合逻辑元件交替连接的形式，即“……状态元件-操作元件-状态元件…”。为简化分析，假设寄存器A和B的写使能信号一直有效，当时钟上升沿到来时，两个寄存器同时锁存各自的新值。从时钟上升沿开始到寄存器A输出稳定的时间称为&lt;code&gt;寄存器延迟&lt;/code&gt; $T_{clk_to_q}$；随后，其输出数据经组合逻辑电路处理，经历一个&lt;code&gt;关键路径延迟&lt;/code&gt; $T_{max}$（所有输出信号达到稳定所需的最长时间）。为确保寄存器B能在下一个时钟上升沿正确采样该数据，其输入必须在时钟沿到来前至少提前 $T_{setup}$（&lt;code&gt;寄存器建立时间&lt;/code&gt;）保持稳定。因此，数据通路的&lt;strong&gt;最小时钟周期&lt;/strong&gt;必须&lt;strong&gt;不小于&lt;/strong&gt; $T_{clk_to_q} + T_{max} + T_{setup}$，其中组合逻辑延迟 $T_{max}$ 是关键因素。可见，在CPU设计中，&lt;strong&gt;缩短组合逻辑的关键路径延迟是提升系统频率的关键手段&lt;/strong&gt;。&lt;/p&gt;
+&lt;h3&gt;5.3.3 数据通路的组织与分类&lt;/h3&gt;
+&lt;p&gt;数据通路可根据其内部部件的连接方式和指令执行的时序组织方式进行分类。&lt;/p&gt;
+&lt;h4&gt;1. 按部件连接方式划分&lt;/h4&gt;
+&lt;h5&gt;(1) 总线式数据通路&lt;/h5&gt;
+&lt;p&gt;总线式数据通路将通用寄存器、ALU和内部寄存器等主要部件连接至一条或多条CPU内部总线（注意，此总线为片内总线，不同于系统总线）。根据总线数量的不同，可分为如下两类：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;单总线结构&lt;/code&gt;：所有数据传输共享一条内部总线，ALU的输入与输出均通过该总线分时传送。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;多总线结构&lt;/code&gt;（如双总线、三总线）：提供多条独立总线，例如分别用于两个源操作数和结果写回，以支持更高的并行度。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;优点&lt;/strong&gt;是硬件简洁、易于扩展；&lt;strong&gt;缺点&lt;/strong&gt;是同一时刻仅能传输一组数据，存在总线竞争问题。&lt;/p&gt;
+&lt;h5&gt;(2) 专用数据通路&lt;/h5&gt;
+&lt;p&gt;专用数据通路采用点对点专用连线连接寄存器、ALU等部件，而非共享总线。各数据通路可并行传输，避免了总线冲突。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;优点&lt;/strong&gt;是数据传输效率高、延迟低；&lt;strong&gt;缺点&lt;/strong&gt;是布线复杂、扩展性差、成本较高。&lt;/p&gt;
+&lt;p&gt;总线式与专用数据通路的特点对比如表5.1所示。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;表5.1 总线式与专用数据通路的特点对比&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;对比维度&lt;/th&gt;
+&lt;th&gt;总线式数据通路&lt;/th&gt;
+&lt;th&gt;专用数据通路&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;结构复杂度&lt;/td&gt;
+&lt;td&gt;简单，部件共享总线，连线少&lt;/td&gt;
+&lt;td&gt;复杂，需要大量点对点专用连线&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;扩展灵活性&lt;/td&gt;
+&lt;td&gt;强，新增部件只需要挂接总线&lt;/td&gt;
+&lt;td&gt;弱，新增部件需要重新布线&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;数据传输效率&lt;/td&gt;
+&lt;td&gt;低，同一时刻仅支持一组数据传输&lt;/td&gt;
+&lt;td&gt;高，多组数据可并行传输&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;硬件成本&lt;/td&gt;
+&lt;td&gt;低&lt;/td&gt;
+&lt;td&gt;高&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;性能瓶颈&lt;/td&gt;
+&lt;td&gt;总线带宽受限，部件增多时延迟增加&lt;/td&gt;
+&lt;td&gt;无总线瓶颈，性能随并行度提升&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;典型应用场景&lt;/td&gt;
+&lt;td&gt;教学模型、嵌入式微控制器&lt;/td&gt;
+&lt;td&gt;高性能通用处理器（如RISC）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4&gt;2. 按时序组织方式划分&lt;/h4&gt;
+&lt;h5&gt;(1) 单周期数据通路&lt;/h5&gt;
+&lt;p&gt;在单周期数据通路中，每条指令的所有操作（取指、译码、执行、访存、写回等）都在一个时钟周期内完成。时钟周期长度由最慢的指令（通常是访存指令）决定。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;特点&lt;/strong&gt;是控制简单，资源利用率低，可基于总线式或专用通路实现。&lt;/p&gt;
+&lt;p&gt;:::note
+单周期处理器(CPI=1)不能采用单总线结构的数据通路，因为单总线将所有寄存器都连接到一条公共总线上，一个时钟周期内只允许一次操作，无法完成一条指令的所有操作。
+:::&lt;/p&gt;
+&lt;h5&gt;(2) 多周期数据通路&lt;/h5&gt;
+&lt;p&gt;多周期数据通路将一条指令的执行划分为多个阶段，每个阶段在一个时钟周期内完成。典型阶段包括取指、译码与读寄存器、执行/地址计算、访存、写回等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;特点&lt;/strong&gt;是各阶段的结果在时钟边沿被锁存到寄存器中；时钟周期长度通常以一次存储器访问时间为基准；相比单周期设计，提高了硬件复用率，缩短了时钟周期。&lt;/p&gt;
+&lt;h5&gt;(3) 流水线数据通路&lt;/h5&gt;
+&lt;p&gt;流水线数据通路将指令执行过程分解为若干独立、可重叠的阶段，不同指令在不同阶段并发推进。每个阶段由专用功能部件完成，并通过流水段寄存器隔离和传递中间结果。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;特点&lt;/strong&gt;是时钟周期长度由最长阶段决定；理想情况下，每个周期可以完成一条指令。&lt;/p&gt;
+&lt;h3&gt;5.3.4 单总线结构的数据通路&lt;/h3&gt;
+&lt;p&gt;单总线数据通路结构简洁，所有数据传输共享同一条内部总线，同一时刻仅允许一个部件向总线输出数据，导致操作需要分步进行。图5.6所示为一种典型的单总线数据通路结构。&lt;/p&gt;
+&lt;p&gt;GPRs为通用寄存器组，rs和rd分别是源寄存器和目的寄存器的编号，各占4位，可寻址 $2^4=16$ 个通用寄存器；Y和Z为暂存寄存器（简称暂存器），用于暂存从总线读取的操作数；FR为标志寄存器，用于保存ALU运算产生的状态标志。所有可向内部总线输出数据的部件（如寄存器、MDR、PC等）均&lt;strong&gt;通过各自的三态门&lt;/strong&gt;与总线相连，以控制其与总线之间的通断，避免多个输出同时驱动总线造成冲突。图中带箭头的虚线表示控制信号，控制信号的命名采用“部件名+in/out”的方式：in表示允许向该部件写入（如PCin表示将内部总线上的数据写入PC），out表示允许该部件输出到总线（如PCout 表示将PC的内容送至内部总线）。&lt;/p&gt;
+&lt;p&gt;ALU的操作类型由控制信号ALUop 决定。若ALUop 为 $n$ 位，则最多支持 $2^n$ 种操作。在以下分析中，假设ALUop 为3位，且约定执行加法操作时ALUop =000。&lt;/p&gt;
+&lt;p&gt;总线是一组共享的传输信号线，不能存储信息，任一时刻只能有一个部件将信息发送到总线上。&lt;code&gt;数据流&lt;/code&gt;是指令执行过程中，根据操作要求依次访问的数据序列。该序列因指令执行的不同阶段而异，也随指令类型的不同而变化。为简化分析，此处将指令周期分为取指和执行两个阶段。&lt;/p&gt;
+&lt;h4&gt;(1) 加法指令&lt;/h4&gt;
+&lt;p&gt;指令功能：将rs和rd寄存器中的值相加，并将结果写入rd寄存器。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;取指阶段&lt;/strong&gt;：根据PC中的内容从主存储器中取出指令代码并存放在IR中。假设从发出主存读命令到主存读出数据并传输到MDR共需5个时钟周期，则取指阶段的数据流如下（不考虑PC增量操作）：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;时钟&lt;/th&gt;
+&lt;th&gt;功能&lt;/th&gt;
+&lt;th&gt;有效控制信号&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;C1&lt;/td&gt;
+&lt;td&gt;(PC) → MAR&lt;/td&gt;
+&lt;td&gt;PCout, MARin&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;C2~C6&lt;/td&gt;
+&lt;td&gt;MEM(MAR) → MDR&lt;/td&gt;
+&lt;td&gt;MDRin, read&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;C7&lt;/td&gt;
+&lt;td&gt;(MDR) → IR&lt;/td&gt;
+&lt;td&gt;MDRout, IRin&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;解释&lt;/strong&gt;：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;将PC的内容写入MAR(1个时钟周期)；&lt;/li&gt;
+&lt;li&gt;读主存并将读出的数据写入MDR(5个时钟周期)；&lt;/li&gt;
+&lt;li&gt;将MDR的内容写入IR(1个时钟周期)。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;执行阶段&lt;/strong&gt;：根据rs和rd寄存器的编号（假设分别为0001和0010），将两个操作数取出，送入ALU进行加法运算，并将运算结果送回rd寄存器。执行阶段的数据流如下：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;时钟&lt;/th&gt;
+&lt;th&gt;功能&lt;/th&gt;
+&lt;th&gt;有效控制信号&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;C8&lt;/td&gt;
+&lt;td&gt;(rs) → Y&lt;/td&gt;
+&lt;td&gt;rs=0001, GPRout, Yin&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;C9&lt;/td&gt;
+&lt;td&gt;(rs)+(rd) → Z&lt;/td&gt;
+&lt;td&gt;rd=0010, GPRout, ALUop=000&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;C10&lt;/td&gt;
+&lt;td&gt;(Z) → rd&lt;/td&gt;
+&lt;td&gt;Zout, rd=0010, GPRin&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;解释&lt;/strong&gt;：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;将rs寄存器的内容写入暂存寄存器Y(1个时钟周期)；&lt;/li&gt;
+&lt;li&gt;将rd寄存器中的值取出并与Y暂存寄存器中的值相加，结果送入Z暂存寄存器(1个时钟周期)；&lt;/li&gt;
+&lt;li&gt;将暂存寄存器Z中的加法结果送回rd寄存器(1个时钟周期)。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;:::note
+在单总线数据通路中，任一时刻总线上仅允许一个数据传输。由于ALU是无存储能力的组合逻辑电路，运算时需要两个输入同时有效，因此需要先将一个操作数经总线送入暂存寄存器Y；下一周期再将另一个操作数送至ALU的另一个输入端，Y的输出即作为其第一个操作数。此外，ALU输出不能直接连到总线，否则可能通过总线反馈至输入端，干扰运算结果，故需要暂存于暂存寄存器Z中。
+:::&lt;/p&gt;
+&lt;h4&gt;(2) 取数指令&lt;/h4&gt;
+&lt;p&gt;指令功能：将主存地址为rs寄存器中的值的主存单元内容取出送回rd寄存器。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;取指阶段&lt;/strong&gt;：所有指令取指阶段的数据流都是相同的，此处不再赘述。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;执行阶段&lt;/strong&gt;：假设rs和rd寄存器的编号分别为0001和0010，从发出主存读命令到主存读出数据并传输到MDR共需5个时钟周期，则执行阶段的数据流如下：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;时钟&lt;/th&gt;
+&lt;th&gt;功能&lt;/th&gt;
+&lt;th&gt;有效控制信号&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;C8&lt;/td&gt;
+&lt;td&gt;(rs) → MAR&lt;/td&gt;
+&lt;td&gt;rs=0001, GPRout, MARin&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;C9~C13&lt;/td&gt;
+&lt;td&gt;MEM(MAR) → MDR&lt;/td&gt;
+&lt;td&gt;MDRin, read&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;C14&lt;/td&gt;
+&lt;td&gt;(MDR) → rd&lt;/td&gt;
+&lt;td&gt;MDRout, rd=0010, GPRin&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;解释&lt;/strong&gt;：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;将rs的内容写入MAR(1个时钟周期)；&lt;/li&gt;
+&lt;li&gt;读主存并将读出的数据写入MDR(5个时钟周期)；&lt;/li&gt;
+&lt;li&gt;将MDR的内容写入rd寄存器(1个时钟周期)。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;5.3.4 专用结构的数据通路&lt;/h3&gt;
+&lt;p&gt;本节以单周期数据通路为例，介绍专用数据通路的设计原理。在单周期数据通路中，每条指令的取指与执行均在一个时钟周期内完成，CPU的时钟周期必须以最耗时的指令为准。此外，由于资源无法复用，系统需要为频繁使用的功能单元（如加法器）配置多组独立的实例。同时，为避免指令获取与数据访问冲突，指令和数据被分别存储在独立的存储器中，确保两者可在同一时钟周期内并行处理。鉴于完整单周期数据通路结构较为复杂，以下将结合具体指令执行过程，逐步拆解其关键设计要点。尽管基于单周期模型，但其中的控制逻辑与数据通路设计思想同样适用于多周期、流水线等更复杂的结构。考生应在夯实基础的前提下，灵活运用所学知识。&lt;/p&gt;
+&lt;h4&gt;1. 取指令部件的设计&lt;/h4&gt;
+&lt;p&gt;每条指令的第一步都是完成取指令并计算下一条指令地址的过程。指令存储在指令存储器中，仅支持读操作。读取指令时，只需提供指令地址，经过固定的延迟后即可输出对应的32位指令字。指令地址由程序计数器(PC)提供。&lt;/p&gt;
+&lt;p&gt;取指令部件包含专用的下地址逻辑电路，用于计算并更新PC值，以确定下一条指令的地址。下地址逻辑根据当前指令类型区分不同的执行路径：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;顺序执行：当指令为普通顺序指令时，直接计算PC+4得到下一条指令的地址。&lt;/li&gt;
+&lt;li&gt;转移执行：对于分支或转移指令，需要根据指令类型计算转移目标地址。例如，beq指令(相等转移)通过比较两个寄存器的内容决定是否转移，并根据偏移量计算新的PC值。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;2. R型运算类指令数据通路&lt;/h4&gt;
+&lt;p&gt;R型指令指的是操作数全部来自通用寄存器、运算结果也写回通用寄存器的算术/逻辑运算指令。以加法指令为例：&lt;/p&gt;
+&lt;p&gt;$$
+\text{add rd, rs, rt} \quad # \text{R[rs] + R[rt]} \to \text{R[rd]}
+$$&lt;/p&gt;
+&lt;p&gt;相关的数据通路示意图。该数据通路能够对两个寄存器Rs和Rt的内容进行运算，并将结果写回Rd寄存器。例如，add和sub等指令还需判断运算结果是否溢出，仅当不溢出时才将结果写回Rd寄存器；发生溢出时，会触发异常处理。&lt;/p&gt;
+&lt;p&gt;指令中的Rs和Rt是两个源操作数寄存器的编号，Rd是目的寄存器的编号。因此，&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;寄存器堆的两个读地址端Ra和Rb应分别与Rs和Rt相连。&lt;/li&gt;
+&lt;li&gt;写地址端Rw应与Rd相连。&lt;/li&gt;
+&lt;li&gt;ALU的运算结果通过总线busW连至寄存器堆的写数据端。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;控制信号RegWr 作为寄存器堆的写使能信号，在RegWr 为1且无溢出的情况下，运算结果才被写入寄存器堆。具体来说，RegWr 信号和溢出标志位Overflow 通过“与”门组合后，决定是否允许写入寄存器堆。显然，在R型指令执行期间，RegWr 信号应始终为1。&lt;/p&gt;
+&lt;p&gt;此外，ALU的操作类型由控制信号ALUctr 决定。假设ALU支持 $N$ 种不同的运算，则ALUctr 至少需要 $\lceil \log_2 N \rceil$ 位来选择具体的运算类型。&lt;/p&gt;
+&lt;p&gt;由于单周期处理器必须在一个时钟周期内完成指令，其&lt;strong&gt;数据通路中不设置指令寄存器&lt;/strong&gt;(IR)，而直接从指令存储器中取指令并解析执行，否则仅取指令到IR就需一个时钟周期。&lt;/p&gt;
+&lt;h4&gt;3. I型运算指令的数据通路&lt;/h4&gt;
+&lt;p&gt;I型运算指令（立即数运算类指令）的核心执行逻辑是，先将指令中的16位立即数扩展为32位，再将寄存器Rs的内容送入ALU运算，结果写回目的寄存器Rt。以有符号加法指令为例：&lt;/p&gt;
+&lt;p&gt;$$
+\text{addi rt, rs, imm16} \quad # \text{R[rs] + Signext[imm16]} \to \text{R[rt]}
+$$&lt;/p&gt;
+&lt;p&gt;其中，SignExt[imm16] 表示对16位立即数进行符号扩展。&lt;/p&gt;
+&lt;p&gt;在R型指令数据通路基础上，增加支持I型指令的功能模块（如立即数扩展器和多路选择器）后形成的通用数据通路。该通路可同时执行R型和I型运算指令。&lt;/p&gt;
+&lt;p&gt;数据通路主要有以下三处改动，以同时兼容R型和I型运算指令的执行。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;目的寄存器选择&lt;/strong&gt;：R型指令使用目的寄存器Rd，而I型指令使用目的寄存器Rt。因此，在寄存器堆的写地址端Rw处增设多路选择器，由控制信号RegDst 控制：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;RegDst =1（执行R型指令）时，选择Rd为目的寄存器。&lt;/li&gt;
+&lt;li&gt;RegDst =0（执行I型指令）时，选择Rt为目的寄存器。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;立即数扩展&lt;/strong&gt;：I型指令的16位立即数需扩展为32位才能送入ALU。数据通路中新增一个立即数扩展器，其输入为指令的imm16字段。由控制信号ExtOp 决定扩展方式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对于算术类指令，采用符号扩展。&lt;/li&gt;
+&lt;li&gt;对于按位逻辑操作指令，采用零扩展。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;ALU第二操作数选择&lt;/strong&gt;：R型指令的第二操作数来自寄存器Rt，I型指令则使用扩展后的立即数。因此，在ALU的第二输入端增设多路选择器，由控制信号ALUSrc 控制：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ALUSrc =0（执行R型指令）时，选择寄存器Rt的数据。&lt;/li&gt;
+&lt;li&gt;ALUSrc =1（执行I型指令）时，选择扩展后的立即数。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;4. 访存指令的数据通路&lt;/h4&gt;
+&lt;p&gt;MIPS访存指令属于I型指令（需要进行立即数运算），包括以下两类：&lt;/p&gt;
+&lt;p&gt;$$\text{lw rt, imm16(rs) \quad # M[R[rs] + Signext(imm16)]} \to \text{R[rt]}$$&lt;/p&gt;
+&lt;p&gt;$$\text{sw rt, imm16(rs) \quad # R[rt]} \to \text{M[R[rs] + Signext(imm16)]}$$&lt;/p&gt;
+&lt;p&gt;LOAD和STORE 指令的访存地址计算逻辑完全一致：首先对指令中的16位立即数imm16进行符号扩展，然后将其与寄存器Rs的内容相加，得到访存地址。二者区别在于数据传输方向：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;LOAD指令从该地址读取32位数据，并将数据写入寄存器Rt。&lt;/li&gt;
+&lt;li&gt;STORE 指令则将寄存器Rt中的32位数据写入该地址对应的存储单元。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;数据通路主要有以下两处改动，以支持LOAD/STORE 指令的执行：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;写回寄存器的数据选择&lt;/strong&gt;：为了处理运算类指令与LOAD指令写回寄存器的不同数据来源，在寄存器堆的写端口busW处增设一个多路选择器，由控制信号MemtoReg 控制：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;MemtoReg =0（运算类指令）时，选择ALU的运算结果。&lt;/li&gt;
+&lt;li&gt;MemtoReg =1（LOAD指令）时，选择数据存储器读出的数据。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;新增数据存储器模块&lt;/strong&gt;：以满足LOAD/STORE 指令对数据存储器的读/写需求。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;数据存储器的地址端Adr直接连接到ALU的输出端（访存地址由ALU计算得出）。&lt;/li&gt;
+&lt;li&gt;STORE 指令需要将寄存器Rt的内容写入存储器，因此将寄存器堆的第二读端口busB(对应寄存器Rt)连接到数据存储器的输入端DataIn。&lt;/li&gt;
+&lt;li&gt;数据存储器的输出端接入busW处的多路选择器，用于LOAD指令的结果写回。&lt;/li&gt;
+&lt;li&gt;控制信号MemWr 作为数据存储器的写使能信号（控制数据存储器的读/写操作）。&lt;/li&gt;
+&lt;li&gt;LOAD/STORE 指令计算访存地址时，需要对16位立即数imm16进行符号扩展，并通过ALU执行不判溢出的加法(addu)，此时控制信号ALUctr 被配置为对应的操作码。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;5. 完整的单周期数据通路结构图&lt;/h4&gt;
+&lt;p&gt;取指令部件，还需接收三类关键外部控制信号：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;控制信号Branch 在执行分支指令时置1。&lt;/li&gt;
+&lt;li&gt;控制信号Jump在执行无条件转移指令时置1。&lt;/li&gt;
+&lt;li&gt;标志位Zero用于判断分支条件是否成立，该信号由ALU输出。例如，执行beq指令（相等转移）时，ALU执行减法操作，若结果为0，则Zero置1，表示满足转移条件。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;基于以上分析，单周期处理器具有以下重要特点：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;存储器分离设计&lt;/strong&gt;：指令存储器与数据存储器相互独立，使得取指令与数据访存操作可并行进行，避免冲突，确保在一个时钟周期内同时完成指令读取与数据读/写。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;无指令寄存器(IR)&lt;/strong&gt;：指令从存储器取出后，其各字段（如rs、rt、rd、imm）直接用于生成控制信号或地址输入，指令解析与执行在同一个时钟周期内同步完成。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;时钟周期由最慢指令决定&lt;/strong&gt;：时钟周期必须满足执行时间最长的指令（如访存指令），导致简单指令（如R型加法）的执行效率受限。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;数据通路资源专用&lt;/strong&gt;：由于所有操作需要在一个周期内并发完成，关键功能单元（如用于PC更新和地址计算的加法器）需要配置多个独立的实例，硬件无法复用，开销较大。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;控制信号单周期有效&lt;/strong&gt;：所有控制信号（如RegWr、MemWr等）在一个时钟周期内保持有效，指令“取指、执行、写回”的完整流程在单个时钟脉冲内完成，无流水线分段。&lt;/li&gt;
+&lt;/ol&gt;
 </content:encoded></item><item><title>4.4CISC和RISC的基本概念</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/44-basic-concepts-of-cisc-and-risc/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/44-basic-concepts-of-cisc-and-risc/</guid><pubDate>Thu, 07 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;指令系统朝着两个截然不同的方向发展：一是通过增强原有指令功能、引入更复杂的指令，将部分软件功能固化到硬件中，这类机器称为&lt;code&gt;复杂指令系统计算机&lt;/code&gt;(CISC)，典型代表包括采用x86架构的处理器；二是通过精简指令集、简化指令功能，以提升指令执行效率，这类机器称为&lt;code&gt;精简指令系统计算机&lt;/code&gt;(RISC)，典型代表包括ARM、MIPS等架构的处理器。&lt;/p&gt;
 &lt;h3&gt;4.4.1 复杂指令系统计算机(CISC)&lt;/h3&gt;
 &lt;p&gt;随着集成电路技术的发展，软件开发成本不断上升，促使设计者在指令系统中加入更多、更复杂的指令，以适应多样化的应用需求，从而形成了CISC架构。&lt;/p&gt;
@@ -178,6 +522,188 @@
 &lt;li&gt;&lt;strong&gt;利于流水线执行&lt;/strong&gt;：统一的指令长度和访存边界，使取指、译码、执行等阶段易于并行化。&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;潜在缺点&lt;/strong&gt;：频繁的数据搬移可能导致程序中LOAD/STORE指令比例较高，增加指令条数；但现代编译器优化和高速缓存机制可有效缓解此问题。&lt;/li&gt;
 &lt;/ul&gt;
+</content:encoded></item><item><title>1.行列式</title><link>https://www.atsuko.top/posts/mathematics-for-postgraduate-entrance-examination/linear-algebra/1-determinant/</link><guid isPermaLink="true">https://www.atsuko.top/posts/mathematics-for-postgraduate-entrance-examination/linear-algebra/1-determinant/</guid><pubDate>Thu, 07 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;行列式的三种定义&lt;/h2&gt;
+&lt;h3&gt;第一种定义：本质定义&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;二阶行列式 $\begin{vmatrix}a_{11} &amp;amp; a_{12} \ a_{21} &amp;amp; a_{22}\end{vmatrix}$ 表示由行向量（或列向量）形成的&lt;strong&gt;有向面积&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;三阶行列式表示三个三维向量张成的&lt;strong&gt;有向体积&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;一般地，$n$ 阶行列式是由 $n$ 个 $n$ 维向量构成的&lt;strong&gt;有向体积&lt;/strong&gt;。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;第二种定义：逆序数定义（通项定义）&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;对于 $n$ 阶方阵 $(a_{ij})$，行列式定义为所有取自不同行不同列的 $n$ 个元素的乘积的代数和，每一项的正负由列标排列的逆序数决定。&lt;/p&gt;
+&lt;p&gt;$$|A| = \sum_{(j_1j_2\cdots j_n)}(-1)^{\tau(j_1j_2\cdots j_n)}a_{1j_1}a_{2j_2}\cdots a_{nj_n}$$&lt;/p&gt;
+&lt;p&gt;其中 $\tau(j_1j_2\cdots j_n)$ 表示排列 $j_1j_2\cdots j_n$ 的&lt;strong&gt;逆序数&lt;/strong&gt;，求和取遍所有 $n$ 元排列。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;第三种定义：展开定理定义（余子式递推定义）&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;利用&lt;strong&gt;余子式&lt;/strong&gt;和&lt;strong&gt;代数余子式&lt;/strong&gt;递归地定义行列式：&lt;/p&gt;
+&lt;p&gt;$$|A| = a_{i1}A_{i1} + a_{i2}A_{i2} + \cdots + a_{in}A_{in} \quad (\text{按第 } i \text{ 行展开})$$&lt;/p&gt;
+&lt;p&gt;也可按列展开：$|A| = \sum_{i=1}^n a_{ij}A_{ij}$。&lt;/p&gt;
+&lt;p&gt;其中 $A_{ij} = (-1)^{i+j}M_{ij}$ 称为元素 $a_{ij}$ 的&lt;strong&gt;代数余子式&lt;/strong&gt;，$M_{ij}$ 为划去第 $i$ 行第 $j$ 列后剩下的 $n-1$ 阶行列式，称为&lt;strong&gt;余子式&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;此即行列式的&lt;strong&gt;展开定理&lt;/strong&gt;（第三种定义），也称为按行（列）展开的&lt;strong&gt;降阶&lt;/strong&gt;定义。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;行列式的7种核心性质&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;序号&lt;/th&gt;
+&lt;th&gt;性质名称&lt;/th&gt;
+&lt;th&gt;准确描述&lt;/th&gt;
+&lt;th&gt;数学表达&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;转置不变&lt;/strong&gt;（行列互换）&lt;/td&gt;
+&lt;td&gt;行列互换，值不变&lt;/td&gt;
+&lt;td&gt;$| A^{\mathrm{T}}| = |A|$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;零行零列&lt;/strong&gt;（某行全0）&lt;/td&gt;
+&lt;td&gt;若行列式中某一行（列）元素全为零，则行列式等于零。&lt;/td&gt;
+&lt;td&gt;若第 $i$ 行全为 $0$，则 $\det=0$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;公因子提取&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;某一行（列）中所有元素的公因子可以提到行列式符号外面。&lt;/td&gt;
+&lt;td&gt;$\begin{vmatrix}\cdots\ ka_1&amp;amp;ka_2&amp;amp;\cdots&amp;amp;ka_n\\cdots\end{vmatrix}=k\begin{vmatrix}\cdots\ a_1&amp;amp;a_2&amp;amp;\cdots&amp;amp;a_n\\cdots\end{vmatrix}$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;可拆性&lt;/strong&gt;（单行可加）&lt;/td&gt;
+&lt;td&gt;若某一行（列）的元素可以表为两数之和，则该行列式可拆为两个行列式之和。&lt;/td&gt;
+&lt;td&gt;$\begin{vmatrix}\cdots\ a_1+b_1&amp;amp;\cdots&amp;amp;a_n+b_n\\cdots\end{vmatrix}=\begin{vmatrix}\cdots\ a_1&amp;amp;\cdots&amp;amp;a_n\\cdots\end{vmatrix}+\begin{vmatrix}\cdots\ b_1&amp;amp;\cdots&amp;amp;b_n\\cdots\end{vmatrix}$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;互换变号&lt;/strong&gt;（两行互换）&lt;/td&gt;
+&lt;td&gt;互换行列式的两行（列），行列式变号。&lt;/td&gt;
+&lt;td&gt;$r_i \leftrightarrow r_j \Rightarrow |A| \to -|A|$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;6&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;成比例为零&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;若两行（列）元素对应成比例，则行列式等于零。&lt;/td&gt;
+&lt;td&gt;若第 $i$ 行 $=k \cdot$ 第 $j$ 行，则 $|A|=0$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;倍加不变&lt;/strong&gt;（$k$ 倍加）&lt;/td&gt;
+&lt;td&gt;将某一行（列）的 $k$ 倍加到另一行（列），行列式的值不变。&lt;/td&gt;
+&lt;td&gt;$r_j + k r_i$ 操作下行列式不变&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;推理记忆&lt;/strong&gt;：由性质5、6可推得“两行相同则行列式为零”；由性质7可衍生出行列式初等变换的规则。七条性质通常可归纳为“&lt;strong&gt;转置、倍乘、互换、倍加、分拆、零行、比例&lt;/strong&gt;”，是计算和证明题的第一武器。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;重要行列式总结（“12+1”全公式）&lt;/h2&gt;
+&lt;h3&gt;1. 主对角线方向（3种）&lt;/h3&gt;
+&lt;p&gt;均为“主对角线元素之积”，不同形式只是矩阵形状的区别。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;(1) 主对角行列式&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;$$
+\begin{vmatrix}
+a_{11} &amp;amp; &amp;amp; &amp;amp; \
+&amp;amp; a_{22} &amp;amp; &amp;amp; \
+&amp;amp; &amp;amp; \ddots &amp;amp; \
+&amp;amp; &amp;amp; &amp;amp; a_{nn}
+\end{vmatrix} = a_{11}a_{22}\cdots a_{nn}
+$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;(2) 主对角线上三角行列式&lt;/strong&gt;（主对角线以下全为 $0$）&lt;/p&gt;
+&lt;p&gt;$$
+\begin{vmatrix}
+a_{11} &amp;amp; a_{12} &amp;amp; \cdots &amp;amp; a_{1n} \
+&amp;amp; a_{22} &amp;amp; \cdots &amp;amp; a_{2n} \
+&amp;amp; &amp;amp; \ddots &amp;amp; \vdots \
+&amp;amp; &amp;amp; &amp;amp; a_{nn}
+\end{vmatrix} = a_{11}a_{22}\cdots a_{nn}
+$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;(3) 主对角线下三角行列式&lt;/strong&gt;（主对角线以上全为 $0$）&lt;/p&gt;
+&lt;p&gt;$$
+\begin{vmatrix}
+a_{11} &amp;amp; &amp;amp; &amp;amp; \
+a_{21} &amp;amp; a_{22} &amp;amp; &amp;amp; \
+\vdots &amp;amp; \vdots &amp;amp; \ddots &amp;amp; \
+a_{n1} &amp;amp; a_{n2} &amp;amp; \cdots &amp;amp; a_{nn}
+\end{vmatrix} = a_{11}a_{22}\cdots a_{nn}
+$$&lt;/p&gt;
+&lt;h3&gt;2. 副对角线方向（3种）&lt;/h3&gt;
+&lt;p&gt;核心是副对角线元素的乘积，并带符号 $(-1)^{\frac{n(n-1)}{2}}$。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;(1) 副对角行列式&lt;/strong&gt;（只有副对角线非零）&lt;/p&gt;
+&lt;p&gt;$$
+\begin{vmatrix}
+&amp;amp; &amp;amp; &amp;amp; a_{1n} \
+&amp;amp; &amp;amp; a_{2,n-1} &amp;amp; \
+&amp;amp; \iddots &amp;amp; &amp;amp; \
+a_{n1} &amp;amp; &amp;amp; &amp;amp;
+\end{vmatrix} = (-1)^{\frac{n(n-1)}{2}} a_{1n}a_{2,n-1}\cdots a_{n1}
+$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;(2) 副对角线上三角行列式&lt;/strong&gt;（副对角线右上方全为 $0$）&lt;/p&gt;
+&lt;p&gt;$$
+\begin{vmatrix}
+a_{11} &amp;amp; \cdots &amp;amp; a_{1,n-1} &amp;amp; a_{1n} \
+\vdots &amp;amp; \iddots &amp;amp; a_{2,n-1} &amp;amp; 0 \
+a_{n-1,1} &amp;amp; \iddots &amp;amp; &amp;amp; \vdots \
+a_{n1} &amp;amp; 0 &amp;amp; \cdots &amp;amp; 0
+\end{vmatrix} = (-1)^{\frac{n(n-1)}{2}} a_{1n}a_{2,n-1}\cdots a_{n1}
+$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;(3) 副对角线下三角行列式&lt;/strong&gt;（副对角线左下方全为 $0$）&lt;/p&gt;
+&lt;p&gt;$$
+\begin{vmatrix}
+0 &amp;amp; \cdots &amp;amp; 0 &amp;amp; a_{1n} \
+0 &amp;amp; \cdots &amp;amp; a_{2,n-1} &amp;amp; a_{2n} \
+\vdots &amp;amp; \iddots &amp;amp; \vdots &amp;amp; \vdots \
+a_{n1} &amp;amp; \cdots &amp;amp; a_{n,n-1} &amp;amp; a_{nn}
+\end{vmatrix} = (-1)^{\frac{n(n-1)}{2}} a_{1n}a_{2,n-1}\cdots a_{n1}
+$$&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;三种形式结果完全一致：&lt;strong&gt;副对角线元素之积&lt;/strong&gt;乘以符号 $(-1)^{n(n-1)/2}$。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;3. 拉普拉斯展开式分块（3种）&lt;/h3&gt;
+&lt;p&gt;设 $A$ 为 $m$ 阶方阵，$B$ 为 $n$ 阶方阵，分块矩阵的行列式结论如下。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;(1) 准对角分块&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;$$
+\begin{vmatrix}
+A &amp;amp; O \
+O &amp;amp; B
+\end{vmatrix} = |A| \cdot |B|
+$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;(2) 准上三角分块&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;$$
+\begin{vmatrix}
+A &amp;amp; C \
+O &amp;amp; B
+\end{vmatrix} = |A| \cdot |B|
+$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;(3) 准下三角分块&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;$$
+\begin{vmatrix}
+A &amp;amp; O \
+C &amp;amp; B
+\end{vmatrix} = |A| \cdot |B|
+$$&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;另有一常见变形：$\begin{vmatrix} O &amp;amp; A \ B &amp;amp; O \end{vmatrix} = (-1)^{mn}|A||B|$，可视为第二种定义的延伸。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;4. 范德蒙德行列式（1种）&lt;/h3&gt;
+&lt;p&gt;$$
+V_n =
+\begin{vmatrix}
+1 &amp;amp; 1 &amp;amp; 1 &amp;amp; \cdots &amp;amp; 1 \
+x_1 &amp;amp; x_2 &amp;amp; x_3 &amp;amp; \cdots &amp;amp; x_n \
+x_1^2 &amp;amp; x_2^2 &amp;amp; x_3^2 &amp;amp; \cdots &amp;amp; x_n^2 \
+\vdots &amp;amp; \vdots &amp;amp; \vdots &amp;amp; &amp;amp; \vdots \
+x_1^{n-1} &amp;amp; x_2^{n-1} &amp;amp; x_3^{n-1} &amp;amp; \cdots &amp;amp; x_n^{n-1}
+\end{vmatrix}
+= \prod_{1 \le j &amp;lt; i \le n} (x_i - x_j)
+$$&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;其中“&lt;strong&gt;下标大减小，连乘不遗漏&lt;/strong&gt;”是记忆口诀；结果为所有可能的两数之差（后减前）的乘积。&lt;/p&gt;
+&lt;/blockquote&gt;
 </content:encoded></item><item><title>0.零基础入门</title><link>https://www.atsuko.top/posts/mathematics-for-postgraduate-entrance-examination/linear-algebra/0-beginner-with-zero-foundation/</link><guid isPermaLink="true">https://www.atsuko.top/posts/mathematics-for-postgraduate-entrance-examination/linear-algebra/0-beginner-with-zero-foundation/</guid><pubDate>Tue, 05 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;本书共分为6讲，可以按以下三大版块进行学习：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;行列式 (基础版块)&lt;/li&gt;
@@ -3478,6 +4004,308 @@ FLAG:
 &lt;blockquote&gt;
 &lt;p&gt;注意：在程序中不建议使用goto语句，以免造成程序流程混乱&lt;/p&gt;
 &lt;/blockquote&gt;
+</content:encoded></item><item><title>1.5数组</title><link>https://www.atsuko.top/posts/dark-horse/c/introduction/15-array/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c/introduction/15-array/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;5.1 概述&lt;/h3&gt;
+&lt;p&gt;所谓数组，就是一个集合，里面存放了相同类型的数据元素&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;特点1&lt;/strong&gt;：数组中的每个&lt;code&gt;数据元素都是相同的数据类型&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;特点2&lt;/strong&gt;：数组是由&lt;code&gt;连续的内存&lt;/code&gt;位置组成的&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1541748375356.png&quot; alt=&quot;1541748375356&quot; /&gt;&lt;/p&gt;
+&lt;h3&gt;5.2 一维数组&lt;/h3&gt;
+&lt;h4&gt;5.2.1 一维数组定义方式&lt;/h4&gt;
+&lt;p&gt;一维数组定义的三种方式：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;数据类型  数组名[ 数组长度 ]; &lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;数据类型  数组名[ 数组长度 ] = { 值1，值2 ...};&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;数据类型  数组名[ ] = { 值1，值2 ...};&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	//定义方式1
+	//数据类型 数组名[元素个数];
+	int score[10];
+
+	//利用下标赋值
+	score[0] = 100;
+	score[1] = 99;
+	score[2] = 85;
+
+	//利用下标输出
+	std::cout &amp;lt;&amp;lt; score[0] &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; score[1] &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; score[2] &amp;lt;&amp;lt; std::endl;
+
+
+	//第二种定义方式
+	//数据类型 数组名[元素个数] =  {值1，值2 ，值3 ...};
+	//如果{}内不足10个数据，剩余数据用0补全
+	int score2[10] = { 100, 90,80,70,60,50,40,30,20,10 };
+
+	//逐个输出
+	//std::cout &amp;lt;&amp;lt; score2[0] &amp;lt;&amp;lt; std::endl;
+	//std::cout &amp;lt;&amp;lt; score2[1] &amp;lt;&amp;lt; std::endl;
+
+	//一个一个输出太麻烦，因此可以利用循环进行输出
+	for (int i = 0; i &amp;lt; 10; i++)
+	{
+		std::cout &amp;lt;&amp;lt; score2[i] &amp;lt;&amp;lt; std::endl;
+	}
+
+	//定义方式3
+	//数据类型 数组名[] =  {值1，值2 ，值3 ...};
+	int score3[] = { 100,90,80,70,60,50,40,30,20,10 };
+
+	for (int i = 0; i &amp;lt; 10; i++)
+	{
+		std::cout &amp;lt;&amp;lt; score3[i] &amp;lt;&amp;lt; std::endl;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结1：数组名的命名规范与变量名命名规范一致，不要和变量重名&lt;/p&gt;
+&lt;p&gt;总结2：数组中下标是从0开始索引&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;5.2.2 一维数组数组名&lt;/h4&gt;
+&lt;p&gt;一维数组名称的&lt;strong&gt;用途&lt;/strong&gt;：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;可以统计整个数组在内存中的长度&lt;/li&gt;
+&lt;li&gt;可以获取数组在内存中的首地址&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	//数组名用途
+	//1、可以获取整个数组占用内存空间大小
+	int arr[10] = { 1,2,3,4,5,6,7,8,9,10 };
+
+	std::cout &amp;lt;&amp;lt; &quot;整个数组所占内存空间为： &quot; &amp;lt;&amp;lt; sizeof(arr) &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;每个元素所占内存空间为： &quot; &amp;lt;&amp;lt; sizeof(arr[0]) &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;数组的元素个数为： &quot; &amp;lt;&amp;lt; sizeof(arr) / sizeof(arr[0]) &amp;lt;&amp;lt; std::endl;
+
+	//2、可以通过数组名获取到数组首地址
+	std::cout &amp;lt;&amp;lt; &quot;数组首地址为： &quot; &amp;lt;&amp;lt; (int)arr &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;数组中第一个元素地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;arr[0] &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;数组中第二个元素地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;arr[1] &amp;lt;&amp;lt; std::endl;
+
+	//arr = 100; 错误，数组名是常量，因此不可以赋值
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注意：数组名是常量，不可以赋值&lt;/p&gt;
+&lt;p&gt;总结1：直接打印数组名，可以查看数组所占内存的首地址&lt;/p&gt;
+&lt;p&gt;总结2：对数组名进行sizeof，可以获取整个数组占内存空间的大小&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;练习案例1&lt;/strong&gt;：五只小猪称体重&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;案例描述&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;在一个数组中记录了五只小猪的体重，如：int arr[5] = {300,350,200,400,250};&lt;/p&gt;
+&lt;p&gt;找出并打印最重的小猪体重。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;练习案例2&lt;/strong&gt;：数组元素逆置&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;案例描述&lt;/strong&gt;：请声明一个5个元素的数组，并且将元素逆置.&lt;/p&gt;
+&lt;p&gt;(如原数组元素为：1,3,2,5,4;逆置后输出结果为:4,5,2,3,1);&lt;/p&gt;
+&lt;h4&gt;5.2.3 冒泡排序&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;： 最常用的排序算法，对数组内元素进行排序&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;比较相邻的元素。如果第一个比第二个大，就交换他们两个。&lt;/li&gt;
+&lt;li&gt;对每一对相邻元素做同样的工作，执行完毕后，找到第一个最大值。&lt;/li&gt;
+&lt;li&gt;重复以上的步骤，每次比较次数-1，直到不需要比较&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1541905327273.png&quot; alt=&quot;1541905327273&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;： 将数组 { 4,2,8,0,5,7,1,3,9 } 进行升序排序&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	// 冒泡排序
+	int arr[9] = { 4,2,8,0,5,7,1,3,9 };
+
+	for (int i = 0; i &amp;lt; 9 - 1; i++)
+	{
+		for (int j = 0; j &amp;lt; 9 - 1 - i; j++)
+		{
+			if (arr[j] &amp;gt; arr[j + 1])
+			{
+				int temp = arr[j];
+				arr[j] = arr[j + 1];
+				arr[j + 1] = temp;
+			}
+		}
+	}
+
+	for (int i = 0; i &amp;lt; 9; i++)
+	{
+		std::cout &amp;lt;&amp;lt; arr[i] &amp;lt;&amp;lt; std::endl;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;5.3 二维数组&lt;/h3&gt;
+&lt;p&gt;二维数组就是在一维数组上，多加一个维度。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1541905559138.png&quot; alt=&quot;1541905559138&quot; /&gt;&lt;/p&gt;
+&lt;h4&gt;5.3.1 二维数组定义方式&lt;/h4&gt;
+&lt;p&gt;二维数组定义的四种方式：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;数据类型  数组名[ 行数 ][ 列数 ];&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;数据类型  数组名[ 行数 ][ 列数 ] = { {数据1，数据2 } ，{数据3，数据4 } };&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;数据类型  数组名[ 行数 ][ 列数 ] = { 数据1，数据2，数据3，数据4};&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt; 数据类型  数组名[  ][ 列数 ] = { 数据1，数据2，数据3，数据4};&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;建议：以上4种定义方式，利用&lt;strong&gt;第二种更加直观，提高代码的可读性&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;示例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	//方式1  
+	//数组类型 数组名 [行数][列数]
+	int arr[2][3];
+	arr[0][0] = 1;
+	arr[0][1] = 2;
+	arr[0][2] = 3;
+	arr[1][0] = 4;
+	arr[1][1] = 5;
+	arr[1][2] = 6;
+
+	for (int i = 0; i &amp;lt; 2; i++)
+	{
+		for (int j = 0; j &amp;lt; 3; j++)
+		{
+			std::cout &amp;lt;&amp;lt; arr[i][j] &amp;lt;&amp;lt; &quot; &quot;;
+		}
+		std::cout &amp;lt;&amp;lt; std::endl;
+	}
+
+	//方式2 
+	//数据类型 数组名[行数][列数] = { {数据1，数据2 } ，{数据3，数据4 } };
+	int arr2[2][3] =
+	{
+		{1,2,3},
+		{4,5,6}
+	};
+
+	//方式3
+	//数据类型 数组名[行数][列数] = { 数据1，数据2 ,数据3，数据4  };
+	int arr3[2][3] = { 1,2,3,4,5,6 };
+
+	//方式4 
+	//数据类型 数组名[][列数] = { 数据1，数据2 ,数据3，数据4  };
+	int arr4[][3] = { 1,2,3,4,5,6 };
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：在定义二维数组时，如果初始化了数据，可以省略行数&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;5.3.2 二维数组数组名&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;查看二维数组所占内存空间&lt;/li&gt;
+&lt;li&gt;获取二维数组首地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	//二维数组数组名
+	int arr[2][3] =
+	{
+		{1,2,3},
+		{4,5,6}
+	};
+
+	std::cout &amp;lt;&amp;lt; &quot;二维数组大小： &quot; &amp;lt;&amp;lt; sizeof(arr) &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;二维数组一行大小： &quot; &amp;lt;&amp;lt; sizeof(arr[0]) &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;二维数组元素大小： &quot; &amp;lt;&amp;lt; sizeof(arr[0][0]) &amp;lt;&amp;lt; std::endl;
+
+	std::cout &amp;lt;&amp;lt; &quot;二维数组行数： &quot; &amp;lt;&amp;lt; sizeof(arr) / sizeof(arr[0]) &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;二维数组列数： &quot; &amp;lt;&amp;lt; sizeof(arr[0]) / sizeof(arr[0][0]) &amp;lt;&amp;lt; std::endl;
+
+	//地址
+	std::cout &amp;lt;&amp;lt; &quot;二维数组首地址：&quot; &amp;lt;&amp;lt; arr &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;二维数组第一行地址：&quot; &amp;lt;&amp;lt; arr[0] &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;二维数组第二行地址：&quot; &amp;lt;&amp;lt; arr[1] &amp;lt;&amp;lt; std::endl;
+
+	std::cout &amp;lt;&amp;lt; &quot;二维数组第一个元素地址：&quot; &amp;lt;&amp;lt; &amp;amp;arr[0][0] &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;二维数组第二个元素地址：&quot; &amp;lt;&amp;lt; &amp;amp;arr[0][1] &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结1：二维数组名就是这个数组的首地址&lt;/p&gt;
+&lt;p&gt;总结2：对二维数组名进行sizeof时，可以获取整个二维数组占用的内存空间大小&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;&lt;strong&gt;5.3.3 二维数组应用案例&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;考试成绩统计&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;案例描述：有三名同学（张三，李四，王五），在一次考试中的成绩分别如下表，&lt;strong&gt;请分别输出三名同学的总成绩&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th&gt;语文&lt;/th&gt;
+&lt;th&gt;数学&lt;/th&gt;
+&lt;th&gt;英语&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;张三&lt;/td&gt;
+&lt;td&gt;100&lt;/td&gt;
+&lt;td&gt;100&lt;/td&gt;
+&lt;td&gt;100&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;李四&lt;/td&gt;
+&lt;td&gt;90&lt;/td&gt;
+&lt;td&gt;50&lt;/td&gt;
+&lt;td&gt;100&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;王五&lt;/td&gt;
+&lt;td&gt;60&lt;/td&gt;
+&lt;td&gt;70&lt;/td&gt;
+&lt;td&gt;80&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;参考答案：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+int main() {
+
+	int scores[3][3] =
+	{
+		{100,100,100},
+		{90,50,100},
+		{60,70,80},
+	};
+
+	std::string names[3] = { &quot;张三&quot;,&quot;李四&quot;,&quot;王五&quot; };
+
+	for (int i = 0; i &amp;lt; 3; i++)
+	{
+		int sum = 0;
+		for (int j = 0; j &amp;lt; 3; j++)
+		{
+			sum += scores[i][j];
+		}
+		std::cout &amp;lt;&amp;lt; names[i] &amp;lt;&amp;lt; &quot;同学总成绩为： &quot; &amp;lt;&amp;lt; sum &amp;lt;&amp;lt; std::endl;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
 </content:encoded></item><item><title>2.3浮点数的表示和运算</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/23-representation-and-operations-of-floating-point-numbers/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/23-representation-and-operations-of-floating-point-numbers/</guid><pubDate>Sun, 26 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;浮点数表示法通过将比例因子嵌入数据中，使小数点位置可根据需要浮动。这样，在有限位数下，既能扩大数值的表示范围，又能保持较高的有效精度。例如，用定点数表示电子质量($9\times10^{-28}$g) 或太阳质量 ($2\times10^{33}$g) 极为不便，而浮点数则能高效处理此类极大或极小的数值。&lt;/p&gt;
 &lt;p&gt;通常，浮点数表示为&lt;/p&gt;
 &lt;p&gt;$$
