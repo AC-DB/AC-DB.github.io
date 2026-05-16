@@ -1,4 +1,335 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>6.2总线事务和定时</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/62-bus-transactions-and-timing/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/62-bus-transactions-and-timing/</guid><pubDate>Wed, 13 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;6.2.1 总线事务&lt;/h3&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>1.4操作系统结构</title><link>https://www.atsuko.top/posts/408/operating-system/14-operating-system-structure/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/14-operating-system-structure/</guid><pubDate>Sat, 16 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;随着操作系统功能的不断扩展和代码规模的持续增长，采用合理的结构设计对降低系统复杂度、提升安全性和可靠性至关重要。&lt;/p&gt;
+&lt;h3&gt;1. 分层法&lt;/h3&gt;
+&lt;p&gt;分层法将操作系统划分为若干层次，最底层（层0）为硬件，顶层（层N）为用户接口。各层仅可调用其紧邻下层所提供的功能与服务（&lt;strong&gt;单向依赖&lt;/strong&gt;）。&lt;/p&gt;
+&lt;p&gt;分层法的优点如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;便于调试与验证&lt;/strong&gt;，系统可自底向上逐层开发与测试。层1完成且验证无误后，即可开发层2，因其仅依赖已验证的下层；后续各层以此类推。若某层出现错误，可将其定位在该层内部，因其所有依赖的下层均已通过验证。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;易于扩充与维护&lt;/strong&gt;。在保持层间接口不变的前提下，可独立修改、替换或新增某一层的实现，而不会影响其他层次的功能。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;分层法的问题如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;层次划分困难&lt;/strong&gt;。合理界定各层的功能边界较为复杂，且一旦依赖关系固化，系统架构可能缺乏灵活性。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;运行效率较低&lt;/strong&gt;。执行一个高层功能通常需穿越多个中间层，每层之间的参数传递与控制转移会引入额外开销，从而影响系统整体性能。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;2. 模块化&lt;/h3&gt;
+&lt;p&gt;模块化是将操作系统按功能划分为若干具有一定独立性的模块。每个模块实现特定的管理功能，并明确定义与其他模块的接口，以便通过这些接口进行通信。还可进一步将模块细分为若干子模块，并且规定子模块之间的接口。这种设计方法称为&lt;code&gt;模块-接口法&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;在划分模块时，若模块过小，虽然可降低单个模块的复杂性，但会导致模块间交互频繁，增加系统的整体复杂度；若模块过大，则模块内部结构复杂，难以维护。因此，需要在粒度大小之间取得合理平衡。此外，应高度重视模块的独立性：模块独立性越高，相互依赖越少，系统结构越清晰。衡量模块独立性的主要标准有两个：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;内聚性&lt;/strong&gt;，模块内部各组成部分间联系的紧密程度。内聚性越高，模块独立性越好。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;耦合度&lt;/strong&gt;，模块间相互依赖和影响的程度。耦合度越低，模块独立性越好。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;模块化的优点：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;提高了操作系统设计的正确性、可理解性和可维护性；&lt;/li&gt;
+&lt;li&gt;增强了系统的可适应性，便于功能扩展；&lt;/li&gt;
+&lt;li&gt;支持并行开发，加速操作系统研制进程。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;模块化的缺点：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;模块间的接口规定很难满足对接口的实际需求。&lt;/li&gt;
+&lt;li&gt;各模块设计者齐头并进，每个决定无法建立在上一个已验证的正确决定的基础上，因此无法找到一个可靠的决定顺序。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;3. 宏内核&lt;/h3&gt;
+&lt;p&gt;从操作系统的内核架构来划分，可分为&lt;strong&gt;宏内核&lt;/strong&gt;和&lt;strong&gt;微内核&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;宏内核&lt;/code&gt;（也称&lt;code&gt;单内核&lt;/code&gt;或&lt;code&gt;大内核&lt;/code&gt;）将系统的主要功能模块集成在一个紧密耦合的整体中，&lt;strong&gt;运行于内核态&lt;/strong&gt;，从而为用户程序提供高效的系统服务。由于各模块共享地址空间，可直接调用彼此的函数，减少了上下文切换和消息传递开销，因而具有较高的性能优势。&lt;/p&gt;
+&lt;p&gt;然而，随着体系结构和应用需求的不断发展，操作系统需提供的服务日益复杂，代码规模急剧膨胀，导致系统维护困难、可靠性下降，面临典型的“软件危机”。为提升系统的模块化、可扩展性与安全性，微内核技术应运而生：其核心思想是仅保留最基本的功能(如进程调度、进程间通信等)在内核中，而将文件系统、设备驱动等非核心服务移至用户态运行。&lt;/p&gt;
+&lt;p&gt;从发展现状看，当前主流操作系统（如Linux 、Windows 、Android ）主要采用宏内核或混合内核架构，在保持高性能的同时，也吸收了微内核的部分设计理念。例如，macOS 和iOS所采用的XNU内核即融合了Mach微内核与BSD宏内核的特性。这表明，宏内核与微内核并非对立，而是相互借鉴、融合发展。近年来，随着对安全性和可验证性的重视，微内核架构重新受到关注，尤其是谷歌的Fuchsia 和华为的HarmonyOS NEXT ，都采用了微内核架构。&lt;/p&gt;
+&lt;h3&gt;4. 微内核&lt;/h3&gt;
+&lt;h4&gt;(1) 微内核的基本概念&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;微内核&lt;/code&gt;架构是指将操作系统中最基本的功能保留在内核，而将其他非核心功能移至用户态运行，从而降低内核的复杂性。这些移出的功能被组织为若干独立的服务程序，它们运行在用户态，彼此之间以及与客户进程之间的交互均通过微内核提供的&lt;strong&gt;消息传递机制&lt;/strong&gt;完成。&lt;/p&gt;
+&lt;p&gt;微内核结构将操作系统划分为两大部分：&lt;strong&gt;微内核&lt;/strong&gt;和&lt;strong&gt;多个服务器&lt;/strong&gt;。&lt;code&gt;微内核&lt;/code&gt;是一个精心设计的小型内核，&lt;strong&gt;仅实现操作系统最核心的机制&lt;/strong&gt;，通常包括：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;与硬件紧密相关的部分；&lt;/li&gt;
+&lt;li&gt;基本的资源管理机制；&lt;/li&gt;
+&lt;li&gt;客户与服务器间的通信支持。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这些部分为构建完整的操作系统提供了基础，确保内核保持极小规模。操作系统的绝大部分功能都放在微内核外的一组服务器（进程）中实现，运行在用户态。例如，进程/线程服务器、虚拟存储器服务器等，均以用户态进程的形式提供相应服务。&lt;/p&gt;
+&lt;p&gt;在微内核结构中，为提升可靠性，仅微内核运行在内核态，其余模块均运行在用户态。因此，某一模块（如文件服务器）发生故障时，仅该模块崩溃，系统可通过重启该服务恢复，而不会导致整个系统宕机。相比之下，在宏内核中，文件系统运行于内核态，其崩溃将直接引发系统崩溃。&lt;/p&gt;
+&lt;h4&gt;(2) 微内核的基本功能&lt;/h4&gt;
+&lt;p&gt;微内核操作系统遵循“&lt;strong&gt;机制与策略分离&lt;/strong&gt;”的设计原则，将与硬件紧密相关的机制置于微内核中，而将策略交由用户态服务器实现。通过这种划分，进程管理、存储器管理和I/O管理等功能均被分解为两部分：机制保留在微内核中，策略则由外部服务器实现。由于服务器通常远大于微内核，该设计使微内核得以保持极小的规模。具体而言，微内核通常具备以下功能：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;进程（线程）管理&lt;/code&gt;。微内核提供进程/线程的创建、切换、调度队列管理等机制，而进程分类、优先级分配等策略则由用户态的进程管理服务器实现。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;低级存储器管理&lt;/code&gt;。微内核仅包含与硬件相关的地址转换机制（如页表管理、逻辑地址到物理地址的映射)，而页面置换算法、内存分配策略等由用户态的存储器管理服务器实现。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;中断和陷入处理&lt;/code&gt;。微内核负责捕获硬件中断和陷入事件，在识别中断或异常类型后，将其分发给相应的用户态服务器处理。中断与陷入的捕获及分发机制属于微内核的核心功能。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;(3) 微内核的特点&lt;/h4&gt;
+&lt;p&gt;微内核结构的主要优点如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;扩展性和灵活性&lt;/code&gt;。新增或修改功能只需调整相应服务器，无须改动内核。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;可靠性和安全性&lt;/code&gt;。用户态服务的故障不会导致系统崩溃，且攻击面更小。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;可移植性&lt;/code&gt;。仅微内核包含硬件相关代码，其余服务器与平台无关，便于移植。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;分布式计算&lt;/code&gt;。客户/服务器间通过消息传递通信，易于扩展至网络环境。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;微内核结构的主要缺点是&lt;code&gt;性能问题&lt;/code&gt;，每次服务请求需多次穿越内核态与用户态，导致系统调用延迟增加。为缓解此问题，部分现代系统采用混合内核设计，在保留微内核思想的同时，将高频服务移入内核以提升性能，但这又会使微内核的容量明显增大。&lt;/p&gt;
+&lt;p&gt;尽管如此，微内核因其高可靠性和可验证性，被广泛应用于对系统可靠性要求极高的关键任务领域，如实时操作系统、工业控制、航空航天及军事等。&lt;/p&gt;
+&lt;h3&gt;5. 外核&lt;/h3&gt;
+&lt;p&gt;与传统操作系统通过抽象层向应用程序提供统一接口不同，&lt;code&gt;外核&lt;/code&gt;(exokernel )采用一种截然不同的设计思想：&lt;strong&gt;将物理资源直接暴露给用户级系统，自身仅负责资源的安全分配与隔离&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;在外核架构中，外核作为运行于内核态的极小程序，其核心职责是将底层硬件资源(如磁盘块、内存页、网络包缓冲区等)划分为互不重叠的子集，并分配给不同的用户级系统。例如，一个用户级系统可能被分配磁盘的0~1023块，另一个用户级系统则被分配独特的1024~2047块。外核通过权限检查机制，确保各用户级系统仅能访问其被明确授权的资源，防止越权访问。&lt;/p&gt;
+&lt;p&gt;在外核之上，可在用户空间构建&lt;code&gt;库操作系统&lt;/code&gt;(library OS )，自主实现文件系统、进程调度、虚拟内存管理等传统操作系统功能。由于库操作系统直接操作物理资源，无须经过传统内核强制性的抽象层，因此避免了不必要的数据拷贝、地址转换以及上下文切换开销，显著提升了系统性能与灵活性。&lt;/p&gt;
+&lt;p&gt;外核机制的主要优点如下。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;减少抽象开销&lt;/code&gt;。传统操作系统强制引入虚拟内存、虚拟文件系统等映射层，而外核允许用户级系统按需定制资源使用方式，显著降低了系统开销。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;提升灵活性与性能&lt;/code&gt;。用户级系统可根据应用特性优化资源管理策略(如数据库可以直接管理磁盘块)，充分发挥硬件的潜力。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;清晰分离保护与实现&lt;/code&gt;。&lt;strong&gt;外核仅负责资源保护，功能实现完全置于用户空间&lt;/strong&gt;，系统结构简洁且易于验证。&lt;/li&gt;
+&lt;/ol&gt;
+</content:encoded></item><item><title>1.5操作系统引导</title><link>https://www.atsuko.top/posts/408/operating-system/15-operating-system-boot/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/15-operating-system-boot/</guid><pubDate>Sat, 16 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;操作系统（如Windows、Linux等）以程序形式存储于硬盘等外部存储设备中。&lt;code&gt;操作系统引导&lt;/code&gt;是指计算机通过执行一系列引导程序，依次定位启动设备、确定可引导分区、加载其中的操作系统内核，最终完成系统启动的链式过程。&lt;/p&gt;
+&lt;p&gt;常见操作系统的引导过程如下。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;CPU激活与BIOS初始化&lt;/strong&gt;。计算机通电后，CPU从ROM中读取并执行BIOS(基本输入/输出系统)程序。BIOS初始化基本硬件，建立中断向量表，为引导阶段的设备访问提供支持。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;硬件自检与启动设备选择&lt;/strong&gt;。BIOS执行通电自检(POST)，检测CPU、内存以及外设是否正常。自检通过后，依据CMOS设置(主板上由电池供电的配置存储器，用于保存启动顺序、系统时间等参数)确定启动设备优先级，并选择首个有效的启动设备（如硬盘、U盘）。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;加载主引导记录(MBR)&lt;/strong&gt;。BIOS将所选启动设备的首扇区（主引导记录，即MBR）加载到内存中。MBR包含两部分核心内容：引导代码与硬盘分区表。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;定位活动分区并加载分区引导记录(PBR)&lt;/strong&gt;。MBR中的引导代码解析分区表，识别标记为“活动”的分区，并将其首扇区（分区引导记录，即PBR）加载到内存中。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;加载启动管理器&lt;/strong&gt;。PBR中的代码负责加载活动分区内的启动管理器(如Linux的GRUB、Windows 的 Bootmgr)，后者提供多操作系统或内核版本的选择界面。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;加载操作系统内核&lt;/strong&gt;。启动管理器将用户选定的操作系统内核映象加载到内存中，并跳转执行。内核随即完全接管系统控制权，重建中断处理机制，不再依赖BIOS提供的服务。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;内核初始化与用户环境启动&lt;/strong&gt;。内核完成核心子系统的初始化：内存管理模块构建内核页表及用户进程地址空间框架；进程调度模块初始化进程控制块(PCB)链表、就绪队列与阻塞队列；设备驱动模块建立设备控制块、设备分配表以及I/O缓冲区管理结构。初始化完成后，内核启动首个用户态进程（如Linux的init），由此逐步构建完整的用户操作环境。&lt;/li&gt;
+&lt;/ol&gt;
+</content:encoded></item><item><title>1.6虚拟机</title><link>https://www.atsuko.top/posts/408/operating-system/16-virtual-machine/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/16-virtual-machine/</guid><pubDate>Sat, 16 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;1.6.1 虚拟机的基本概念&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;虚拟机&lt;/code&gt;是指通过&lt;strong&gt;虚拟化技术&lt;/strong&gt;，将一台物理计算机抽象为多台逻辑上独立的计算环境，每台虚拟机都表现为完整硬件系统的精确复制品。虚拟化技术的核心在于&lt;strong&gt;隐藏底层物理硬件的细节&lt;/strong&gt;，向上层提供统一且隔离的执行平台。目前主流的虚拟化方案分为两类。&lt;/p&gt;
+&lt;h4&gt;1. 第一类虚拟机管理程序&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;第一类虚拟机管理程序&lt;/code&gt;（又称&lt;code&gt;裸金属架构&lt;/code&gt;）直接运行在物理硬件之上，是系统中唯一处于最高特权级的软件。它类似于一个轻量级的操作系统，负责管理硬件资源和并发调度多个虚拟机。每个虚拟机均可安装独立的操作系统（称为客户操作系统），彼此完全隔离。&lt;/p&gt;
+&lt;p&gt;在此类架构中，客户操作系统运行于&lt;code&gt;虚拟内核态&lt;/code&gt;，它认为自己处于真实的CPU内核态，但实际上并非如此；其用户进程则运行在真实的用户态。当客户操作系统执行一条仅允许在真实内核态下执行的敏感指令时，会触发异常并陷入虚拟机管理程序。&lt;/p&gt;
+&lt;p&gt;在支持硬件虚拟化的CPU上，虚拟机管理程序能够根据执行上下文判断该指令源自客户操作系统还是用户程序：若为前者，则代为完成其功能；若为后者（用户程序非法执行敏感指令)，则模拟真实硬件的异常响应行为。而在早期不支持硬件虚拟化的CPU上，所有敏感指令均被透明重定向到虚拟机管理程序，由其通过软件模拟实现相应功能。&lt;/p&gt;
+&lt;h4&gt;2. 第二类虚拟机管理程序&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;第二类虚拟机管理程序&lt;/code&gt;（又称&lt;code&gt;寄居架构&lt;/code&gt;）以应用程序的形式运行在&lt;strong&gt;宿主操作系统&lt;/strong&gt;(如Windows 或Linux )之上，依赖宿主系统进行资源分配与调度，本质上是一个用户态进程。尽管如此，它仍向&lt;strong&gt;客户操作系统&lt;/strong&gt;伪装成完整的硬件平台。VMware Workstation 是x86平台上首个广泛使用的第二类虚拟机管理程序。&lt;/p&gt;
+&lt;p&gt;首次启动时，第二类虚拟机管理程序模拟一台新计算机的行为，用户可将客户操作系统安装到虚拟磁盘（实际上是宿主操作系统中的一个普通文件），安装完成后即可正常启动和运行。&lt;/p&gt;
+&lt;p&gt;虚拟化技术在Web主机领域应用广泛。若无虚拟化，服务商只能提供共享托管(用户无法控制软件环境)或独占托管（成本高昂）。借助虚拟化，单台物理服务器可同时运行多个虚拟机，每个虚拟机对用户而言都是一台完整的服务器，支持自定义操作系统与软件，且成本显著降低——这正是当前主流云服务器服务的基础。&lt;/p&gt;
+</content:encoded></item><item><title>1.7第一章总结</title><link>https://www.atsuko.top/posts/408/operating-system/chapter-1-summary/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/chapter-1-summary/</guid><pubDate>Sat, 16 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;1.7 本章疑难点&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;并行性与并发性的区别和联系&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;并行性与并发性是两个既相似又有区别的概念。&lt;strong&gt;并行性&lt;/strong&gt;是指多个事件在同一时刻发生，而&lt;strong&gt;并发性&lt;/strong&gt;是指多个事件在同一时间间隔内发生。在多道程序环境下，并发性表现为宏观上多个程序同时运行；但在单处理器系统中，任一时刻仅能执行一个程序，因此微观上这些程序分时交替执行。若系统配备多个处理器，则可将并发执行的程序分配至不同处理器，实现真正的并行。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;特权指令与非特权指令&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;特权指令&lt;/strong&gt;是一类具有特殊权限的指令，用于执行清内存、置时钟、分配系统资源、修改虚存页表、调整用户访问权限等关键操作。由于其权限极高，使用不当可能导致系统崩溃。为保障系统安全，特权指令仅允许在&lt;strong&gt;内核态&lt;/strong&gt;执行；实际上，CPU在内核态下可执行完整的指令集。&lt;/p&gt;
+&lt;p&gt;为防止用户程序误用特权指令，用户态下允许执行非特权指令。当用户程序试图执行特权指令时，硬件将触发异常以阻止该操作。系统中涉及特权操作的部分必须运行于内核态，从而确保系统的安全性与可靠性。从用户态切换至内核态的唯一途径是中断或异常。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;访管指令与访管中断&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;访管指令&lt;/strong&gt;(Trap指令)是一条可在用户态执行的特殊指令。当用户程序需要请求操作系统服务时，会主动执行该指令，从而引发一个自愿中断——&lt;strong&gt;访管中断&lt;/strong&gt;，使系统从用户态切换至内核态，由操作系统内核处理相应请求。&lt;strong&gt;系统调用正是通过访管指令实现的&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;引入访管指令的原因在于：用户程序运行于用户态，而诸如I/O操作、进程创建、内存分配等任务涉及特权资源，无法在用户态直接完成，必须借助访管指令主动触发中断，进入内核态以获取所需服务。值得注意的是，访管指令本身&lt;strong&gt;并非特权指令&lt;/strong&gt;，其核心作用是为用户提供一种&lt;strong&gt;受控且主动的内核态入口机制&lt;/strong&gt;，在保障系统安全的同时，实现用户程序与操作系统的高效交互。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;定义微内核结构OS的四个方面&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;足够小的内核&lt;/strong&gt;：微内核仅包含最基础的核心功能，如进程间通信、基本调度等。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;基于客户/服务器模式&lt;/strong&gt;：内核作为服务器提供基础服务，应用程序作为客户端请求服务。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;机制与策略分离&lt;/strong&gt;：机制指实现功能的具体执行机构，策略则是在机制基础上通过参数或算法实现优化或差异化目标。传统操作系统将机制置于底层、策略置于高层；而微内核OS将机制保留在内核中，策略移至用户态服务进程，从而显著减小内核规模。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;采用面向对象技术&lt;/strong&gt;：通过“抽象”“封装”“继承”等特性，有效控制系统复杂性，并提升操作系统的正确性、可靠性与可扩展性，因而被广泛应用于现代操作系统设计。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</content:encoded></item><item><title>1.1操作系统基本概念</title><link>https://www.atsuko.top/posts/408/operating-system/11-basic-concepts-of-operating-system/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/11-basic-concepts-of-operating-system/</guid><pubDate>Fri, 15 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;1.1.1 操作系统的概念&lt;/h3&gt;
+&lt;p&gt;在信息化时代，软件是计算机系统的灵魂，而作为其核心的操作系统，已与现代计算机系统深度融合。从使用层次来看，计算机系统自下而上可分为四层：硬件、操作系统、应用程序和用户（该划分侧重人机交互视角，不同于计算机组成原理中的结构分层）。其中，硬件(如中央处理器、内存、输入/输出设备等)提供基本计算资源；应用程序(如文字处理软件、电子表格、编译器、浏览器等)则利用这些资源解决用户的实际问题。操作系统负责&lt;strong&gt;管理硬件资源&lt;/strong&gt;，&lt;strong&gt;为应用程序提供运行环境&lt;/strong&gt;，并&lt;strong&gt;充当硬件与用户之间的桥梁&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;具体而言，操作系统通过有效协调多个应用程序对硬件资源的访问，确保系统高效、安全地运行。综上所述，&lt;code&gt;操作系统&lt;/code&gt;(Operating System,OS)是控制和管理计算机系统软/硬件资源、合理调度任务与分配资源，并为用户及其他软件提供统一接口与运行环境的最基本的系统软件。&lt;/p&gt;
+&lt;h3&gt;1.1.2 操作系统的功能和目标&lt;/h3&gt;
+&lt;p&gt;为多道程序提供良好的运行环境，操作系统需具备四大核心功能：&lt;strong&gt;处理机管理&lt;/strong&gt;、&lt;strong&gt;存储器管理&lt;/strong&gt;、&lt;strong&gt;设备管理&lt;/strong&gt;和&lt;strong&gt;文件管理&lt;/strong&gt;。此外，为方便用户使用，操作系统还需提供用户接口；同时，它通过抽象与虚拟化技术扩充硬件功能，从而提供更便捷的服务并提升资源利用率。&lt;/p&gt;
+&lt;p&gt;下面用直观的例子来描述操作系统的角色。例如，将用户视为“雇主”，计算机(由处理机、存储器、设备和文件等组成)视为“机器”，而操作系统则如同一位“工人”。这位工人具备协调和控制各个部件工作的能力，这体现了操作系统对系统资源的管理功能；同时，工人接收雇主的命令并执行任务，这对应于操作系统提供的“用户接口”；由于工人的存在，让原本复杂的机器变得简单易用，并充分发挥其价值，这正是操作系统“扩充机器”的作用。&lt;/p&gt;
+&lt;h4&gt;1. 操作系统作为计算机系统资源的管理者&lt;/h4&gt;
+&lt;h5&gt;(1) 处理机管理&lt;/h5&gt;
+&lt;p&gt;在多道程序环境下，处理机的分配和运行都以进程（或线程）为基本单位，因此处理机管理&lt;strong&gt;本质上是对进程的管理&lt;/strong&gt;。&lt;code&gt;并发&lt;/code&gt;是指多个进程在一段时间内交替执行，宏观上呈现同时运行的特征。进程管理的主要任务包括进程控制、进程同步、进程通信、死锁处理以及处理机调度等。&lt;/p&gt;
+&lt;h5&gt;(2) 存储器管理&lt;/h5&gt;
+&lt;p&gt;存储器管理旨在&lt;strong&gt;为多道程序提供良好的内存运行环境&lt;/strong&gt;，方便用户使用并提高内存利用率，主要功能包括内存分配与回收、地址映射、内存保护与共享，以及内存扩充等。&lt;/p&gt;
+&lt;h5&gt;(3) 文件管理&lt;/h5&gt;
+&lt;p&gt;用户可见的持久化信息通常以文件形式组织。操作系统中负责文件管理的部分称为&lt;code&gt;文件系统&lt;/code&gt;，其功能包括文件存储空间的管理、目录管理、文件读/写操作及访问保护等。&lt;/p&gt;
+&lt;h5&gt;(4) 设备管理&lt;/h5&gt;
+&lt;p&gt;设备管理的主要任务是&lt;strong&gt;处理用户的I/O请求&lt;/strong&gt;，&lt;strong&gt;屏蔽设备差异&lt;/strong&gt;，方便用户使用各类外设，并提高设备利用率，主要包括缓冲管理、设备分配、设备驱动处理和虚拟设备等功能。&lt;/p&gt;
+&lt;p&gt;上述任务均由“工人”（操作系统）自动完成，“雇主”（用户）无须关注。&lt;/p&gt;
+&lt;h4&gt;2. 操作系统作为用户与计算机硬件系统之间的接口&lt;/h4&gt;
+&lt;p&gt;所谓操作系统，是指用户与计算机硬件系统的接口，即操作系统位于用户与硬件之间，是用户使用硬件的必经媒介。正是有了操作系统的支撑，用户才能更方便、更可靠地操作硬件设备和运行用户程序。操作系统处于计算机硬件与用户之间，充当二者之间的桥梁。&lt;/p&gt;
+&lt;p&gt;用户通过应用程序或直接交互方式访问系统服务，而这些请求最终均由操作系统统一管理和调度。从交互方式来看，终端用户通过命令行和图形界面与操作系统通信；应用程序则通过系统调用请求操作系统服务。根据服务对象与使用场景的不同，这些交互方式可以分为两大类：&lt;code&gt;用户接口&lt;/code&gt;包括命令方式和图形方式，面向普通终端用户；&lt;code&gt;程序接口&lt;/code&gt;即系统调用，专为应用程序设计。&lt;/p&gt;
+&lt;h5&gt;(1) 用户接口&lt;/h5&gt;
+&lt;p&gt;为了使用户能够直接或间接控制作业的执行，操作系统提供了以下三类用户接口。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;联机用户接口&lt;/code&gt;（命令行接口）：面向交互式用户，由键盘命令与命令解释程序组成。用户输入命令后，系统立即解释并执行，完成后返回控制权，适用于实时交互场景。可以这样理解：“雇主”说一句话，“工人”做一件事，并做出反馈，这就体现了交互性。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;脱机用户接口&lt;/code&gt;（作业控制语言）：用于批处理系统。用户将作业控制命令写入作业说明书，连同作业一并提交；系统调度到该作业时，自动解释并执行说明书中的命令，无须用户实时干预。可以这样理解：“雇主”预先将任务清单交给“工人”，“工人”按清单逐条完成这些任务。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;图形用户接口&lt;/code&gt;(GUI)：为提升易用性，通过图标、菜单、对话框等图形元素替代文本命令。用户借助鼠标等设备进行操作，底层通过系统调用与内核交互，显著降低了使用门槛。&lt;/p&gt;
+&lt;h5&gt;(2) 程序接口&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;程序接口&lt;/code&gt;是应用程序在运行时请求操作系统服务、访问系统资源的唯一合法途径，其核心是一组&lt;strong&gt;系统调用&lt;/strong&gt;。每个系统调用对应内核中实现某个特定功能的子程序。当应用程序需要操作系统服务时，必须通过调用相应的系统调用来完成。&lt;/p&gt;
+&lt;p&gt;早期的系统调用多基于汇编语言实现，仅能在汇编程序中直接使用；在高级语言（如C语言）环境中，程序员通常调用标准库函数（如 &lt;code&gt;printf()&lt;/code&gt;、&lt;code&gt;open()&lt;/code&gt; 等)来间接触发系统调用。注意，库函数本身并非操作系统接口，它们只是&lt;strong&gt;对系统调用的封装&lt;/strong&gt;。例如，&lt;code&gt;printf()&lt;/code&gt; 最终通过 &lt;code&gt;write&lt;/code&gt; 系统调用输出数据，&lt;code&gt;malloc()&lt;/code&gt; 在需要更多内存时可能调用 &lt;code&gt;brk&lt;/code&gt; 或 &lt;code&gt;mmap&lt;/code&gt; 系统调用；而 &lt;code&gt;strlen()&lt;/code&gt;、&lt;code&gt;sqrt()&lt;/code&gt; 等纯计算类库函数则完全在用户空间中运行，不涉及任何系统调用。因此，尽管库函数在编程中被频繁使用，但操作系统真正提供给应用程序的接口&lt;strong&gt;本质上仍是系统调用&lt;/strong&gt;。&lt;/p&gt;
+&lt;h4&gt;3. 操作系统实现了对计算机资源的扩充&lt;/h4&gt;
+&lt;p&gt;未安装任何软件的计算机称为&lt;code&gt;裸机&lt;/code&gt;，它仅构成计算机系统的物质基础。实际呈现在用户面前的计算机系统，是经过多层软件增强后的逻辑实体。裸机位于最内层，其外层覆盖着操作系统。操作系统通过资源管理功能和用户服务功能，将裸机抽象并扩展为一台&lt;strong&gt;功能更强、使用更便捷的逻辑机器&lt;/strong&gt;。因此，通常将这种被操作系统抽象和扩展后的机器称为&lt;code&gt;扩充机器&lt;/code&gt;。可以这样理解：操作系统作为“工人”，操作原始机器，使机器发挥远超本身的能力。&lt;/p&gt;
+&lt;p&gt;需要说明的是，本章的重点在于理解操作系统如何控制和协调处理机、存储器、设备和文件四大资源。关于接口与扩充机器的概念，读者只需理解其基本思想即可。&lt;/p&gt;
+&lt;h3&gt;1.1.3 操作系统的特征&lt;/h3&gt;
+&lt;p&gt;操作系统是一种系统软件，但与其他系统软件和应用软件有显著不同，具有自身的特殊性，即基本特征。操作系统的基本特征包括&lt;strong&gt;并发&lt;/strong&gt;、&lt;strong&gt;共享&lt;/strong&gt;、&lt;strong&gt;虚拟&lt;/strong&gt;和&lt;strong&gt;异步&lt;/strong&gt;。这些概念对理解和掌握操作系统的核心至关重要，将贯穿于后续各章节。&lt;/p&gt;
+&lt;h4&gt;1. 并发(Concurrency)&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;并发&lt;/code&gt;是指两个或多个事件在&lt;strong&gt;同一时间间隔内&lt;/strong&gt;发生。在多道程序环境下，内存中同时驻留若干道程序，操作系统通过调度机制，在一道程序因I/O操作而暂停时，立即切换到另一道程序运行，从而实现多道程序的交替执行，使CPU保持高利用率。&lt;/p&gt;
+&lt;p&gt;需要注意的是，&lt;code&gt;并行&lt;/code&gt;是指两个或多个事件在&lt;strong&gt;同一时刻&lt;/strong&gt;真正同时发生。在单处理机系统中，尽管宏观上多道程序看似同时运行，但微观上任一时刻仅有一个程序在执行，因此属于&lt;strong&gt;并发而非并行&lt;/strong&gt;；而CPU与I/O设备之间、多个I/O设备之间则可实现真正的硬件并行。若要实现进程级别的并行，则需多核CPU或多处理机等硬件支持。&lt;/p&gt;
+&lt;p&gt;可通过一个生活实例理解并发和并行的区别。例如，在 9:00-10:00 期间，你交替吃面包和写字：9:00-9:10 吃面包，9：10—9：20写字，9：20—9：30吃面包，9：3 9:00-10:00 。两种活动在同一时段内交错进行，但任一时刻仅执行一项，这属于&lt;strong&gt;并发&lt;/strong&gt;。又如，在9：00—10：00期间，你在右手写字的同时，左手拿着面包吃，则两种行为在&lt;strong&gt;同一时刻真正同时进行&lt;/strong&gt;，这属于&lt;strong&gt;并行&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;在操作系统中，引入进程这一概念，其核心目的之一就是支持程序的并发执行。&lt;/p&gt;
+&lt;h4&gt;2. 共享(Sharing)&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;共享&lt;/code&gt;是指系统中的资源可供内存中多个并发执行的进程共同使用。根据资源特性与访问方式的不同，共享主要分为&lt;strong&gt;互斥共享&lt;/strong&gt;和&lt;strong&gt;同时访问&lt;/strong&gt;两种形式。&lt;/p&gt;
+&lt;h5&gt;(1) 互斥共享方式&lt;/h5&gt;
+&lt;p&gt;系统中的某些资源，如打印机、磁带机等，虽然可供多个进程使用，但为避免所打印或记录的结果混淆，必须保证在任一时间段内仅有一个进程访问该资源。&lt;/p&gt;
+&lt;p&gt;具体而言，当进程A访问某个资源时，需先提出请求；若资源空闲，则系统将其分配给A；此后，若其他进程请求访问该资源而A尚未释放，则必须等待。仅当A使用完毕并释放资源后，才允许另一进程对该资源进行访问。我们将此类资源共享方式称为&lt;code&gt;互斥共享&lt;/code&gt;，而将在一段时间内只允许一个进程访问的资源称为&lt;code&gt;临界资源&lt;/code&gt;。计算机系统中的大多数独占型物理设备（如打印机），以及软件中的栈、变量、表格等，均属于临界资源，必须以互斥方式共享。&lt;/p&gt;
+&lt;h5&gt;(2) 同时访问方式&lt;/h5&gt;
+&lt;p&gt;系统中还存在另一类资源，允许多个进程在宏观上“同时”访问。此处的“同时”通常指&lt;strong&gt;逻辑上的并发访问&lt;/strong&gt;，微观上这些进程可能通过分时交替方式访问资源，即&lt;code&gt;分时共享&lt;/code&gt;。典型的可同时访问资源包括磁盘上的文件（尤其是只读文件），允许多个用户同时读取同一份文档；此外，用重入代码编写的程序也可被多个进程并发调用，而不会产生冲突。&lt;/p&gt;
+&lt;p&gt;需注意，互斥共享要求资源在任意时刻仅响应一个请求，否则将导致数据混乱(例如，若多个进程同时向打印机输出，可能导致文档A与文档B的内容交错混杂)；而同时访问则允许多个请求分时完成，只要其最终效果对用户而言等同于连续访问即可。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;并发与共享是操作系统两个最基本的特征&lt;/strong&gt;，二者&lt;strong&gt;互为前提&lt;/strong&gt;：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;资源共享以程序的并发执行为前提，若系统仅支持单道程序，则无须考虑资源共享；&lt;/li&gt;
+&lt;li&gt;有效的资源共享机制是并发执行的基础，若无法协调资源访问，则并发程序将因竞争冲突而无法正确运行。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;3. 虚拟(Virtual)&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;虚拟&lt;/code&gt;是指通过某种技术手段，将一个物理实体映射为多个&lt;strong&gt;逻辑上的对应物&lt;/strong&gt;。物理实体是真实存在的硬件资源，而逻辑对应物则是用户或程序所感知的抽象资源。操作系统主要通过两类复用技术实现虚拟：&lt;code&gt;时分复用&lt;/code&gt;（如处理器的分时共享）和空分复用（如虚拟存储器）。&lt;/p&gt;
+&lt;p&gt;利用&lt;strong&gt;多道程序设计技术&lt;/strong&gt;，操作系统可让多道程序并发执行，分时共享同一个处理器。尽管系统中仅有一个物理CPU，但每个用户都仿佛独占一个CPU。这种通过时间片轮转实现的处理器抽象，使得单个物理CPU在逻辑上表现为多个处理单元。&lt;/p&gt;
+&lt;p&gt;采用&lt;strong&gt;虚拟存储器技术&lt;/strong&gt;，可将有限的物理内存扩展为更大的逻辑地址空间。用户程序所面对的是虚拟存储器，其逻辑容量通常超过实际物理内存，从而在逻辑上实现了存储容量的扩充。&lt;/p&gt;
+&lt;p&gt;此外，通过&lt;strong&gt;虚拟设备技术&lt;/strong&gt;（如SPOOLing），可将某些独占型物理I/O设备（如打印机）转化为多台逻辑设备。每个用户可独占一台逻辑设备，而系统在后台将请求排队处理。这样，原本需要互斥访问的临界资源，便转化为可并发使用的共享资源。&lt;/p&gt;
+&lt;h4&gt;4. 异步(Asynchronism)&lt;/h4&gt;
+&lt;p&gt;在多道程序环境下，多个进程并发执行。但由于系统资源有限，进程的执行并非连续进行，而是以不可预知的速度断续推进，这种特性称为进程的&lt;code&gt;异步性&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;异步性使操作系统运行于高度不确定的环境中，若对共享资源的访问缺乏协调，可能导致&lt;strong&gt;与时间相关的错误&lt;/strong&gt;（例如，多个进程并发修改全局变量而未加同步保护）。然而，在程序正确使用操作系统提供的同步机制的前提下，其执行结果的正确性与可再现性能够得到保障。&lt;/p&gt;
+</content:encoded></item><item><title>1.2操作系统发展历程</title><link>https://www.atsuko.top/posts/408/operating-system/12-development-history-of-operating-systems/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/12-development-history-of-operating-systems/</guid><pubDate>Fri, 15 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;1.2.1 手工操作阶段（未配置操作系统）&lt;/h3&gt;
+&lt;h4&gt;1. 人工操作方式&lt;/h4&gt;
+&lt;p&gt;早期阶段，用户将程序和数据穿孔在纸带或卡片上，装入输入设备后手动控制读入内存并启动程序运行。程序的装入、执行与结果输出等全过程均依赖人工操作。随着计算机硬件性能不断提升，人机速度之间的矛盾日益突出，系统资源利用率低下的问题也愈发严重。&lt;/p&gt;
+&lt;p&gt;手工操作阶段存在两个突出缺点：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;用户独占全机，虽无资源竞争，但系统资源利用率极低；&lt;/li&gt;
+&lt;li&gt;CPU长时间空闲，等待人工完成I/O操作，导致其计算能力未能充分发挥。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;为此，人们提出用高速设备替代人工操作，来控制作业流程。&lt;/p&gt;
+&lt;h4&gt;2. 脱机I/O方式&lt;/h4&gt;
+&lt;p&gt;为缓解人机速度不匹配以及CPU与外设之间的速度差异，诞生了&lt;code&gt;脱机I/O技术&lt;/code&gt;。其核心思想是引入一台外围机（如小型专用计算机），在CPU不参与的情况下，预先完成I/O准备工作：输入时，外围机将纸带或卡片上的程序和数据读入磁带，供CPU后续调入内存；输出时，CPU将结果先写入磁带，再由外围机将磁带内容输出至外设。&lt;/p&gt;
+&lt;p&gt;由于I/O操作完全由外围机独立完成，脱离了主机的直接控制，故称为脱机I/O；相比之下，由主机直接管理I/O设备的方式则称为联机I/O。&lt;/p&gt;
+&lt;p&gt;脱机I/O的主要优点包括：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;装带、卸带及数据传输等操作在脱机状态下由外围机完成，显著减少了CPU空闲时间；&lt;/li&gt;
+&lt;li&gt;CPU可直接从高速磁带读取或写入数据，大幅提升了I/O效率。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;1.2.2 批处理阶段（操作系统开始出现）&lt;/h3&gt;
+&lt;p&gt;在脱机I/O技术的基础上，为实现作业的自动连续处理并进一步提升CPU与系统资源的利用率，&lt;code&gt;批处理系统&lt;/code&gt;应运而生。按发展历程，可分为&lt;strong&gt;单道批处理系统&lt;/strong&gt;和&lt;strong&gt;多道批处理系统&lt;/strong&gt;。&lt;/p&gt;
+&lt;h4&gt;1. 单道批处理系统&lt;/h4&gt;
+&lt;p&gt;为实现对作业的连续处理，系统先将一批作业以脱机方式输入到磁带，并配备一个&lt;code&gt;监督程序&lt;/code&gt;(Monitor)。在其控制下，作业能自动、顺序地逐个运行。尽管作业成批提交，但内存中始终仅驻留一道用户程序。单道批处理系统的主要特征如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;自动性&lt;/code&gt;。在正常情况下，磁带上的作业可自动连续执行，无须人工干预。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;顺序性&lt;/code&gt;。作业按磁带上的顺序依次装入内存，先装入者先完成。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;单道性&lt;/code&gt;。内存中仅允许一道用户程序运行；监督程序每次仅从磁带调入一道作业，待其完成或异常终止后才装入下一道。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;然而，该系统存在明显局限：当正在运行的作业发起I/O请求时，高速CPU不得不空闲等待低速I/O操作结束，导致资源利用率低下。为克服这一瓶颈，&lt;code&gt;多道程序设计技术&lt;/code&gt;被引入。&lt;/p&gt;
+&lt;h4&gt;2. 多道批处理系统&lt;/h4&gt;
+&lt;p&gt;用户提交的作业首先存放在外存的后备队列中。作业调度程序按一定算法从该队列中选取若干作业调入内存，使其在管理程序的控制下并发执行，并共享系统资源。当某道程序因I/O请求而暂停运行时，CPU立即切换至另一就绪程序继续执行。该机制依赖&lt;strong&gt;中断技术&lt;/strong&gt;，使系统各部件尽可能保持忙碌，从而显著提升整体吞吐量和资源利用率。这种采用多道程序设计技术的批处理系统称为&lt;code&gt;多道批处理系统&lt;/code&gt;，它将用户作业成批送入内存，由作业调度程序自动选择运行。&lt;/p&gt;
+&lt;p&gt;多道程序设计具有以下核心特点：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;多道&lt;/code&gt;。内存中同时驻留多道相互独立的程序。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;宏观上并行&lt;/code&gt;。多道程序均处于运行过程中，但尚未全部完成。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;微观上串行&lt;/code&gt;。各程序轮流占用CPU，交替执行。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;为实现多道程序设计，需解决以下关键问题：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;处理器的分配策略。&lt;/li&gt;
+&lt;li&gt;多道程序的内存分配与保护机制。&lt;/li&gt;
+&lt;li&gt;I/O设备的分配与调度方法。&lt;/li&gt;
+&lt;li&gt;大量程序与数据的组织、存储方式，以及安全性与一致性保障。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;优点：资源利用率高，多道程序共享CPU、内存、I/O设备等资源；系统吞吐量大，各部件保持高负载状态。缺点：缺乏交互能力，用户无法了解程序运行状态或进行干预，响应时间较长。&lt;/p&gt;
+&lt;h3&gt;1.2.3 分时操作系统&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;分时技术&lt;/code&gt;是指将处理器时间划分为很短的&lt;strong&gt;时间片&lt;/strong&gt;，轮流分配给各用户程序使用。若某程序在其时间片内未完成计算，则暂停运行，释放处理器给其他用户程序，待下一轮再继续执行。由于计算机运行速度极快，程序轮转迅速，每个用户均能获得“独占计算机”的交互体验。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;分时操作系统&lt;/code&gt;允许多个用户通过终端同时连接到一台主机，并与系统进行交互，彼此互不干扰。其实现的核心在于：当用户在终端输入命令时，系统必须能够及时接收、快速处理并立即返回结果。分时操作系统基于多道程序设计，但与多道批处理系统有本质区别：后者追求高吞吐量和资源利用率，无须人工干预；而前者以&lt;strong&gt;人机交互为核心目标&lt;/strong&gt;，由此形成了以下主要特征。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;同时性&lt;/code&gt;（&lt;code&gt;多路性&lt;/code&gt;）。允许多个终端用户同时使用同一台计算机。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;交互性&lt;/code&gt;。用户可通过终端以人机对话方式直接控制程序运行，并与其程序进行交互。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;独立性&lt;/code&gt;。各用户的操作相互隔离，任一用户均感觉系统为其独占。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;及时性&lt;/code&gt;。用户请求能在较短时间内获得响应，满足交互需求。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;尽管分时操作系统较好地解决了通用交互问题，但在某些特定场景，系统必须在严格限定的时间内对外部事件做出响应，且需保证响应的确定性与时限性。为此，实时操作系统应运而生。&lt;/p&gt;
+&lt;h3&gt;1.2.4 实时操作系统&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;实时操作系统&lt;/code&gt;是为在&lt;strong&gt;严格的时间限制内完成关键任务&lt;/strong&gt;而设计的系统。它摒弃了分时操作系统的时间片轮转机制，转而采用基于任务紧迫性或截止时间的调度策略，确保高优先级任务能够及时获得处理器资源。根据时限要求的严格程度，实时操作系统可分为两类：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;硬实时操作系统&lt;/code&gt;：要求任务必须在规定的截止时间前完成，否则可能引发灾难性后果。例如飞机的控制系统、导弹的制导系统等，这类系统必须提供绝对可靠的时间保证；&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;软实时操作系统&lt;/code&gt;：允许偶尔错过截止时间，只要不造成永久性损害即可。例如飞机订票系统、银行管理系统等，其短暂延迟通常可被容忍。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在实时操作系统的控制下，计算机在接收到外部事件后，能够在可预测且有保障的时限内完成处理。其主要特点包括：&lt;strong&gt;确定性&lt;/strong&gt;（响应时间可预测）、&lt;strong&gt;高可靠性&lt;/strong&gt;和&lt;strong&gt;强时效性&lt;/strong&gt;。&lt;/p&gt;
+&lt;h3&gt;1.2.5 网络操作系统和分布式系统&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;网络操作系统&lt;/code&gt;是在单机操作系统基础上扩展网络功能而形成的系统，主要用于支持计算机之间的通信、数据传输以及资源共享（如文件、打印机共享等）。在该系统中，各计算机保持独立运行，用户需显式指定远程资源的位置才能访问，系统不提供统一的全局视图。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;分布式系统&lt;/code&gt;是由多台计算机组成的集合，具有以下特征：节点地位对等，无固定的主从关系；系统资源可被所有用户透明地共享；具备良好的可扩展性与容错能力，支持动态重组；能够将一个任务分解为多个子任务，并分布到不同节点上并行执行、协同完成。用于管理此类系统的操作系统称为&lt;code&gt;分布式操作系统&lt;/code&gt;，其核心特点包括&lt;strong&gt;分布性&lt;/strong&gt;、&lt;strong&gt;并行性&lt;/strong&gt;和&lt;strong&gt;透明性&lt;/strong&gt;。其中，透明性尤为关键，用户无须感知底层的多机结构，操作体验如同使用一台计算机。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;二者的区别在于&lt;/strong&gt;：网络操作系统仅实现资源共享与通信功能，用户需主动干预远程操作；而分布式操作系统通过协同机制，使多台计算机共同完成同一任务，并向用户提供&lt;strong&gt;单一系统映像&lt;/strong&gt;。&lt;/p&gt;
+&lt;h3&gt;1.2.6 微机操作系统&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;微机操作系统&lt;/code&gt;是为微型计算机（如个人计算机、工作站等）设计的操作系统，广泛应用于日常计算与办公环境。根据用户数量和任务并发能力，可分为以下三类。&lt;/p&gt;
+&lt;h4&gt;1. 单用户单任务操作系统&lt;/h4&gt;
+&lt;p&gt;仅允许一个用户登录并运行一个程序。这类系统结构简单，但资源利用率低，典型代表为早期的MS-DOS(16位)。&lt;/p&gt;
+&lt;h4&gt;2. 单用户多任务操作系统&lt;/h4&gt;
+&lt;p&gt;支持一个用户同时运行多个应用程序，系统通过时间片轮转实现任务切换，显著提升了交互体验与资源利用率。代表性系统包括Windows XP及后续版本、macOS以及现代Linux 桌面版。此类系统是当前主流的微机操作系统，兼具良好的人机交互性、高效率与稳定性。&lt;/p&gt;
+&lt;h4&gt;3. 多用户多任务操作系统&lt;/h4&gt;
+&lt;p&gt;允许多个用户通过终端或网络同时登录，各自并发执行多个任务，资源共享且互不干扰。常用于服务器或高性能工作站，典型代表为UNIX、Linux服务器版和Windows Server系列。&lt;/p&gt;
+&lt;p&gt;此外，还有嵌入式操作系统、服务器操作系统、智能手机操作系统等。&lt;/p&gt;
+</content:encoded></item><item><title>1.3操作系统运行环境</title><link>https://www.atsuko.top/posts/408/operating-system/13-operating-system-operating-environment/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/13-operating-system-operating-environment/</guid><pubDate>Fri, 15 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;1.3 操作系统的运行环境&lt;/h2&gt;
+&lt;h3&gt;1.3.1 操作系统内核&lt;/h3&gt;
+&lt;p&gt;现代操作系统通常采用分层架构，将与硬件紧密相关的模块(如中断处理程序、设备驱动程序)、运行频率较高的模块（如时钟管理、进程调度），以及各模块共用的基础操作，集中置于紧靠硬件的层次并常驻内存。这部分核心组件被称为&lt;code&gt;操作系统内核&lt;/code&gt;。这种设计有两个主要目的：一是保护核心模块免受应用程序破坏；二是提升操作系统的运行效率。不同操作系统的内核功能存在一定差异，但大多数都包含以下两类功能：&lt;/p&gt;
+&lt;h4&gt;1. 支撑功能&lt;/h4&gt;
+&lt;p&gt;这类功能为操作系统其他模块提供基础支持，以保障系统稳定且高效地运行。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;时钟管理&lt;/code&gt;。时钟是计算机系统的关键部件，其功能包括计时和产生定时中断。操作系统通过时钟管理向用户提供标准系统时间，并利用时钟中断实现任务调度。例如，在分时操作系统中通过时间片轮转进行进程切换，在实时操作系统中依据截止时间控制任务执行，在批处理系统中衡量作业运行进度。因此，&lt;strong&gt;系统的大量活动均依赖于时钟机制&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;中断机制&lt;/code&gt;。&lt;strong&gt;中断是现代操作系统运行的基础&lt;/strong&gt;，它允许CPU在I/O操作期间执行其他指令，从而提高资源利用率。中断来源广泛，包括键盘输入、鼠标事件、系统调用、设备驱动和文件访问等。当发生中断时，内核负责保存当前进程的现场，转移控制权至相应的处理程序，并在处理完成后恢复现场，有效提升了系统的并发处理能力。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;原语&lt;/code&gt;。原语是由若干条指令组成的、用于完成特定功能的操作，具有&lt;strong&gt;原子性&lt;/strong&gt;，即&lt;strong&gt;其执行过程不可被中断&lt;/strong&gt;，必须一气呵成。原语通常运行在内核态，执行时间短、调用频繁，是保证系统安全性和一致性的重要机制。常见的原语包括进程切换、进程同步和资源分配等。为实现原子性，原语常通过关闭中断等手段确保执行不被干扰。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;2. 系统资源管理功能&lt;/h4&gt;
+&lt;p&gt;操作系统通过一系列核心数据结构（如进程控制块、设备控制块、内存分配表、缓冲区等）对系统资源进行统一管理。为实现高效、安全的资源使用，内核需提供以下三类基本管理功能：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;进程管理&lt;/code&gt;。负责进程的创建与撤销、状态转换、调度与分派，并维护进程控制块(PCB)等核心数据结构。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;存储器管理&lt;/code&gt;。实现内存的分配与回收、地址映射、内存保护及页面置换等机制，确保多道程序安全、高效地共享主存资源。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;设备管理&lt;/code&gt;。完成设备的分配与回收、缓冲区管理、I/O调度及设备驱动调用，屏蔽硬件差异，为用户提供统一的设备访问接口。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;1.3.2 处理机的双重工作模式&lt;/h3&gt;
+&lt;p&gt;为确保操作系统正确运行，必须严格区分操作系统代码与用户程序的执行环境。绝大多数计算机系统通过硬件支持实现这一区分，即为处理机设置至少两种独立的运行模式：&lt;code&gt;用户态&lt;/code&gt;(也称&lt;code&gt;目态&lt;/code&gt;)和&lt;code&gt;内核态&lt;/code&gt;（也称&lt;code&gt;管态&lt;/code&gt;或&lt;code&gt;系统态&lt;/code&gt;）。硬件通过一个&lt;strong&gt;模式位&lt;/strong&gt;标识当前运行模式(例如0表示内核态，1表示用户态)，从而明确当前执行的是系统任务还是用户任务。&lt;/p&gt;
+&lt;p&gt;系统引导时，硬件从内核态开始工作，完成操作系统的加载后，切换到用户态执行用户程序。一旦发生中断或陷阱，硬件就会自动从用户态切换至内核态（模式位置0）。因此，操作系统一旦获得控制权，就处于内核态；而在将控制权交还用户程序前，将切换回用户态（模式位置1）。&lt;/p&gt;
+&lt;p&gt;这种双重模式机制通过指令分类提供保护：将可能危及系统安全的指令定义为&lt;strong&gt;特权指令&lt;/strong&gt;，&lt;strong&gt;仅允许在内核态下执行&lt;/strong&gt;；其余指令定义为&lt;strong&gt;非特权指令&lt;/strong&gt;，&lt;strong&gt;可在任意模式下执行&lt;/strong&gt;。具体如下。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;特权指令&lt;/code&gt;。仅能在内核态执行，可访问全部地址空间（包括用户空间和系统空间），并执行关键操作，如启动外设、设置系统时钟、关闭中断、修改模式位或&lt;strong&gt;返回用户态&lt;/strong&gt;等。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;非特权指令&lt;/code&gt;。通常在用户态下执行，主要用于一般计算和数据处理，其内存访问被限制在用户地址空间，无法直接操作硬件或系统核心资源。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;上述限制由硬件强制实施：若用户程序试图执行特权指令，则硬件将产生非法指令异常；操作系统捕获该异常后，会终止该程序并重新调度。&lt;/p&gt;
+&lt;h3&gt;1.3.3 中断和异常的概念&lt;/h3&gt;
+&lt;p&gt;在引入内核态与用户态之后，操作系统必须解决两者之间的安全切换问题。内核运行在内核态，用户程序运行在用户态；用户程序虽不能直接执行内核功能，却必须通过受控方式使用这些服务。为此，系统在内核中设立若干称为“门”的受控入口，而&lt;strong&gt;用户程序进入内核态的唯一合法途径就是中断或异常&lt;/strong&gt;。当CPU运行用户程序时，一旦发生中断（如I/O完成）或异常(如系统调用、除零错误)，硬件会自动将处理器切换至内核态，并跳转至内核中对应的处理程序。这一机制由硬件强制保障，确保状态切换的安全性与原子性。&lt;/p&gt;
+&lt;p&gt;中断机制对现代操作系统至关重要。操作系统的演进本质上是不断提升资源利用率的过程：当某程序因等待I/O等事件而暂时无法继续执行时，系统需及时将其挂起，转而调度其他就绪程序运行。在抢占式多任务系统中，这一调度行为主要依赖中断（尤其是时钟中断）来触发。因此，中断机制是现代操作系统实现高效并发与资源共享的基础。&lt;/p&gt;
+&lt;h4&gt;1. 中断和异常的定义&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;中断&lt;/code&gt;(Interrupt)也称&lt;code&gt;外中断&lt;/code&gt;，是指来自CPU执行指令外部的事件，通常用于信息输入/输出(见第5章)，如设备发出的I/O结束中断，表示设备I/O操作已完成。时钟中断，表示一个固定的时间片已到，用于系统计时、进程调度或启动定时任务等。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;异常&lt;/code&gt;(Exception)也称&lt;code&gt;内中断&lt;/code&gt;，是指来自CPU执行指令内部的事件，如程序的非法操作码、地址越界、运算溢出、虚存系统的缺页及专门的陷入指令等引起的事件。异常一旦发生，就必须立即处理，不可被屏蔽。&lt;/p&gt;
+&lt;h4&gt;2. 中断和异常的分类&lt;/h4&gt;
+&lt;p&gt;外中断可分为可屏蔽中断和不可屏蔽中断。&lt;code&gt;可屏蔽中断&lt;/code&gt;是指通过INTR线发出的中断请求，通过改变屏蔽字可以实现多重中断，从而使得中断处理更加灵活。&lt;code&gt;不可屏蔽中断&lt;/code&gt;是指通过NMI线发出的中断请求，通常是紧急的硬件故障，如电源掉电等。此外，异常也是不能被屏蔽的。&lt;/p&gt;
+&lt;p&gt;异常可分为故障、自陷和终止。&lt;code&gt;故障&lt;/code&gt;(Fault)通常是由指令执行引起的异常，如非法操作码、缺页故障、除数为0、运算溢出等。&lt;code&gt;自陷&lt;/code&gt;(Trap，也称陷入)是一种事先安排的“异常”事件，用于在用户态下调用操作系统内核程序，如条件陷阱指令、系统调用指令等。&lt;code&gt;终止&lt;/code&gt;(Abort)是指出现了使得CPU无法继续执行的硬件故障，如控制器出错、存储器校验错等。故障和自陷异常属于&lt;code&gt;软件中断&lt;/code&gt;（程序性异常），终止异常和外中断属于&lt;code&gt;硬件中断&lt;/code&gt;。&lt;/p&gt;
+&lt;h4&gt;3. 中断和异常的处理过程&lt;/h4&gt;
+&lt;p&gt;中断和异常处理过程的大致描述如下：当CPU在执行用户程序的第 $i$ 条指令时，若该指令引发异常（如缺页、除零），或在指令执行结束后检测到中断请求信号，则CPU会打断当前程序，转入相应的中断或异常处理程序执行。若问题可被处理程序解决，则对于异常，通常在处理完成后返回第 $i$ 条指令重新执行（例如，缺页处理完成后重访原内存地址）；而对于中断，则在处理完成后返回第 $i+1$ 条指令继续执行。若处理程序判定为不可恢复的致命错误，则终止该用户程序。通常情况下，中断和异常的具体处理由操作系统（及设备驱动程序）完成。&lt;/p&gt;
+&lt;p&gt;注意区分中断处理和子程序调用：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;中断处理程序与被中断的程序相互独立，无固定关联；而子程序与主程序属于同一程序的主从关系。&lt;/li&gt;
+&lt;li&gt;中断的产生通常是随机的；而子程序调用由CALL指令显式触发，是程序员事先安排的。&lt;/li&gt;
+&lt;li&gt;子程序调用完全由软件实现；而中断处理需要硬件电路支持才能完成。&lt;/li&gt;
+&lt;li&gt;中断处理程序的入口地址由中断向量表直接提供；子程序的入口地址则由CALL指令中的地址码指定。&lt;/li&gt;
+&lt;li&gt;调用中断处理程序和子程序均需保护程序计数器(PC)的内容：前者由硬件在中断响应过程中自动保存，后者由CALL指令在执行时将当前PC压入栈中。&lt;/li&gt;
+&lt;li&gt;响应中断时，需对同时到达的多个中断请求进行优先级裁决；而子程序调用不存在此类操作。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;1.3.4 系统调用&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;系统调用&lt;/code&gt;是操作系统&lt;strong&gt;提供给应用程序（程序员）使用的接口&lt;/strong&gt;，可视为一种特殊的公共子程序调用。系统中的各种共享资源均由操作系统统一管理，因此凡涉及共享资源的操作(如存储分配、I/O传输及文件管理等)，都必须通过系统调用向操作系统提出服务请求，由操作系统代为完成，并将结果返回给应用程序。这样可以保证系统的稳定性和安全性，防止用户进行非法操作。通常，一个操作系统提供的系统调用有几十条乃至上百条，每个系统调用都有唯一的系统调用号。这些系统调用按功能大致可分为如下几类。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;设备管理&lt;/code&gt;。完成设备的请求或释放，以及设备启动等功能。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;文件管理&lt;/code&gt;。完成文件的读、写、创建及删除等功能。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;进程控制&lt;/code&gt;。完成进程的创建、撤销、阻塞及唤醒等功能。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;进程通信&lt;/code&gt;。完成进程之间的消息传递或信号传递等功能。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;内存管理&lt;/code&gt;。完成内存的分配、回收，以及获取作业占用内存区的大小和起始地址等功能。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;显然，系统调用涉及系统资源管理、进程管理等关键操作，对整个系统的影响非常大，因此必须由操作系统内核程序在内核态下完成。操作系统提供系统调用的核心目的，是让应用程序能够安全地间接调用内核功能。它本质上是一种特殊的过程调用，与普通过程调用存在显著差异。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;运行状态不同&lt;/strong&gt;。普通过程调用的调用者与被调用者运行在同一特权级；而系统调用的调用者运行在用户态，被调用者运行在内核态。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;状态转换不同&lt;/strong&gt;。普通过程调用无须特权级切换，可以直接跳转；系统调用则需要通过陷入指令(Trap)触发，先从用户态切换到内核态，再由内核分派至相应处理程序。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;返回机制不同&lt;/strong&gt;。系统调用执行完毕后，内核可能根据调度策略决定是否切换进程；而普通过程调用总是直接返回原调用点。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;嵌套调用限制不同&lt;/strong&gt;。系统调用的嵌套深度受到内核栈空间的限制；而普通过程调用的嵌套深度通常仅受用户栈大小约束。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;系统调用的处理过程可分为4个阶段。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;传递系统调用参数&lt;/strong&gt;。用户程序将系统调用号及所需参数压入堆栈（或通过寄存器），为内核服务做准备。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;执行陷入指令并切换至内核态&lt;/strong&gt;。用户程序执行陷入指令，触发CPU从用户态切换至内核态。硬件与内核协同保存现场，将PC、PSW及通用寄存器内容压入内核堆栈。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;定位并执行相应服务程序&lt;/strong&gt;。内核根据系统调用号查询系统调用表，找到对应处理程序的入口地址，并执行具体的服务逻辑。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;恢复现场并返回用户态&lt;/strong&gt;。服务完成后，内核恢复被中断进程的CPU现场，将运行模式切换回用户态，并将控制权交还给用户程序，使其从断点继续执行。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;用户程序通过执行陷入指令，主动将CPU控制权移交操作系统内核；内核完成请求后，再将控制权交还。这一机制确保了用户程序无法直接执行高危操作，必须通过受控接口请求操作系统代为执行，进而保障系统安全与稳定。由此，可概括&lt;strong&gt;操作系统的运行环境&lt;/strong&gt;：用户程序运行在受限的用户态，通过系统调用（主动）或异常/中断(被动)两种受控途径进入内核态，请求内核提供资源管理与服务支持；内核处理完毕后，再安全返回用户态继续执行。这种用户态与内核态的隔离，构成了现代操作系统安全、高效运行的基础环境。&lt;/p&gt;
+&lt;p&gt;在操作系统层面，我们关注内核态与用户态的软件实现与切换机制；其硬件支持细节可结合“计算机组成原理”课程中关于中断与异常的内容深入理解。&lt;/p&gt;
+&lt;p&gt;常见的用户态转向内核态的情形包括：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;用户程序请求操作系统服务（系统调用）。&lt;/li&gt;
+&lt;li&gt;发生外中断（如I/O完成、时钟信号）。&lt;/li&gt;
+&lt;li&gt;用户程序执行过程中产生异常（如除零、缺页）。&lt;/li&gt;
+&lt;li&gt;用户程序试图执行特权指令，从而触发异常。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;从内核态返回用户态由内核通过特定的返回指令（如IRET）完成，该操作在内核态执行。&lt;/p&gt;
+</content:encoded></item><item><title>6.2总线事务和定时</title><link>https://www.atsuko.top/posts/408/principles-of-computer-organization/62-bus-transactions-and-timing/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/principles-of-computer-organization/62-bus-transactions-and-timing/</guid><pubDate>Wed, 13 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;6.2.1 总线事务&lt;/h3&gt;
 &lt;p&gt;在总线上，&lt;code&gt;主设备&lt;/code&gt;（如CPU、DMA控制器）与&lt;code&gt;从设备&lt;/code&gt;（如主存、I/O设备）之间完成一次完整的信息交换过程，称为一个&lt;code&gt;总线事务&lt;/code&gt;。总线事务的类型由操作性质决定，典型的包括存储器读（从主存取数据至处理器）、存储器写（向主存写入数据）、I/O读/写、中断响应等。&lt;/p&gt;
 &lt;p&gt;每个总线事务通常包含三个基本阶段（依据历年真题）：&lt;/p&gt;
 &lt;ol&gt;
@@ -3754,7 +4085,7 @@ $$&lt;/p&gt;
 &lt;p&gt;当所有存储模块一次并行读/写的总位数恰好等于存储器数据总线宽度时，可采用同时启动方式。例如，使用8个 $16M \times 8$ 位的DRAM芯片构成一个128MB内存条：每个DRAM芯片内部为 $4096 \times 4096 \times 8$ 位的存储阵列（行地址与列地址各12位），含8个位平面。&lt;/p&gt;
 &lt;p&gt;CPU发出的主存地址被拆分为行地址和列地址，通过分时复用方式先后送入DRAM芯片的行、列地址译码器，选中行列交叉处的8位单元进行读/写操作。因此，单个芯片每次传输8位，8个芯片&lt;strong&gt;同步工作&lt;/strong&gt;，可一次性提供64位数据，匹配64位总线宽度。&lt;/p&gt;
 &lt;p&gt;需要注意的是，并行访问以&lt;strong&gt;连续8字节为单位&lt;/strong&gt;进行，即每次读取的数据只能来自地址对齐的块(如第 $0 \sim 7$，$8 \sim 15$，$\cdots$，$8k \sim 8k+7$ 单元)。若访问一个 &lt;code&gt;int&lt;/code&gt; 型(4字节)数据时起始地址未对齐（如地址6，占用第 $6 \sim 9$ 单元，横跨两个访问块），则需两次访问；若地址按4字节对齐(4的倍数)，则一次即可完成。这正是内存访问要求&lt;strong&gt;数据对齐&lt;/strong&gt;的根本原因。&lt;/p&gt;
-</content:encoded></item><item><title>1.2数据类型</title><link>https://www.atsuko.top/posts/dark-horse/c/introduction/12-data-type/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c/introduction/12-data-type/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;C++规定在创建一个变量或者常量时，必须要指定出相应的数据类型，否则无法给变量分配内存&lt;/p&gt;
+</content:encoded></item><item><title>1.2数据类型</title><link>https://www.atsuko.top/posts/dark-horse/c++/introduction/12-data-type/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/introduction/12-data-type/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;C++规定在创建一个变量或者常量时，必须要指定出相应的数据类型，否则无法给变量分配内存&lt;/p&gt;
 &lt;h3&gt;2.1 整型&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：整型变量表示的是&lt;code&gt;整数类型&lt;/code&gt;的数据&lt;/p&gt;
 &lt;p&gt;C++中能够表示整型的类型有以下几种方式，&lt;strong&gt;区别在于所占内存空间不同&lt;/strong&gt;：&lt;/p&gt;
@@ -4449,7 +4780,7 @@ int main() {
 	return 0;
 }
 &lt;/code&gt;&lt;/pre&gt;
-</content:encoded></item><item><title>1.3运算符</title><link>https://www.atsuko.top/posts/dark-horse/c/introduction/13-operator/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c/introduction/13-operator/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：用于执行代码的运算&lt;/p&gt;
+</content:encoded></item><item><title>1.3运算符</title><link>https://www.atsuko.top/posts/dark-horse/c++/introduction/13-operator/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/introduction/13-operator/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：用于执行代码的运算&lt;/p&gt;
 &lt;p&gt;本章我们主要讲解以下几类运算符：&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -4939,7 +5270,7 @@ int main() {
 &lt;blockquote&gt;
 &lt;p&gt;逻辑&lt;strong&gt;或&lt;/strong&gt;运算符总结： &lt;strong&gt;同假为假，其余为真&lt;/strong&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
-</content:encoded></item><item><title>1.4程序流程结构</title><link>https://www.atsuko.top/posts/dark-horse/c/introduction/14-program-flow-structure/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c/introduction/14-program-flow-structure/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;C/C++支持最基本的三种程序运行结构：&lt;strong&gt;顺序结构、选择结构、循环结构&lt;/strong&gt;&lt;/p&gt;
+</content:encoded></item><item><title>1.4程序流程结构</title><link>https://www.atsuko.top/posts/dark-horse/c++/introduction/14-program-flow-structure/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/introduction/14-program-flow-structure/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;C/C++支持最基本的三种程序运行结构：&lt;strong&gt;顺序结构、选择结构、循环结构&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;顺序结构：程序按顺序执行，不发生跳转&lt;/li&gt;
 &lt;li&gt;选择结构：依据条件是否满足，有选择的执行相应功能&lt;/li&gt;
@@ -5413,7 +5744,7 @@ FLAG:
 &lt;blockquote&gt;
 &lt;p&gt;注意：在程序中不建议使用goto语句，以免造成程序流程混乱&lt;/p&gt;
 &lt;/blockquote&gt;
-</content:encoded></item><item><title>1.5数组</title><link>https://www.atsuko.top/posts/dark-horse/c/introduction/15-array/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c/introduction/15-array/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;5.1 概述&lt;/h3&gt;
+</content:encoded></item><item><title>1.5数组</title><link>https://www.atsuko.top/posts/dark-horse/c++/introduction/15-array/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/introduction/15-array/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;5.1 概述&lt;/h3&gt;
 &lt;p&gt;所谓数组，就是一个集合，里面存放了相同类型的数据元素&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;特点1&lt;/strong&gt;：数组中的每个&lt;code&gt;数据元素都是相同的数据类型&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;特点2&lt;/strong&gt;：数组是由&lt;code&gt;连续的内存&lt;/code&gt;位置组成的&lt;/p&gt;
@@ -5715,7 +6046,7 @@ int main() {
 	return 0;
 }
 &lt;/code&gt;&lt;/pre&gt;
-</content:encoded></item><item><title>1.6函数</title><link>https://www.atsuko.top/posts/dark-horse/c/introduction/16-function/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c/introduction/16-function/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;6 函数&lt;/h2&gt;
+</content:encoded></item><item><title>1.6函数</title><link>https://www.atsuko.top/posts/dark-horse/c++/introduction/16-function/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/introduction/16-function/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;6 函数&lt;/h2&gt;
 &lt;h3&gt;6.1 概述&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：将一段经常使用的代码封装起来，减少重复代码&lt;/p&gt;
 &lt;p&gt;一个较大的程序，一般分为若干个程序块，每个模块实现特定的功能。&lt;/p&gt;
@@ -5946,6 +6277,648 @@ int main() {
 	int b = 200;
 
 	swap(a, b);
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>1.7指针</title><link>https://www.atsuko.top/posts/dark-horse/c++/introduction/17-pointer/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/introduction/17-pointer/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;7 指针&lt;/h2&gt;
+&lt;h3&gt;7.1 指针的基本概念&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;指针的作用&lt;/strong&gt;： 可以通过指针间接访问内存&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;内存编号是从0开始记录的，一般用十六进制数字表示&lt;/li&gt;
+&lt;li&gt;可以利用指针变量保存地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;7.2 指针变量的定义和使用&lt;/h3&gt;
+&lt;p&gt;指针变量定义语法： &lt;code&gt;数据类型 * 变量名；&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	//1、指针的定义
+	int a = 10; //定义整型变量a
+
+	//指针定义语法： 数据类型 * 变量名 ;
+	int* p;
+
+	//指针变量赋值
+	p = &amp;amp;a; //指针指向变量a的地址
+	std::cout &amp;lt;&amp;lt; &amp;amp;a &amp;lt;&amp;lt; std::endl; //打印数据a的地址
+	std::cout &amp;lt;&amp;lt; p &amp;lt;&amp;lt; std::endl;  //打印指针变量p
+
+	//2、指针的使用
+	//通过*操作指针变量指向的内存
+	std::cout &amp;lt;&amp;lt; &quot;*p = &quot; &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;指针变量和普通变量的区别&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;普通变量存放的是数据,指针变量存放的是地址&lt;/li&gt;
+&lt;li&gt;指针变量可以通过&quot; * &quot;操作符，操作指针变量指向的内存空间，这个过程称为解引用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结1： 我们可以通过 &amp;amp; 符号 获取变量的地址&lt;/p&gt;
+&lt;p&gt;总结2：利用指针可以记录地址&lt;/p&gt;
+&lt;p&gt;总结3：对指针变量解引用，可以操作指针指向的内存&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;7.3 指针所占内存空间&lt;/h3&gt;
+&lt;p&gt;提问：指针也是种数据类型，那么这种数据类型占用多少内存空间？&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	int a = 10;
+
+	int* p;
+	p = &amp;amp;a; //指针指向数据a的地址
+
+	std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl; //* 解引用
+	std::cout &amp;lt;&amp;lt; sizeof(p) &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; sizeof(char*) &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; sizeof(float*) &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; sizeof(double*) &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：所有指针类型在32位操作系统下是4个字节,在64位操作系统下是8个字节&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;7.4 空指针和野指针&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;空指针&lt;/strong&gt;：指针变量指向内存中编号为0的空间&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;用途&lt;/strong&gt;：初始化指针变量&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;：空指针指向的内存是不可以访问的&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例1：空指针&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	//指针变量p指向内存地址编号为0的空间
+	int* p = NULL;
+
+	//访问空指针报错 
+	//内存编号0 ~255为系统占用内存，不允许用户访问
+	std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;野指针&lt;/strong&gt;：指针变量指向非法的内存空间&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例2：野指针&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	//指针变量p指向内存地址编号为0x1100的空间
+	int* p = (int*)0x1100;
+
+	//访问野指针报错 
+	std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：空指针和野指针都不是我们申请的空间，因此不要访问。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;7.5 const修饰指针&lt;/h3&gt;
+&lt;p&gt;const修饰指针有三种情况&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;const修饰指针   --- 常量指针&lt;/li&gt;
+&lt;li&gt;const修饰常量   --- 指针常量&lt;/li&gt;
+&lt;li&gt;const即修饰指针，又修饰常量&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	int a = 10;
+	int b = 10;
+
+	//const修饰的是指针，指针指向可以改，指针指向的值不可以更改
+	// 就是 const * 代表取*后的数是常量不能变
+	const int* p1 = &amp;amp;a;
+	p1 = &amp;amp;b; //正确
+	//*p1 = 100;  报错
+
+
+	//const修饰的是常量，指针指向不可以改，指针指向的值可以更改
+	// 代表 const 后面的指针变量不能变
+	int* const p2 = &amp;amp;a;
+	//p2 = &amp;amp;b; //错误
+	*p2 = 100; //正确
+
+	//const既修饰指针又修饰常量
+	const int* const p3 = &amp;amp;a;
+	//p3 = &amp;amp;b; //错误
+	//*p3 = 100; //错误
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;技巧：看const右侧紧跟着的是指针还是常量, 是指针就是常量指针，是常量就是指针常量&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;7.6 指针和数组&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：利用指针访问数组中元素&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	int arr[] = { 1,2,3,4,5,6,7,8,9,10 };
+
+	int* p = arr;  //指向数组的指针
+
+	std::cout &amp;lt;&amp;lt; &quot;第一个元素： &quot; &amp;lt;&amp;lt; arr[0] &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;指针访问第一个元素： &quot; &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+
+	for (int i = 0; i &amp;lt; 10; i++)
+	{
+		//利用指针遍历数组
+		std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+		p++;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;7.7 指针和函数&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：利用指针作函数参数，可以修改实参的值&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//值传递
+void swap1(int a, int b)
+{
+	int temp = a;
+	a = b;
+	b = temp;
+}
+//地址传递
+void swap2(int* p1, int* p2)
+{
+	int temp = *p1;
+	*p1 = *p2;
+	*p2 = temp;
+}
+
+int main7() {
+
+	int a = 10;
+	int b = 20;
+	swap1(a, b); // 值传递不会改变实参
+
+	swap2(&amp;amp;a, &amp;amp;b); //地址传递会改变实参
+
+	std::cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
+
+	std::cout &amp;lt;&amp;lt; &quot;b = &quot; &amp;lt;&amp;lt; b &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：如果不想修改实参，就用值传递，如果想修改实参，就用地址传递&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;7.8 指针、数组、函数&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;案例描述&lt;/strong&gt;：封装一个函数，利用冒泡排序，实现对整型数组的升序排序&lt;/p&gt;
+&lt;p&gt;例如数组：&lt;code&gt;int arr[10] = { 4,3,6,9,1,2,10,8,7,5 };&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//冒泡排序函数
+void bubbleSort(int* arr, int len)  //int * arr 也可以写为int arr[]
+{
+	for (int i = 0; i &amp;lt; len - 1; i++)
+	{
+		for (int j = 0; j &amp;lt; len - 1 - i; j++)
+		{
+			if (arr[j] &amp;gt; arr[j + 1])
+			{
+				// *(arr + j) 等价于 arr[j]
+				int temp = arr[j];
+				arr[j] = arr[j + 1];
+				arr[j + 1] = temp;
+			}
+		}
+	}
+}
+
+//打印数组函数
+void printArray(int arr[], int len)
+{
+	for (int i = 0; i &amp;lt; len; i++)
+	{
+		std::cout &amp;lt;&amp;lt; arr[i] &amp;lt;&amp;lt; std::endl;
+	}
+}
+
+int main() {
+
+	int arr[10] = { 4,3,6,9,1,2,10,8,7,5 };
+	int len = sizeof(arr) / sizeof(int);
+
+	bubbleSort(arr, len);
+
+	printArray(arr, len);
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：当数组名传入到函数作为参数时，被退化为指向首元素的指针&lt;/p&gt;
+&lt;/blockquote&gt;
+</content:encoded></item><item><title>1.8结构体</title><link>https://www.atsuko.top/posts/dark-horse/c++/introduction/18-struct/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/introduction/18-struct/</guid><pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;8 结构体&lt;/h2&gt;
+&lt;h3&gt;8.1 结构体基本概念&lt;/h3&gt;
+&lt;p&gt;结构体属于用户&lt;code&gt;自定义的数据类型&lt;/code&gt;，允许用户存储不同的数据类型&lt;/p&gt;
+&lt;h3&gt;8.2 结构体定义和使用&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;语法&lt;/strong&gt;：&lt;code&gt;struct 结构体名 { 结构体成员列表 }；&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;通过结构体创建变量的方式有三种：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;struct 结构体名 变量名&lt;/li&gt;
+&lt;li&gt;struct 结构体名 变量名 = { 成员1值 ， 成员2值...}&lt;/li&gt;
+&lt;li&gt;定义结构体时顺便创建变量&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+//结构体定义
+struct student
+{
+	//成员列表
+	std::string name;  //姓名
+	int age;      //年龄
+	int score;    //分数
+}stu3; //结构体变量创建方式3 
+
+int main() {
+
+	//结构体变量创建方式1
+	struct student stu1; //struct 关键字可以省略
+
+	stu1.name = &quot;张三&quot;;
+	stu1.age = 18;
+	stu1.score = 100;
+
+	std::cout &amp;lt;&amp;lt; &quot;姓名：&quot; &amp;lt;&amp;lt; stu1.name &amp;lt;&amp;lt; &quot; 年龄：&quot; &amp;lt;&amp;lt; stu1.age &amp;lt;&amp;lt; &quot; 分数：&quot; &amp;lt;&amp;lt; stu1.score &amp;lt;&amp;lt; std::endl;
+
+	//结构体变量创建方式2
+	struct student stu2 = { &quot;李四&quot;,19,60 };
+
+	std::cout &amp;lt;&amp;lt; &quot;姓名：&quot; &amp;lt;&amp;lt; stu2.name &amp;lt;&amp;lt; &quot; 年龄：&quot; &amp;lt;&amp;lt; stu2.age &amp;lt;&amp;lt; &quot; 分数：&quot; &amp;lt;&amp;lt; stu2.score &amp;lt;&amp;lt; std::endl;
+
+	stu3.name = &quot;王五&quot;;
+	stu3.age = 18;
+	stu3.score = 80;
+
+	std::cout &amp;lt;&amp;lt; &quot;姓名：&quot; &amp;lt;&amp;lt; stu3.name &amp;lt;&amp;lt; &quot; 年龄：&quot; &amp;lt;&amp;lt; stu3.age &amp;lt;&amp;lt; &quot; 分数：&quot; &amp;lt;&amp;lt; stu3.score &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结1：定义结构体时的关键字是struct，不可省略&lt;/p&gt;
+&lt;p&gt;总结2：创建结构体变量时，关键字struct可以省略&lt;/p&gt;
+&lt;p&gt;总结3：结构体变量利用操作符 &apos;&apos;.&apos;&apos;  访问成员&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;8.3 结构体数组&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：将自定义的结构体放入到数组中方便维护&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;语法&lt;/strong&gt;：&lt;code&gt; struct  结构体名 数组名[元素个数] = {  {} , {} , ... {} }&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+//结构体定义
+struct student
+{
+	//成员列表
+	std::string name;  //姓名
+	int age;      //年龄
+	int score;    //分数
+};
+
+int main() {
+
+	//结构体数组
+	struct student arr[3] =
+	{
+		{&quot;张三&quot;,18,80 },
+		{&quot;李四&quot;,19,60 },
+		{&quot;王五&quot;,20,70 }
+	};
+
+	for (int i = 0; i &amp;lt; 3; i++)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;姓名：&quot; &amp;lt;&amp;lt; arr[i].name &amp;lt;&amp;lt; &quot; 年龄：&quot; &amp;lt;&amp;lt; arr[i].age &amp;lt;&amp;lt; &quot; 分数：&quot; &amp;lt;&amp;lt; arr[i].score &amp;lt;&amp;lt; std::endl;
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;8.4 结构体指针&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：通过指针访问结构体中的成员&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;利用操作符 &lt;code&gt;-&amp;gt; &lt;/code&gt;可以通过结构体指针访问结构体属性&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+//结构体定义
+struct student
+{
+	//成员列表
+	std::string name;  //姓名
+	int age;      //年龄
+	int score;    //分数
+};
+
+int main() {
+
+	struct student stu = { &quot;张三&quot;,18,100, };
+
+	struct student* p = &amp;amp;stu;
+
+	p-&amp;gt;score = 80; //指针通过 -&amp;gt; 操作符可以访问成员
+
+	std::cout &amp;lt;&amp;lt; &quot;姓名：&quot; &amp;lt;&amp;lt; p-&amp;gt;name &amp;lt;&amp;lt; &quot; 年龄：&quot; &amp;lt;&amp;lt; p-&amp;gt;age &amp;lt;&amp;lt; &quot; 分数：&quot; &amp;lt;&amp;lt; p-&amp;gt;score &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：结构体指针可以通过 -&amp;gt; 操作符 来访问结构体中的成员&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;8.5 结构体嵌套结构体&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;： 结构体中的成员可以是另一个结构体&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;例如&lt;/strong&gt;：每个老师辅导一个学员，一个老师的结构体中，记录一个学生的结构体&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+//学生结构体定义
+struct student
+{
+	//成员列表
+	std::string name;	//姓名
+	int age;			//年龄
+	int score;			//分数
+};
+
+//教师结构体定义
+struct teacher
+{
+	//成员列表
+	int id;				//职工编号
+	std::string name;	//教师姓名
+	int age;			//教师年龄
+	struct student stu; //子结构体 学生
+};
+
+int main() {
+
+	struct teacher t1;
+	t1.id = 10000;
+	t1.name = &quot;老王&quot;;
+	t1.age = 40;
+
+	t1.stu.name = &quot;张三&quot;;
+	t1.stu.age = 18;
+	t1.stu.score = 100;
+
+	std::cout &amp;lt;&amp;lt; &quot;教师 职工编号： &quot; &amp;lt;&amp;lt; t1.id &amp;lt;&amp;lt; &quot; 姓名： &quot; &amp;lt;&amp;lt; t1.name &amp;lt;&amp;lt; &quot; 年龄： &quot; &amp;lt;&amp;lt; t1.age &amp;lt;&amp;lt; std::endl;
+
+	std::cout &amp;lt;&amp;lt; &quot;辅导学员 姓名： &quot; &amp;lt;&amp;lt; t1.stu.name &amp;lt;&amp;lt; &quot; 年龄：&quot; &amp;lt;&amp;lt; t1.stu.age &amp;lt;&amp;lt; &quot; 考试分数： &quot; &amp;lt;&amp;lt; t1.stu.score &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;总结&lt;/strong&gt;：在结构体中可以定义另一个结构体作为成员，用来解决实际问题&lt;/p&gt;
+&lt;h3&gt;8.6 结构体做函数参数&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：将结构体作为参数向函数中传递&lt;/p&gt;
+&lt;p&gt;传递方式有两种：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;值传递&lt;/li&gt;
+&lt;li&gt;地址传递&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+//学生结构体定义
+struct student
+{
+	//成员列表
+	std::string name;  //姓名
+	int age;      //年龄
+	int score;    //分数
+};
+
+//值传递
+void printStudent(student stu)
+{
+	stu.age = 28;
+	std::cout &amp;lt;&amp;lt; &quot;子函数中 姓名：&quot; &amp;lt;&amp;lt; stu.name &amp;lt;&amp;lt; &quot; 年龄： &quot; &amp;lt;&amp;lt; stu.age &amp;lt;&amp;lt; &quot; 分数：&quot; &amp;lt;&amp;lt; stu.score &amp;lt;&amp;lt; std::endl;
+}
+
+//地址传递
+void printStudent2(student* stu)
+{
+	stu-&amp;gt;age = 28;
+	std::cout &amp;lt;&amp;lt; &quot;子函数中 姓名：&quot; &amp;lt;&amp;lt; stu-&amp;gt;name &amp;lt;&amp;lt; &quot; 年龄： &quot; &amp;lt;&amp;lt; stu-&amp;gt;age &amp;lt;&amp;lt; &quot; 分数：&quot; &amp;lt;&amp;lt; stu-&amp;gt;score &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+	student stu = { &quot;张三&quot;,18,100 };
+	//值传递
+	printStudent(stu);
+	std::cout &amp;lt;&amp;lt; &quot;主函数中 姓名：&quot; &amp;lt;&amp;lt; stu.name &amp;lt;&amp;lt; &quot; 年龄： &quot; &amp;lt;&amp;lt; stu.age &amp;lt;&amp;lt; &quot; 分数：&quot; &amp;lt;&amp;lt; stu.score &amp;lt;&amp;lt; std::endl;
+
+	std::cout &amp;lt;&amp;lt; std::endl;
+
+	//地址传递
+	printStudent2(&amp;amp;stu);
+	std::cout &amp;lt;&amp;lt; &quot;主函数中 姓名：&quot; &amp;lt;&amp;lt; stu.name &amp;lt;&amp;lt; &quot; 年龄： &quot; &amp;lt;&amp;lt; stu.age &amp;lt;&amp;lt; &quot; 分数：&quot; &amp;lt;&amp;lt; stu.score &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：如果不想修改主函数中的数据，用值传递，反之用地址传递&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;8.7 结构体中 const使用场景&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：用const来防止误操作&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+//学生结构体定义
+struct student
+{
+	//成员列表
+	std::string name;  //姓名
+	int age;      //年龄
+	int score;    //分数
+};
+
+//const使用场景 减少数据的复制开销，改为地址传递节省内存
+void printStudent(const student* stu) //加const防止函数体中的误操作
+{
+	//stu-&amp;gt;age = 100; //操作失败，因为加了const修饰
+	std::cout &amp;lt;&amp;lt; &quot;姓名：&quot; &amp;lt;&amp;lt; stu-&amp;gt;name &amp;lt;&amp;lt; &quot; 年龄：&quot; &amp;lt;&amp;lt; stu-&amp;gt;age &amp;lt;&amp;lt; &quot; 分数：&quot; &amp;lt;&amp;lt; stu-&amp;gt;score &amp;lt;&amp;lt; std::endl;
+
+}
+
+int main() {
+
+	student stu = { &quot;张三&quot;,18,100 };
+
+	printStudent(&amp;amp;stu);
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;8.8 结构体案例&lt;/h3&gt;
+&lt;h4&gt;8.8.1 案例1&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;案例描述&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;学校正在做毕设项目，每名老师带领5个学生，总共有3名老师，需求如下&lt;/p&gt;
+&lt;p&gt;设计学生和老师的结构体，其中在老师的结构体中，有老师姓名和一个存放5名学生的数组作为成员&lt;/p&gt;
+&lt;p&gt;学生的成员有姓名、考试分数，创建数组存放3名老师，通过函数给每个老师及所带的学生赋值&lt;/p&gt;
+&lt;p&gt;最终打印出老师数据以及老师所带的学生数据。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+#include &amp;lt;ctime&amp;gt;
+
+struct Student
+{
+	std::string name;
+	int score;
+};
+
+struct Teacher
+{
+	std::string name;
+	Student sArray[5];
+};
+
+// 传入数组等同于指针
+void allocateSpace(Teacher tArray[], int len)
+{
+	std::string tName = &quot;教师&quot;;
+	std::string sName = &quot;学生&quot;;
+	std::string nameSeed = &quot;ABCDE&quot;;
+	for (int i = 0; i &amp;lt; len; i++)
+	{
+		tArray[i].name = tName + nameSeed[i];
+
+		for (int j = 0; j &amp;lt; 5; j++)
+		{
+			tArray[i].sArray[j].name = sName + nameSeed[j];
+			tArray[i].sArray[j].score = rand() % 61 + 40;
+		}
+	}
+}
+
+void printTeachers(Teacher tArray[], int len)
+{
+	for (int i = 0; i &amp;lt; len; i++)
+	{
+		std::cout &amp;lt;&amp;lt; tArray[i].name &amp;lt;&amp;lt; std::endl;
+		for (int j = 0; j &amp;lt; 5; j++)
+		{
+			std::cout &amp;lt;&amp;lt; &quot;\t姓名：&quot; &amp;lt;&amp;lt; tArray[i].sArray[j].name &amp;lt;&amp;lt; &quot; 分数：&quot; &amp;lt;&amp;lt; tArray[i].sArray[j].score &amp;lt;&amp;lt; std::endl;
+		}
+	}
+}
+
+int main() {
+
+	srand((unsigned int)time(NULL)); //随机数种子 头文件 #include &amp;lt;ctime&amp;gt;
+
+	Teacher tArray[3]; //老师数组
+
+	int len = sizeof(tArray) / sizeof(Teacher);
+
+	allocateSpace(tArray, len); //创建数据
+
+	printTeachers(tArray, len); //打印数据
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;8.8.2 案例2&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;案例描述&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;设计一个英雄的结构体，包括成员姓名，年龄，性别;创建结构体数组，数组中存放5名英雄。&lt;/p&gt;
+&lt;p&gt;通过冒泡排序的算法，将数组中的英雄按照年龄进行升序排序，最终打印排序后的结果。&lt;/p&gt;
+&lt;p&gt;五名英雄信息如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;		{&quot;刘备&quot;,23,&quot;男&quot;},
+		{&quot;关羽&quot;,22,&quot;男&quot;},
+		{&quot;张飞&quot;,20,&quot;男&quot;},
+		{&quot;赵云&quot;,21,&quot;男&quot;},
+		{&quot;貂蝉&quot;,19,&quot;女&quot;},
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+//英雄结构体
+struct hero
+{
+	std::string name;
+	int age;
+	std::string sex;
+};
+
+//冒泡排序
+void bubbleSort(hero arr[], int len)
+{
+	for (int i = 0; i &amp;lt; len - 1; i++)
+	{
+		for (int j = 0; j &amp;lt; len - 1 - i; j++)
+		{
+			if (arr[j].age &amp;gt; arr[j + 1].age)
+			{
+				hero temp = arr[j];
+				arr[j] = arr[j + 1];
+				arr[j + 1] = temp;
+			}
+		}
+	}
+}
+
+//打印数组
+void printHeros(hero arr[], int len)
+{
+	for (int i = 0; i &amp;lt; len; i++)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;姓名： &quot; &amp;lt;&amp;lt; arr[i].name &amp;lt;&amp;lt; &quot; 性别： &quot; &amp;lt;&amp;lt; arr[i].sex &amp;lt;&amp;lt; &quot; 年龄： &quot; &amp;lt;&amp;lt; arr[i].age &amp;lt;&amp;lt; std::endl;
+	}
+}
+
+int main() {
+
+	struct hero arr[5] =
+	{
+		{&quot;刘备&quot;,23,&quot;男&quot;},
+		{&quot;关羽&quot;,22,&quot;男&quot;},
+		{&quot;张飞&quot;,20,&quot;男&quot;},
+		{&quot;赵云&quot;,21,&quot;男&quot;},
+		{&quot;貂蝉&quot;,19,&quot;女&quot;},
+	};
+
+	int len = sizeof(arr) / sizeof(hero); //获取数组元素个数
+
+	bubbleSort(arr, len); //排序
+
+	printHeros(arr, len); //打印
 
 	return 0;
 }
@@ -6415,7 +7388,7 @@ $$&lt;/p&gt;
 &lt;p&gt;设B从地址0x0000开始，成员b的对齐值是1，其存放地址符合 $0x0000%1=0$；成员a的对齐值是4，需对齐到4字节边界，故起始于0x0004，占据 $0x0004\sim 0x0007$；成员c的对齐值是2，起始于 $0x0008$，占据 $0x0008\sim 0x0009$。此外，结构体长度必须是最大对齐值(4)的整数倍，当前大小10字节，需填充至12字节 ($0x000A\sim 0x000B$)。&lt;/p&gt;
 &lt;p&gt;设A也从地址0x0000开始，成员a的对齐值是4，存放在 $0x0000\sim 0x0003$；成员b的对齐值是1，存放在0x0004；成员c的对齐值是2，为满足“起始地址 $%$ 对齐值 $=0$”的条件，只能存放在 $0x0006\sim 0x0007$，总大小为8字节，无须尾部填充。&lt;/p&gt;
 &lt;p&gt;精简指令集计算机(RISC)普遍采用边界对齐，以支持高效的指令流水线。&lt;/p&gt;
-</content:encoded></item><item><title>1.1初识</title><link>https://www.atsuko.top/posts/dark-horse/c/introduction/11-first-encounter/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c/introduction/11-first-encounter/</guid><pubDate>Sun, 26 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;1.1  第一个C++程序&lt;/h3&gt;
+</content:encoded></item><item><title>1.1初识</title><link>https://www.atsuko.top/posts/dark-horse/c++/introduction/11-first-encounter/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/introduction/11-first-encounter/</guid><pubDate>Sun, 26 Apr 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;1.1  第一个C++程序&lt;/h3&gt;
 &lt;p&gt;编写一个C++程序总共分为4个步骤&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;创建项目&lt;/li&gt;
