@@ -1,4 +1,227 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>1.4操作系统结构</title><link>https://www.atsuko.top/posts/408/operating-system/14-operating-system-structure/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/14-operating-system-structure/</guid><pubDate>Sat, 16 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;随着操作系统功能的不断扩展和代码规模的持续增长，采用合理的结构设计对降低系统复杂度、提升安全性和可靠性至关重要。&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>2.1进程和线程简介1</title><link>https://www.atsuko.top/posts/408/operating-system/21-introduction-to-processes-and-threads-1/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/21-introduction-to-processes-and-threads-1/</guid><pubDate>Sun, 17 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;在学习本节时，请读者思考以下问题：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;为什么要引入进程？&lt;/li&gt;
+&lt;li&gt;什么是进程？进程由什么组成？&lt;/li&gt;
+&lt;li&gt;引入进程主要解决了多道程序并发执行中的哪些关键问题？&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;希望读者带着这些问题进入本节的学习，并在学习过程中多思考，从而更深入地把握核心概念。进程本身是一个抽象的逻辑实体，它并非物理存在的对象，初学者在理解时往往感到困难。为此，在系统阐述相关理论之后，我们将通过直观的例子帮助读者理解。&lt;/p&gt;
+&lt;h3&gt;2.1.1 进程的概念和特征&lt;/h3&gt;
+&lt;h4&gt;1. 进程的概念&lt;/h4&gt;
+&lt;p&gt;在多道程序环境下，允许多个程序并发执行，但并发性破坏了程序原本的封闭性，使其执行过程呈现间断性，并可能导致结果不可再现。为有效描述和控制程序的并发行为，操作系统引入了&lt;code&gt;进程&lt;/code&gt;(Process)这一核心概念，以支撑操作系统的两大基本特性：&lt;strong&gt;并发性&lt;/strong&gt;与&lt;strong&gt;共享性&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;为使每个参与并发执行的程序能独立运行，必须为其配置一个专门的数据结构，称为&lt;code&gt;进程控制块&lt;/code&gt;(Process Control Block, PCB)。操作系统通过PCB记录进程的基本信息和运行状态，从而实现对其的控制与管理。通常，&lt;strong&gt;程序段&lt;/strong&gt;、&lt;strong&gt;相关数据段&lt;/strong&gt;和&lt;strong&gt;PCB&lt;/strong&gt;三者共同构成&lt;code&gt;进程实体&lt;/code&gt;(也称&lt;code&gt;进程映像&lt;/code&gt;)。因此，&lt;strong&gt;创建进程的本质是创建其PCB&lt;/strong&gt;；相应地，撤销进程即释放该PCB及相关资源。&lt;/p&gt;
+&lt;p&gt;从不同视角出发，进程可有不同的定义，比较典型的定义如下。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;进程是正在执行的程序实例。&lt;/li&gt;
+&lt;li&gt;进程是程序及其数据从外存加载到内存后，在CPU上运行的过程。&lt;/li&gt;
+&lt;li&gt;进程是具有独立功能的程序在一个特定数据集合上的执行活动。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在传统操作系统中，&lt;code&gt;进程&lt;/code&gt;被正式定义为：“&lt;strong&gt;进程是进程实体的运行过程，是系统进行资源分配和调度的一个独立单位&lt;/strong&gt;”。这里所说的“系统资源”不仅包括内存空间、I/O设备等硬件资源，也包括CPU的使用权，而CPU的使用权通常通过时间片的分配来实现。正因进程是资源分配与调度的基本单位，它必然不是静态的程序，而必须是一个动态的、具有生命周期的过程性实体。&lt;/p&gt;
+&lt;h4&gt;2. 进程的特征&lt;/h4&gt;
+&lt;p&gt;进程源于多道程序并发执行的需求，与静态的程序有着本质区别。其核心特征如下。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;动态性&lt;/code&gt;。进程是程序的一次执行实例，具有明确的生命周期，包括创建、就绪、运行、阻塞和终止等状态变化。动态性是进程最根本的特征。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;并发性&lt;/code&gt;。多个进程可同时驻留于内存，并在一段时间内交替或并行执行。引入进程的根本目的，正是为了支持程序的并发执行。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;独立性&lt;/code&gt;。进程是能够独立运行、独立获取系统资源，并作为调度基本单位参与CPU竞争的实体。任何未建立PCB的程序，均不能被操作系统调度执行。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;异步性&lt;/code&gt;。进程相互制约，以不可预知的速度向前推进。这种异步性可能导致执行结果不可再现，因此操作系统必须提供相关机制，以协调进程行为，确保执行的正确性。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;尽管考试中较少直接考查四大特征，但对其内涵的理解是分析进程调度、同步互斥、死锁等问题的基础。建议读者着重把握各特征的成因、表现及其对系统设计的影响，而非机械记忆。&lt;/p&gt;
+&lt;h3&gt;2.1.2 进程的组成&lt;/h3&gt;
+&lt;p&gt;进程是操作系统进行资源分配和调度的基本单位，由三部分共同构成：程序段、数据段和进程控制块(PCB)，其中PCB是最核心的组成部分。&lt;/p&gt;
+&lt;h4&gt;1. 进程控制块&lt;/h4&gt;
+&lt;p&gt;进程创建时，操作系统为其分配一个PCB；该结构常驻内存，可随时被系统访问，并在进程终止时被回收。&lt;strong&gt;PCB是进程存在的唯一标志&lt;/strong&gt;，系统唯有通过它才能感知并管理进程。&lt;/p&gt;
+&lt;p&gt;在进程的整个生命期内，系统始终依赖PCB对其进行管理。操作系统通过PCB记录并维护进程的当前状态，以便在需要调度、切换或干预时，能够准确地控制其行为。&lt;/p&gt;
+&lt;p&gt;具体而言，当操作系统准备调度某个进程运行时，首先从其PCB中读取当前状态、优先级等调度所需信息；一旦该进程被选中，系统便根据PCB中保存的CPU上下文（如寄存器值）恢复其执行现场，并依据其中记录的内存地址找到对应的程序段和数据段。在进程运行过程中，若需与其他进程实现同步、通信，或访问文件，同样需要查询PCB中的相关资源信息。而当进程因某种原因而暂停执行时，其当前的CPU状态会被保存回PCB，以便后续重新调度时能从中断处继续执行。当进程正常结束或被强制终止时，系统将回收其PCB，该进程也随之消亡。由此可见，从创建到终止，系统对进程的所有操作，都离不开对其PCB的访问与更新。&lt;/p&gt;
+&lt;p&gt;PCB主要包括如表2.1所示的四类信息，各部分的主要说明如下。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;表2.1 PCB通常包含的内容&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;进程标识信息&lt;/th&gt;
+&lt;th&gt;进程调度信息&lt;/th&gt;
+&lt;th&gt;资源和内存信息&lt;/th&gt;
+&lt;th&gt;处理机状态信息&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;进程ID(PID)&lt;/td&gt;
+&lt;td&gt;进程当前状态&lt;/td&gt;
+&lt;td&gt;代码段指针&lt;/td&gt;
+&lt;td&gt;通用寄存器值&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;父进程ID(PPID)&lt;/td&gt;
+&lt;td&gt;进程优先级&lt;/td&gt;
+&lt;td&gt;数据段指针&lt;/td&gt;
+&lt;td&gt;程序计数器值&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;用户ID(UID)&lt;/td&gt;
+&lt;td&gt;CPU占用时间&lt;/td&gt;
+&lt;td&gt;堆栈段指针&lt;/td&gt;
+&lt;td&gt;程序状态字(PSW)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;等待时间&lt;/td&gt;
+&lt;td&gt;文件描述符列表&lt;/td&gt;
+&lt;td&gt;栈指针(SP)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;进入内存时间&lt;/td&gt;
+&lt;td&gt;I/O资源清单&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;阻塞原因&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;进程标识信息&lt;/code&gt;。用于唯一标识一个进程及其归属关系。&lt;strong&gt;进程ID&lt;/strong&gt;(PID)是系统为每个进程分配的唯一编号；&lt;strong&gt;父进程ID&lt;/strong&gt;(PPID)记录创建该进程的父进程标识符；&lt;strong&gt;用户ID&lt;/strong&gt;(UID)指明进程所属用户，为资源共享与安全保护提供依据。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;进程调度信息&lt;/code&gt;。支持操作系统的调度决策与状态管理。&lt;strong&gt;进程当前状态&lt;/strong&gt;是CPU分配的基本依据；&lt;strong&gt;进程优先级&lt;/strong&gt;决定其抢占CPU的能力；此外，还包括CPU占用时间、等待时间、进入内存时间等统计信息，以及阻塞原因，用于调整调度策略及后续唤醒。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;资源和内存信息&lt;/code&gt;。记录进程所占用的各类系统资源。包括&lt;strong&gt;代码段&lt;/strong&gt;、&lt;strong&gt;数据段&lt;/strong&gt;和&lt;strong&gt;堆栈段在内存中的起始地址&lt;/strong&gt;（或指针）、已打开文件的描述符列表，以及所占用的I/O资源。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;处理机状态信息&lt;/code&gt;。也称CPU上下文，主要包括通用寄存器、程序计数器、栈指针及程序状态字(PSW)等&lt;strong&gt;寄存器的值&lt;/strong&gt;。当进程被切换出CPU时，这些信息必须完整保存到PCB中；再次被调度运行时，系统将其恢复至CPU，从而能从中断处继续执行。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在一个实际系统中，通常同时存在大量进程，有的处于就绪态，有的处于阻塞态，并且阻塞原因各不相同。为高效地进行调度与管理，操作系统需将各进程的PCB以适当方式组织起来。常用的组织方法主要有两种：&lt;strong&gt;链接方式&lt;/strong&gt;和&lt;strong&gt;索引方式&lt;/strong&gt;。在&lt;code&gt;链接方式&lt;/code&gt;中，系统将处于相同状态的PCB通过指针链接成一个队列，如就绪队列、阻塞队列；对于阻塞进程，还可根据其阻塞原因(如等待I/O完成、等待信号量等)进一步划分为多个阻塞子队列。在&lt;code&gt;索引方式&lt;/code&gt;中，系统为每种状态建立一个索引表（如就绪索引表、阻塞索引表等），表项指向对应状态的PCB。&lt;/p&gt;
+&lt;h4&gt;2. 程序段&lt;/h4&gt;
+&lt;p&gt;程序段是进程中可被CPU执行的代码部分。需要指出的是，&lt;strong&gt;程序本身是静态的，可被多个进程共享&lt;/strong&gt;。例如，多个用户同时运行同一个文本编辑器程序时，系统只需在内存中保留一份代码副本，各进程通过各自的PCB指向该共享代码段，从而节省内存空间并提高系统效率。&lt;/p&gt;
+&lt;h4&gt;3. 数据段&lt;/h4&gt;
+&lt;p&gt;数据段包含进程运行所需的各种数据，既包括程序处理的原始输入，也包括执行过程中产生的中间结果和最终输出。与程序段不同，&lt;strong&gt;每个进程的数据段是私有的&lt;/strong&gt;，即使多个进程运行同一程序，它们的数据段也彼此隔离。这种设计有效保障了进程间的独立性与安全性。&lt;/p&gt;
+&lt;h3&gt;2.1.3 进程的内存映像&lt;/h3&gt;
+&lt;p&gt;当程序被加载运行时，操作系统会为其建立一个&lt;strong&gt;虚拟地址空间&lt;/strong&gt;，该空间的逻辑布局称为&lt;code&gt;进程的内存映像&lt;/code&gt;。它反映了进程在运行时代码、数据、堆、栈等部分的组织方式。与磁盘上的静态可执行文件不同，内存映像是动态的。在虚拟内存机制（见3.2节）下，进程的整个地址空间无须全部驻留物理内存，只有在实际访问某一部分时，系统才会通过缺页中断将其从磁盘调入内存。&lt;/p&gt;
+&lt;p&gt;典型的进程虚拟地址空间由以下几个主要区域构成。&lt;/p&gt;
+&lt;h4&gt;1. 代码段&lt;/h4&gt;
+&lt;p&gt;代码段是指存放程序的机器指令，即编译后的可执行代码。该段通常是&lt;strong&gt;只读的&lt;/strong&gt;，防止程序运行时意外修改指令，同时也允许多个进程共享同一份代码。代码段通常包含以下几个子区域。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;.init&lt;/code&gt;：包含程序启动时由系统自动调用的初始化代码。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.text&lt;/code&gt;：存放主程序的指令。如 &lt;code&gt;main()&lt;/code&gt; 函数、自定义函数编译后的机器指令。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.rodata&lt;/code&gt;：存放只读数据。如字符串常量&quot;Hello World!&quot;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;2. 数据段&lt;/h4&gt;
+&lt;p&gt;数据段用于存放全局变量和静态变量(static变量)，分为如下两部分。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;.data&lt;/code&gt;：存放已初始化（已显式赋初值）的全局变量和静态变量，如 &lt;code&gt;int x=5;&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.bss&lt;/code&gt;：存放未初始化的全局变量和静态变量，如 &lt;code&gt;int y;&lt;/code&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;3. 进程控制块(PCB)&lt;/h4&gt;
+&lt;p&gt;虽然PCB是管理进程的核心数据结构，但&lt;strong&gt;它并不属于进程的虚拟地址空间&lt;/strong&gt;。它由操作系统内核维护，存放在系统内核区中，对用户进程不可见。&lt;/p&gt;
+&lt;h4&gt;4. 堆&lt;/h4&gt;
+&lt;p&gt;堆是指程序运行时动态申请内存的区域。通过 &lt;code&gt;malloc()&lt;/code&gt; 等函数从堆中申请内存，不再需要时通过 &lt;code&gt;free()&lt;/code&gt; 释放。堆从低地址向高地址增长，大小不固定，适合存储生命周期不确定的数据。例如，C语言语句 &lt;code&gt;int* ptr = (int*)malloc(4)&lt;/code&gt; 会在堆上分配4字节内存，用于存储一个整数。&lt;/p&gt;
+&lt;h4&gt;5. 栈&lt;/h4&gt;
+&lt;p&gt;栈用于支持函数调用，存放局部变量、函数参数、返回地址等临时信息，由系统自动管理。遵循后进先出(LIFO)原则，&lt;strong&gt;栈从高地址向低地址扩展&lt;/strong&gt;。例如，调用函数 &lt;code&gt;add(3,5)&lt;/code&gt; 时，参数3、5和返回地址会被压入栈；函数执行结束后，这些数据被弹出，栈指针自动回退。&lt;/p&gt;
+&lt;h4&gt;6. 共享库的存储映射区&lt;/h4&gt;
+&lt;p&gt;共享库用于提供进程所依赖的公共函数代码(如 &lt;code&gt;printf()&lt;/code&gt; 等标准库函数)。它们在运行时被动态映射到进程的地址空间，&lt;strong&gt;代码是只读的，且可被多个进程共享&lt;/strong&gt;，从而节省内存资源。&lt;/p&gt;
+&lt;p&gt;一个典型进程在内存中的映像。最高地址处是用户栈，随函数调用向下增长；其下方是共享库的映射区域，用于加载动态库；再往下是堆，由 &lt;code&gt;malloc()&lt;/code&gt; 等函数动态扩展；堆下方是读/写数据段(.data和.bss)；底部是只读代码段(.init、.text、.rodata)；注意，&lt;strong&gt;代码段和数据段的大小在程序加载时就已确定，而堆和栈则可在运行过程中动态扩展和收缩&lt;/strong&gt;。&lt;/p&gt;
+&lt;h3&gt;2.1.4 进程的状态与转换&lt;/h3&gt;
+&lt;p&gt;进程在其生命周期中，由于与其他进程的相互制约以及系统运行环境的变化，其状态会不断发生转换。通常，进程具有以下五种状态，其中前三种为基本状态。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;运行态&lt;/code&gt;。进程正在CPU上执行。在单CPU中，任一时刻最多只有一个进程处于运行态。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;就绪态&lt;/code&gt;。进程已获得除CPU外的所有必要资源，一旦获得CPU，便可立即投入运行。系统中可能有多个就绪进程，通常将它们组织成一个队列，称为&lt;code&gt;就绪队列&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;阻塞态&lt;/code&gt;，也称&lt;code&gt;等待态&lt;/code&gt;。进程因等待某一事件（如某个资源可用、I/O操作完成等）而暂停运行。此时即使CPU空闲，该进程也无法执行。系统通常将处于阻塞态的进程组织成一个阻塞队列，甚至根据阻塞原因的不同，还可进一步划分为多个子队列。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;创建态&lt;/code&gt;。进程正处于创建过程中，尚未进入就绪态。创建进程包括多个步骤：首先申请一个空白的 PCB，并向其中填写用于控制和管理进程的信息；然后为该进程分配运行时所需的资源（如内存空间）；最后，当所有必要资源都已到位，系统将该进程转入就绪态，并插入就绪队列。创建态是一个短暂的中间状态，正常情况下不会长期停留。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;终止态&lt;/code&gt;。进程已完成执行（无论是正常结束还是被强制终止），正在等待系统回收其资源。此时，进程不再参与调度，但其PCB等信息可能暂时保留，直至完成最终清理。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;区分就绪态与阻塞态&lt;/strong&gt;：就绪态是指进程仅缺少CPU，只要获得CPU就可立即运行；而阻塞态是指进程需要其他资源（除CPU外）或等待某一事件。之所以将CPU与其他资源分开，是因为在分时系统的时间片轮转机制中，每个进程分得的时间片很短（通常为几毫秒），因此进程在运行过程中会频繁地在运行态与就绪态之间切换；而其他资源（如外设）的分配或事件(如I/O完成)的发生往往需要较长时间，导致进程进入阻塞态的频率远低于就绪态。由此可见，就绪态和阻塞态在进程生命周期中代表了两种性质完全不同的等待情形。&lt;/p&gt;
+&lt;p&gt;五种进程状态之间的转换关系。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;就绪态→运行态&lt;/code&gt;：处于就绪态的进程被调度程序选中，获得CPU的使用权(例如分配到一个时间片)，随即由就绪态转换为运行态。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;运行态→就绪态&lt;/code&gt;：处于运行态的进程在时间片用完后，必须主动让出CPU，从而转回就绪态；此外，在可剥夺式调度系统中，若有更高优先级的进程变为就绪，则当前运行的进程也会被强制切换回就绪态，以便让更高优先级的进程执行。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;运行态→阻塞态&lt;/code&gt;：当运行中的进程通过系统调用请求某项服务（如发起I/O操作），而该请求无法立即满足（需等待I/O完成），进程便会主动进入阻塞态。需注意，并非所有系统调用都会导致阻塞，只有那些需要等待外部事件的操作才会引发状态转换。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;阻塞态→就绪态&lt;/code&gt;：当进程所等待的事件发生时（如I/O操作完成），相应的中断处理程序会将其状态由阻塞态修改为就绪态，并重新插入就绪队列，等待下一次调度。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;值得注意的是，&lt;strong&gt;进程从运行态变为阻塞态是一种主动行为&lt;/strong&gt;（由自身发起的系统调用触发），而&lt;strong&gt;从阻塞态变为就绪态则是一种被动行为&lt;/strong&gt;，依赖于外部事件的发生或其他进程的协助。&lt;/p&gt;
+&lt;h3&gt;2.1.5 进程控制&lt;/h3&gt;
+&lt;p&gt;进程控制的功能是对系统中所有进程进行有效的管理，主要包括创建新进程、撤销已有进程、实现进程状态转换等操作。在操作系统中，这些控制操作通常以&lt;code&gt;原语&lt;/code&gt;的形式实现。原语在执行期间不允许被中断，是一个&lt;strong&gt;不可分割的基本单位&lt;/strong&gt;，确保了关键操作的原子性和一致性。&lt;/p&gt;
+&lt;h4&gt;1. 进程的创建&lt;/h4&gt;
+&lt;p&gt;允许一个进程创建另一个进程。创建者称为&lt;code&gt;父进程&lt;/code&gt;，被创建的进程称为&lt;code&gt;子进程&lt;/code&gt;。子进程在创建时会复制父进程的当前状态，包括程序代码、数据段、堆栈内容、打开的文件描述符、环境变量等。然而，&lt;strong&gt;子进程与父进程是相互独立的实体&lt;/strong&gt;，拥有各自的PCB和虚拟地址空间。&lt;/p&gt;
+&lt;p&gt;在操作系统中，终端用户登录系统、作业调度启动批处理任务、系统提供服务、用户程序发起应用请求等，都会触发进程的创建。操作系统通过&lt;code&gt;创建原语&lt;/code&gt;建立新进程，具体步骤如下。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;分配唯一标识并申请PCB&lt;/code&gt;：为新进程分配唯一的进程标识号(PID)，并从系统PCB池中申请一个空白PCB。若PCB资源耗尽，则创建失败，系统返回错误。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;分配新进程运行所需的资源&lt;/code&gt;：如内存、文件、I/O设备等（记录在PCB中）。这些资源或从操作系统获得，或从其父进程继承。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;初始化PCB&lt;/code&gt;：初始化的内容包括：标识信息、处理机状态信息、调度与控制信息和内存与资源信息。通常将新进程设置为最低优先级，除非用户显式提出高优先级要求。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;插入就绪队列&lt;/code&gt;：若系统允许新进程参与调度，则将其PCB插入就绪队列，等待调度。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;2. 进程的终止&lt;/h4&gt;
+&lt;p&gt;引起进程终止的事件主要包括：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;正常结束&lt;/strong&gt;，表示进程完成其预定任务后主动退出。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;异常结束&lt;/strong&gt;，表示进程在运行过程中发生严重错误，导致无法继续执行。常见原因包括：存储区越界、非法指令、特权指令违规、算术运算错误、I/O故障、运行超时等。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;外界干预&lt;/strong&gt;，由外部实体请求终止进程，如操作员强制终止、操作系统因资源不足或安全策略终止进程、父进程通过系统调用请求终止其子进程。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;操作系统通过&lt;code&gt;终止原语&lt;/code&gt;完成进程的撤销，具体步骤如下。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;根据被终止进程的标识符，检索其PCB，并读取当前状态。&lt;/li&gt;
+&lt;li&gt;若该进程正处于运行态，立即剥夺其CPU，并触发调度程序选择下一个就绪进程。&lt;/li&gt;
+&lt;li&gt;释放该进程占用的所有系统资源，统一归还给操作系统。&lt;/li&gt;
+&lt;li&gt;若系统支持级联终止，则递归终止其所有子孙进程；否则，子孙进程继续运行。&lt;/li&gt;
+&lt;li&gt;将该进程的PCB从所在队列（或链表）中移除，完成清理。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在某些系统中，当一个进程终止时，其所有子孙进程也必须随之终止，这种机制称为级联终止。然而，并非所有操作系统都采用这一策略。以Linux 为例，当父进程终止时，其子进程并不会被自动终止，而是由init进程(PID=1)收养，并继续正常运行。&lt;/p&gt;
+&lt;h4&gt;3. 进程的阻塞和唤醒&lt;/h4&gt;
+&lt;p&gt;当一个正在运行的进程因等待某个外部事件而暂时无法继续执行时，会主动调用&lt;code&gt;阻塞原语&lt;/code&gt;(Block)，使自己从运行态转换为阻塞态。常见的等待事件包括：请求系统资源暂时不可用、等待I/O操作完成、等待接收数据、等待信号量等。需要强调的是，&lt;strong&gt;阻塞是进程的主动行为&lt;/strong&gt;，因此只有处于运行态的进程才能执行阻塞操作。阻塞原语的执行过程如下。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;保存当前进程的CPU现场（如程序计数器、状态寄存器等）到其PCB中。&lt;/li&gt;
+&lt;li&gt;将其PCB中的状态字段修改为阻塞态，并将该PCB插入所等待事件的等待队列中。&lt;/li&gt;
+&lt;li&gt;调用调度程序，从就绪队列中选择另一个进程投入运行，以释放CPU资源。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;当被阻塞进程所等待的事件发生时（如I/O操作完成、所需数据到达），由内核的中断处理程序或合作进程调用&lt;code&gt;唤醒&lt;/code&gt;(Wakeup)原语，将该进程重新激活。唤醒原语的执行过程如下。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;在指定事件的等待队列中找到目标进程的PCB。&lt;/li&gt;
+&lt;li&gt;将其从等待队列中移出，并将状态置为就绪态。&lt;/li&gt;
+&lt;li&gt;将该PCB插入就绪队列，等待调度程序在适当时机选中并恢复其执行。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;需要注意是，Block与Wakeup是一对作用相反的原语，&lt;strong&gt;必须成对使用&lt;/strong&gt;。若某进程调用了Block进入阻塞态，但系统中没有任何机制调用对应的Wakeup，则该进程将&lt;strong&gt;永久停留在阻塞态&lt;/strong&gt;，无法再被调度执行。因此，在设计并发程序时，必须确保每个阻塞操作都有相应的唤醒路径。&lt;/p&gt;
+&lt;h3&gt;2.1.6 进程的通信&lt;/h3&gt;
+&lt;p&gt;进程通信(IPC)是指进程之间的信息交换。根据通信效率和数据量的不同，可分为&lt;strong&gt;低级通信&lt;/strong&gt;和&lt;strong&gt;高级通信&lt;/strong&gt;两类：&lt;code&gt;低级通信&lt;/code&gt;主要用于传递控制信息（如同步、互斥），典型代表是PV操作（见2.3节）；&lt;code&gt;高级通信&lt;/code&gt;用于高效传输大量数据，主要包括共享存储、消息传递和管道通信、信号等方式。&lt;/p&gt;
+&lt;h4&gt;1. 共享存储&lt;/h4&gt;
+&lt;p&gt;进程的地址空间通常是相互隔离的，一个进程不能直接访问另一个进程的内存。因此，若要实现高效的数据交换，操作系统提供了&lt;code&gt;共享存储&lt;/code&gt;机制：通过特殊的系统调用，创建一段独立的内存区域，并将其&lt;strong&gt;映射到多个进程的虚拟地址空间中&lt;/strong&gt;，使这些进程都能直接读/写该区域。在共享存储方式中，参与通信的进程通过对这一共享区域进行读/写来交换信息，如图2.3所示。由于多个进程可能并发访问同一块内存，&lt;strong&gt;必须由用户程序引入同步互斥机制&lt;/strong&gt;（如信号量的P、V操作），以避免数据竞争或不一致。需要注意的是，操作系统仅负责分配共享内存区并完成地址映射，并&lt;strong&gt;不会自动提供同步保护&lt;/strong&gt;；具体的读/写逻辑与同步控制，均需由用户程序自行设计和实现。&lt;/p&gt;
+&lt;p&gt;通俗地理解，可以想象甲和乙之间放着一个公共的大布袋：甲把要传递的物品放进布袋，乙再从里面取出。但乙不能直接伸手去拿甲手里的东西，甲也不能直接取走乙的东西，所有交换都必须通过这个公共区域完成。&lt;/p&gt;
+&lt;h4&gt;2. 消息传递&lt;/h4&gt;
+&lt;p&gt;当进程之间没有共享内存，或出于安全等考虑不便使用共享存储时，可采用操作系统提供的&lt;code&gt;消息传递&lt;/code&gt;机制进行通信。在消息传递系统中，进程间的数据交换以格式化的&lt;code&gt;消息&lt;/code&gt;(Message)为单位，通过操作系统提供的发送原语和接收原语进行。这种方式将通信的底层细节封装在内核中，&lt;strong&gt;对用户透明&lt;/strong&gt;，从而简化了应用程序的设计。消息传递是目前应用最广泛的进程间通信机制，在微内核操作系统中，微内核与服务器之间的交互正是基于消息传递。此外，该机制很好地支持多处理器系统、分布式系统和计算机网络，因此也成为这些环境中的主流通信方式。&lt;/p&gt;
+&lt;p&gt;消息传递可分为两种基本模式：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;直接通信方式&lt;/code&gt;。发送进程通过发送原语将消息发给指定的接收进程；内核负责将消息从发送方复制到接收方的内核缓冲队列中；接收进程通过接收原语接收消息。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;间接通信方式&lt;/code&gt;。通信双方不直接指定对方，而是通过一个中间实体（通常称为&lt;code&gt;信箱&lt;/code&gt;）进行消息交换。发送进程将消息投递到信箱，接收进程从信箱中取出消息。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;通俗地理解，甲要向乙传递信息，便写好一封信交给邮差。在直接通信中，邮差将信件直接交到乙本人手中；在间接通信中，乙家门口设有一个邮箱，邮差只需将信投入该邮箱，乙随后自行取阅。无论哪种方式，消息的投递均由邮差（操作系统内核）完成消息的可靠投递。&lt;/p&gt;
+&lt;h4&gt;3. 管道通信&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;管道通信&lt;/code&gt;是一种基于先进先出原则的进程间通信机制，常用于具有亲缘关系的进程(如父子进程)之间，以&lt;strong&gt;生产者-消费者模式&lt;/strong&gt;进行数据交换。从编程接口上看，&lt;code&gt;管道&lt;/code&gt;(Pipe)表现为一种特殊的共享文件，支持标准的 &lt;code&gt;read()&lt;/code&gt; 和 &lt;code&gt;write()&lt;/code&gt; 操作；但从实现上看，它并非存储在磁盘上的文件，而是由操作系统内核维护的一块&lt;strong&gt;固定大小的内存缓冲区&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;为确保通信的正确性，管道机制必须提供三方面的协调能力：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;互斥&lt;/strong&gt;，指任一时刻只允许一个进程对管道进行读或写操作，防止多个进程并发访问导致数据混乱；&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;同步&lt;/strong&gt;，指当管道满时，写进程自动阻塞，直到读进程取走部分数据；当管道空时，读进程自动阻塞，直到写进程向其中写入新数据；&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;写端关闭检测&lt;/strong&gt;，当写端关闭后，读端 &lt;code&gt;read()&lt;/code&gt; 返回0，表明无数据可读。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在Linux系统中，管道是一种广泛使用的IPC机制。其主要特点包括：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;固定缓冲区大小&lt;/code&gt;。管道使用内核中的环形缓冲区（如64KB），不会像普通文件那样无限制增长。当缓冲区满时，后续的 &lt;code&gt;write()&lt;/code&gt; 调用将被阻塞，直到有足够空间可用。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;自动阻塞与唤醒&lt;/code&gt;。若读进程的消费速度快于写进程，则管道中的数据会被迅速读空。此时，任何 &lt;code&gt;read()&lt;/code&gt; 调用将被阻塞，等待写进程再次写入数据。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;管道由父进程通过 &lt;code&gt;pipe()&lt;/code&gt; 系统调用创建。由于子进程在创建时会继承父进程的文件描述符表，因此能够通过这些描述符访问同一管道，从而与父进程进行通信。&lt;/p&gt;
+&lt;p&gt;:::note
+从管道中读取数据是一次性操作，数据一旦被读出，其占用的缓冲区空间即被释放，供后续写入使用；普通管道仅支持单向通信，若需双向通信，则必须创建两个管道，分别用于两个方向的数据传输。
+:::&lt;/p&gt;
+&lt;h4&gt;4. 信号&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;信号&lt;/code&gt;(Signal)是一种用于通知进程某个事件已发生的机制。不同的系统事件对应不同的信号类型，每类信号对应一个序号。例如，Linux内核实现了约30种信号，编号通常为 $1 \sim 30$。&lt;/p&gt;
+&lt;p&gt;在进程的PCB中，用一个 $n$ 位向量（如Linux使用一个32位整型变量）记录该进程当前&lt;strong&gt;待处理的信号&lt;/strong&gt;。当向某进程发送一个信号时，内核会将该信号对应的位置为1；一旦该信号被成功处理，对应位即被清零。此外，PCB中还维护另一个 $n$ 位向量，用于记录&lt;strong&gt;被阻塞&lt;/strong&gt;（屏蔽）的信号。当某一位为1时，表示对应的信号&lt;strong&gt;不会被立即处理&lt;/strong&gt;，而是暂存起来，直到解除阻塞。&lt;/p&gt;
+&lt;p&gt;信号的发送主要有以下两种方式：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;内核发送信号&lt;/code&gt;。当内核检测到特定的系统事件时，会向相关进程发送相应的信号。例如，若进程执行了非法指令，则内核将向其发送SIGILL信号（序号为4）。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;由进程发送信号&lt;/code&gt;。一个进程可以通过调用 &lt;code&gt;kill()&lt;/code&gt; 函数，请求内核向指定进程(需提供目标进程的PID和信号序号)发送信号。当然，进程也可以向自身发送信号。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;当操作系统&lt;strong&gt;从内核态返回用户态&lt;/strong&gt;时（如系统调用结束），会检查当前进程是否存在&lt;strong&gt;未被阻塞的待处理信号&lt;/strong&gt;。若存在，则立即处理其中一个信号（通常优先处理序号较小的信号）。&lt;/p&gt;
+&lt;p&gt;信号的处理方式有两种：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;执行默认的信号处理程序&lt;/code&gt;。操作系统为每类信号预设了默认操作。例如，收到SIGILL信号的默认操作是终止进程。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;执行进程自定义的信号处理程序&lt;/code&gt;。进程可以为某类信号定义自己的处理函数。例如，可定义收到SIGILL时输出&quot;hello world&quot;，而不是终止进程。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;信号处理程序执行结束后，通常会返回到原程序被中断的位置，继续执行后续指令。&lt;/p&gt;
+</content:encoded></item><item><title>1.4操作系统结构</title><link>https://www.atsuko.top/posts/408/operating-system/14-operating-system-structure/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/14-operating-system-structure/</guid><pubDate>Sat, 16 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;随着操作系统功能的不断扩展和代码规模的持续增长，采用合理的结构设计对降低系统复杂度、提升安全性和可靠性至关重要。&lt;/p&gt;
 &lt;h3&gt;1. 分层法&lt;/h3&gt;
 &lt;p&gt;分层法将操作系统划分为若干层次，最底层（层0）为硬件，顶层（层N）为用户接口。各层仅可调用其紧邻下层所提供的功能与服务（&lt;strong&gt;单向依赖&lt;/strong&gt;）。&lt;/p&gt;
 &lt;p&gt;分层法的优点如下：&lt;/p&gt;
@@ -119,6 +342,501 @@
 &lt;/ol&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
+</content:encoded></item><item><title>2.通讯录管理系统</title><link>https://www.atsuko.top/posts/dark-horse/c++/practical-operations-address-book/2-address-book-management-system/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/practical-operations-address-book/2-address-book-management-system/</guid><pubDate>Sat, 16 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;1、系统需求&lt;/h2&gt;
+&lt;p&gt;通讯录是一个可以记录亲人、好友信息的工具。&lt;/p&gt;
+&lt;p&gt;本教程主要利用C++来实现一个通讯录管理系统&lt;/p&gt;
+&lt;p&gt;系统中需要实现的功能如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;添加联系人：向通讯录中添加新人，信息包括（姓名、性别、年龄、联系电话、家庭住址）最多记录1000人&lt;/li&gt;
+&lt;li&gt;显示联系人：显示通讯录中所有联系人信息&lt;/li&gt;
+&lt;li&gt;删除联系人：按照姓名进行删除指定联系人&lt;/li&gt;
+&lt;li&gt;查找联系人：按照姓名查看指定联系人信息&lt;/li&gt;
+&lt;li&gt;修改联系人：按照姓名重新修改指定联系人&lt;/li&gt;
+&lt;li&gt;清空联系人：清空通讯录中所有信息&lt;/li&gt;
+&lt;li&gt;退出通讯录：退出当前使用的通讯录&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;2、创建项目&lt;/h2&gt;
+&lt;p&gt;创建项目步骤如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;创建新项目&lt;/li&gt;
+&lt;li&gt;添加文件&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;2.1 创建项目&lt;/h3&gt;
+&lt;p&gt;打开vs2017后，点击创建新项目，创建新的C++项目&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544151401138.png&quot; alt=&quot;1544151401138&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;填写项目名称，选择项目路径&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544151579620.png&quot; alt=&quot;1544151579620&quot; /&gt;&lt;/p&gt;
+&lt;h3&gt;2.2添加文件&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544161551746.png&quot; alt=&quot;1544161551746&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544161648175.png&quot; alt=&quot;1544161648175&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;添加成功后，效果如图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544162344057.png&quot; alt=&quot;1544162344057&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;至此，项目已创建完毕&lt;/p&gt;
+&lt;h2&gt;3、菜单功能&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;功能描述&lt;/strong&gt;： 用户选择功能的界面&lt;/p&gt;
+&lt;p&gt;菜单界面效果如下图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544149559893.png&quot; alt=&quot;1544149559893&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;步骤&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;封装函数显示该界面  如 &lt;code&gt;void showMenu()&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;在main函数中调用封装好的函数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;代码&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//菜单界面
+void showMenu()
+{
+	std::cout &amp;lt;&amp;lt; &quot;***************************&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;*****  1、添加联系人  *****&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;*****  2、显示联系人  *****&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;*****  3、删除联系人  *****&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;*****  4、查找联系人  *****&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;*****  5、修改联系人  *****&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;*****  6、清空联系人  *****&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;*****  0、退出通讯录  *****&quot; &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;***************************&quot; &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+	showMenu();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;4、退出功能&lt;/h2&gt;
+&lt;p&gt;功能描述：退出通讯录系统&lt;/p&gt;
+&lt;p&gt;思路：根据用户不同的选择，进入不同的功能，可以选择switch分支结构，将整个架构进行搭建&lt;/p&gt;
+&lt;p&gt;当用户选择0时候，执行退出，选择其他先不做操作，也不会退出程序&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;代码&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;int main() {
+
+	// 用户输入变量
+	int select = 0;
+
+	while (true)
+	{
+		showMenu();
+
+		std::cin &amp;gt;&amp;gt; select;
+
+		switch (select)
+		{
+		case 1:  //添加联系人
+			break;
+		case 2:  //显示联系人
+			break;
+		case 3:  //删除联系人
+			break;
+		case 4:  //查找联系人
+			break;
+		case 5:  //修改联系人
+			break;
+		case 6:  //清空联系人
+			break;
+		case 0:  //退出通讯录
+			std::cout &amp;lt;&amp;lt; &quot;欢迎下次使用&quot; &amp;lt;&amp;lt; std::endl;
+			return 0;
+			break;
+		default:
+			std::cout &amp;lt;&amp;lt; &quot;输入错误，请检查输入&quot; &amp;lt;&amp;lt; std::endl;
+			break;
+		}
+	}
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;效果图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544163868043.png&quot; alt=&quot;1544163868043&quot; /&gt;&lt;/p&gt;
+&lt;h2&gt;5、添加联系人&lt;/h2&gt;
+&lt;p&gt;功能描述：&lt;/p&gt;
+&lt;p&gt;实现添加联系人功能，联系人上限为1000人，联系人信息包括（姓名、性别、年龄、联系电话、家庭住址）&lt;/p&gt;
+&lt;p&gt;添加联系人实现步骤：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;设计联系人结构体&lt;/li&gt;
+&lt;li&gt;设计通讯录结构体&lt;/li&gt;
+&lt;li&gt;main函数中创建通讯录&lt;/li&gt;
+&lt;li&gt;封装添加联系人函数&lt;/li&gt;
+&lt;li&gt;测试添加联系人功能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;5.1 设计联系人结构体&lt;/h3&gt;
+&lt;p&gt;联系人信息包括：姓名、性别、年龄、联系电话、家庭住址&lt;/p&gt;
+&lt;p&gt;设计如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;string&amp;gt;
+//联系人结构体
+struct Person
+{
+	std::string m_Name;		//姓名
+	int m_Sex;				//性别：1男 2女
+	int m_Age;				//年龄
+	std::string m_Phone;	//电话
+	std::string m_Addr;		//住址
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;5.2 设计通讯录结构体&lt;/h3&gt;
+&lt;p&gt;设计时候可以在通讯录结构体中，维护一个容量为1000的存放联系人的数组，并记录当前通讯录中联系人数量&lt;/p&gt;
+&lt;p&gt;设计如下&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#define MAX 1000 //最大人数
+
+//通讯录结构体
+struct Addressbooks
+{
+	struct Person personArray[MAX];	//通讯录中保存的联系人数组
+	int m_Size;						//通讯录中人员个数
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;5.3 main函数中创建通讯录&lt;/h3&gt;
+&lt;p&gt;添加联系人函数封装好后，在main函数中创建一个通讯录变量，这个就是我们需要一直维护的通讯录&lt;/p&gt;
+&lt;p&gt;mian函数起始位置添加：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;	//创建通讯录
+	Addressbooks abs;
+	//初始化通讯录中人数
+	abs.m_Size = 0;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;5.4 封装添加联系人函数&lt;/h3&gt;
+&lt;p&gt;思路：添加联系人前先判断通讯录是否已满，如果满了就不再添加，未满情况将新联系人信息逐个加入到通讯录&lt;/p&gt;
+&lt;p&gt;添加联系人代码：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;//1、添加联系人信息
+void addPerson(Addressbooks* abs)
+{
+	//判断电话本是否满了
+	if (abs-&amp;gt;m_Size == MAX)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;通讯录已满，无法添加&quot; &amp;lt;&amp;lt; std::endl;
+		return;
+	}
+	else
+	{
+		//姓名
+		std::string name;
+		std::cout &amp;lt;&amp;lt; &quot;请输入姓名：&quot; &amp;lt;&amp;lt; std::endl;
+		std::cin &amp;gt;&amp;gt; name;
+		abs-&amp;gt;personArray[abs-&amp;gt;m_Size].m_Name = name;
+
+		std::cout &amp;lt;&amp;lt; &quot;请输入性别：&quot; &amp;lt;&amp;lt; std::endl;
+		std::cout &amp;lt;&amp;lt; &quot;1 -- 男&quot; &amp;lt;&amp;lt; std::endl;
+		std::cout &amp;lt;&amp;lt; &quot;2 -- 女&quot; &amp;lt;&amp;lt; std::endl;
+
+		//性别
+		int sex = 0;
+		while (true)
+		{
+			std::cin &amp;gt;&amp;gt; sex;
+			if (sex == 1 || sex == 2)
+			{
+				abs-&amp;gt;personArray[abs-&amp;gt;m_Size].m_Sex = sex;
+				break;
+			}
+			std::cout &amp;lt;&amp;lt; &quot;输入有误，请重新输入&quot;;
+		}
+
+		//年龄
+		std::cout &amp;lt;&amp;lt; &quot;请输入年龄：&quot; &amp;lt;&amp;lt; std::endl;
+		int age = 0;
+		std::cin &amp;gt;&amp;gt; age;
+		abs-&amp;gt;personArray[abs-&amp;gt;m_Size].m_Age = age;
+
+		//联系电话
+		std::cout &amp;lt;&amp;lt; &quot;请输入联系电话：&quot; &amp;lt;&amp;lt; std::endl;
+		std::string phone = &quot;&quot;;
+		std::cin &amp;gt;&amp;gt; phone;
+		abs-&amp;gt;personArray[abs-&amp;gt;m_Size].m_Phone = phone;
+
+		//家庭住址
+		std::cout &amp;lt;&amp;lt; &quot;请输入家庭住址：&quot; &amp;lt;&amp;lt; std::endl;
+		std::string address;
+		std::cin &amp;gt;&amp;gt; address;
+		abs-&amp;gt;personArray[abs-&amp;gt;m_Size].m_Addr = address;
+
+		//更新通讯录人数
+		abs-&amp;gt;m_Size++;
+
+		std::cout &amp;lt;&amp;lt; &quot;添加成功&quot; &amp;lt;&amp;lt; std::endl;
+		system(&quot;pause&quot;);
+		system(&quot;cls&quot;);
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;5.5 测试添加联系人功能&lt;/h3&gt;
+&lt;p&gt;选择界面中，如果玩家选择了1，代表添加联系人，我们可以测试下该功能&lt;/p&gt;
+&lt;p&gt;在switch case 语句中，case1里添加：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;case 1:  //添加联系人
+	addPerson(&amp;amp;abs);
+	break;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试效果如图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544165554002.png&quot; alt=&quot;1544165554002&quot; /&gt;&lt;/p&gt;
+&lt;h2&gt;6、显示联系人&lt;/h2&gt;
+&lt;p&gt;功能描述：显示通讯录中已有的联系人信息&lt;/p&gt;
+&lt;p&gt;显示联系人实现步骤：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;封装显示联系人函数&lt;/li&gt;
+&lt;li&gt;测试显示联系人功能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;6.1 封装显示联系人函数&lt;/h3&gt;
+&lt;p&gt;思路：判断如果当前通讯录中没有人员，就提示记录为空，人数大于0，显示通讯录中信息&lt;/p&gt;
+&lt;p&gt;显示联系人代码：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;//2、显示所有联系人信息
+void showPerson(Addressbooks* abs)
+{
+	if (abs-&amp;gt;m_Size == 0)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;当前记录为空&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	else
+	{
+		for (int i = 0; i &amp;lt; abs-&amp;gt;m_Size; i++)
+		{
+			std::cout &amp;lt;&amp;lt; &quot;姓名：&quot; &amp;lt;&amp;lt; abs-&amp;gt;personArray[i].m_Name &amp;lt;&amp;lt; &quot;\t&quot;;
+			std::cout &amp;lt;&amp;lt; &quot;性别：&quot; &amp;lt;&amp;lt; (abs-&amp;gt;personArray[i].m_Sex == 1 ? &quot;男&quot; : &quot;女&quot;) &amp;lt;&amp;lt; &quot;\t&quot;;
+			std::cout &amp;lt;&amp;lt; &quot;年龄：&quot; &amp;lt;&amp;lt; abs-&amp;gt;personArray[i].m_Age &amp;lt;&amp;lt; &quot;\t&quot;;
+			std::cout &amp;lt;&amp;lt; &quot;电话：&quot; &amp;lt;&amp;lt; abs-&amp;gt;personArray[i].m_Phone &amp;lt;&amp;lt; &quot;\t&quot;;
+			std::cout &amp;lt;&amp;lt; &quot;住址：&quot; &amp;lt;&amp;lt; abs-&amp;gt;personArray[i].m_Addr &amp;lt;&amp;lt; std::endl;
+		}
+	}
+	system(&quot;pause&quot;);
+	system(&quot;cls&quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;6.2 测试显示联系人功能&lt;/h3&gt;
+&lt;p&gt;在switch case语句中，case 2 里添加&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;case 2:  //显示联系人
+	showPerson(&amp;amp;abs);
+	break;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试效果如图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544166401582.png&quot; alt=&quot;1544166401582&quot; /&gt;&lt;/p&gt;
+&lt;h2&gt;7、删除联系人&lt;/h2&gt;
+&lt;p&gt;功能描述：按照姓名进行删除指定联系人&lt;/p&gt;
+&lt;p&gt;删除联系人实现步骤：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;封装检测联系人是否存在&lt;/li&gt;
+&lt;li&gt;封装删除联系人函数&lt;/li&gt;
+&lt;li&gt;测试删除联系人功能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;7.1  封装检测联系人是否存在&lt;/h3&gt;
+&lt;p&gt;设计思路：&lt;/p&gt;
+&lt;p&gt;删除联系人前，我们需要先判断用户输入的联系人是否存在，如果存在删除，不存在提示用户没有要删除的联系人&lt;/p&gt;
+&lt;p&gt;因此我们可以把检测联系人是否存在封装成一个函数中，如果存在，返回联系人在通讯录中的位置，不存在返回-1&lt;/p&gt;
+&lt;p&gt;检测联系人是否存在代码：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;//判断是否存在查询的人员，存在返回在数组中索引位置，不存在返回-1
+int isExist(Addressbooks* abs, std::string name)
+{
+	for (int i = 0; i &amp;lt; abs-&amp;gt;m_Size; i++)
+	{
+		if (abs-&amp;gt;personArray[i].m_Name == name)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;7.2 封装删除联系人函数&lt;/h3&gt;
+&lt;p&gt;根据用户输入的联系人判断该通讯录中是否有此人&lt;/p&gt;
+&lt;p&gt;查找到进行删除，并提示删除成功&lt;/p&gt;
+&lt;p&gt;查不到提示查无此人。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;//3、删除指定联系人信息
+void deletePerson(Addressbooks* abs)
+{
+	std::cout &amp;lt;&amp;lt; &quot;请输入您要删除的联系人&quot; &amp;lt;&amp;lt; std::endl;
+	std::string name;
+	std::cin &amp;gt;&amp;gt; name;
+
+	int ret = isExist(abs, name);
+	if (ret != -1)
+	{
+		for (int i = ret; i &amp;lt; abs-&amp;gt;m_Size; i++)
+		{
+			abs-&amp;gt;personArray[i] = abs-&amp;gt;personArray[i + 1];
+		}
+		abs-&amp;gt;m_Size--;
+		std::cout &amp;lt;&amp;lt; &quot;删除成功&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	else
+	{
+		std::cout &amp;lt;&amp;lt; &quot;查无此人&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	system(&quot;pause&quot;);
+	system(&quot;cls&quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;7.3 测试删除联系人功能&lt;/h3&gt;
+&lt;p&gt;在switch case 语句中，case3里添加：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;case 3:  //删除联系人
+	deletePerson(&amp;amp;abs);
+	break;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试效果如图：&lt;/p&gt;
+&lt;p&gt;存在情况：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544167951559.png&quot; alt=&quot;1544167951559&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;不存在情况：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544168010831.png&quot; alt=&quot;1544168010831&quot; /&gt;&lt;/p&gt;
+&lt;h2&gt;8、查找联系人&lt;/h2&gt;
+&lt;p&gt;功能描述：按照姓名查看指定联系人信息&lt;/p&gt;
+&lt;p&gt;查找联系人实现步骤&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;封装查找联系人函数&lt;/li&gt;
+&lt;li&gt;测试查找指定联系人&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;8.1 封装查找联系人函数&lt;/h3&gt;
+&lt;p&gt;实现思路：判断用户指定的联系人是否存在，如果存在显示信息，不存在则提示查无此人。&lt;/p&gt;
+&lt;p&gt;查找联系人代码：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;//4、查找指定联系人信息
+void findPerson(Addressbooks* abs)
+{
+	std::cout &amp;lt;&amp;lt; &quot;请输入您要查找的联系人&quot; &amp;lt;&amp;lt; std::endl;
+	std::string name;
+	std::cin &amp;gt;&amp;gt; name;
+
+	int ret = isExist(abs, name);
+	if (ret != -1)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;姓名：&quot; &amp;lt;&amp;lt; abs-&amp;gt;personArray[ret].m_Name &amp;lt;&amp;lt; &quot;\t&quot;;
+		std::cout &amp;lt;&amp;lt; &quot;性别：&quot; &amp;lt;&amp;lt; abs-&amp;gt;personArray[ret].m_Sex &amp;lt;&amp;lt; &quot;\t&quot;;
+		std::cout &amp;lt;&amp;lt; &quot;年龄：&quot; &amp;lt;&amp;lt; abs-&amp;gt;personArray[ret].m_Age &amp;lt;&amp;lt; &quot;\t&quot;;
+		std::cout &amp;lt;&amp;lt; &quot;电话：&quot; &amp;lt;&amp;lt; abs-&amp;gt;personArray[ret].m_Phone &amp;lt;&amp;lt; &quot;\t&quot;;
+		std::cout &amp;lt;&amp;lt; &quot;住址：&quot; &amp;lt;&amp;lt; abs-&amp;gt;personArray[ret].m_Addr &amp;lt;&amp;lt; std::endl;
+	}
+	else
+	{
+		std::cout &amp;lt;&amp;lt; &quot;查无此人&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	system(&quot;pause&quot;);
+	system(&quot;cls&quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;8.2 测试查找指定联系人&lt;/h3&gt;
+&lt;p&gt;在switch case 语句中，case4里添加：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;case 4:  //查找联系人
+	findPerson(&amp;amp;abs);
+	break;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试效果如图&lt;/p&gt;
+&lt;p&gt;存在情况：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544170057646.png&quot; alt=&quot;1544170057646&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;不存在情况：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544170254021.png&quot; alt=&quot;1544170254021&quot; /&gt;&lt;/p&gt;
+&lt;h2&gt;9、修改联系人&lt;/h2&gt;
+&lt;p&gt;功能描述：按照姓名重新修改指定联系人&lt;/p&gt;
+&lt;p&gt;修改联系人实现步骤&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;封装修改联系人函数&lt;/li&gt;
+&lt;li&gt;测试修改联系人功能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;9.1 封装修改联系人函数&lt;/h3&gt;
+&lt;p&gt;实现思路：查找用户输入的联系人，如果查找成功进行修改操作，查找失败提示查无此人&lt;/p&gt;
+&lt;p&gt;修改联系人代码：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;//5、修改指定联系人信息
+void modifyPerson(Addressbooks* abs)
+{
+	std::cout &amp;lt;&amp;lt; &quot;请输入您要修改的联系人&quot; &amp;lt;&amp;lt; std::endl;
+	std::string name;
+	std::cin &amp;gt;&amp;gt; name;
+
+	int ret = isExist(abs, name);
+	if (ret != -1)
+	{
+		//姓名
+		std::string name;
+		std::cout &amp;lt;&amp;lt; &quot;请输入姓名：&quot; &amp;lt;&amp;lt; std::endl;
+		std::cin &amp;gt;&amp;gt; name;
+		abs-&amp;gt;personArray[ret].m_Name = name;
+
+		std::cout &amp;lt;&amp;lt; &quot;请输入性别：&quot; &amp;lt;&amp;lt; std::endl;
+		std::cout &amp;lt;&amp;lt; &quot;1 -- 男&quot; &amp;lt;&amp;lt; std::endl;
+		std::cout &amp;lt;&amp;lt; &quot;2 -- 女&quot; &amp;lt;&amp;lt; std::endl;
+
+		//性别
+		int sex = 0;
+		while (true)
+		{
+			std::cin &amp;gt;&amp;gt; sex;
+			if (sex == 1 || sex == 2)
+			{
+				abs-&amp;gt;personArray[ret].m_Sex = sex;
+				break;
+			}
+			std::cout &amp;lt;&amp;lt; &quot;输入有误，请重新输入&quot;;
+		}
+
+		//年龄
+		std::cout &amp;lt;&amp;lt; &quot;请输入年龄：&quot; &amp;lt;&amp;lt; std::endl;
+		int age = 0;
+		std::cin &amp;gt;&amp;gt; age;
+		abs-&amp;gt;personArray[ret].m_Age = age;
+
+		//联系电话
+		std::cout &amp;lt;&amp;lt; &quot;请输入联系电话：&quot; &amp;lt;&amp;lt; std::endl;
+		std::string phone = &quot;&quot;;
+		std::cin &amp;gt;&amp;gt; phone;
+		abs-&amp;gt;personArray[ret].m_Phone = phone;
+
+		//家庭住址
+		std::cout &amp;lt;&amp;lt; &quot;请输入家庭住址：&quot; &amp;lt;&amp;lt; std::endl;
+		std::string address;
+		std::cin &amp;gt;&amp;gt; address;
+		abs-&amp;gt;personArray[ret].m_Addr = address;
+
+		std::cout &amp;lt;&amp;lt; &quot;修改成功&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	else
+	{
+		std::cout &amp;lt;&amp;lt; &quot;查无此人&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	system(&quot;pause&quot;);
+	system(&quot;cls&quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;9.2 测试修改联系人功能&lt;/h3&gt;
+&lt;p&gt;在switch case 语句中，case 5里添加：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;case 5:  //修改联系人
+	modifyPerson(&amp;amp;abs);
+	break;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试效果如图：&lt;/p&gt;
+&lt;p&gt;查不到指定联系人情况：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544172265676.png&quot; alt=&quot;1544172265676&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;查找到联系人，并修改成功：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544172164141.png&quot; alt=&quot;1544172164141&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;再次查看通讯录，确认修改完毕&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544172228627.png&quot; alt=&quot;1544172228627&quot; /&gt;&lt;/p&gt;
+&lt;h2&gt;10、清空联系人&lt;/h2&gt;
+&lt;p&gt;功能描述：清空通讯录中所有信息&lt;/p&gt;
+&lt;p&gt;清空联系人实现步骤&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;封装清空联系人函数&lt;/li&gt;
+&lt;li&gt;测试清空联系人&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;10.1 封装清空联系人函数&lt;/h3&gt;
+&lt;p&gt;实现思路： 将通讯录所有联系人信息清除掉，只要将通讯录记录的联系人数量置为0，做逻辑清空即可。&lt;/p&gt;
+&lt;p&gt;清空联系人代码：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;//6、清空所有联系人
+void cleanPerson(Addressbooks* abs)
+{
+	abs-&amp;gt;m_Size = 0;
+	std::cout &amp;lt;&amp;lt; &quot;通讯录已清空&quot; &amp;lt;&amp;lt; std::endl;
+	system(&quot;pause&quot;);
+	system(&quot;cls&quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;10.2  测试清空联系人&lt;/h3&gt;
+&lt;p&gt;在switch case 语句中，case 6 里添加：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;case 6:  //清空联系人
+	cleanPerson(&amp;amp;abs);
+	break;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试效果如图：&lt;/p&gt;
+&lt;p&gt;清空通讯录&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544172909693.png&quot; alt=&quot;1544172909693&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;再次查看信息，显示记录为空&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544172943653.png&quot; alt=&quot;1544172943653&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;至此，通讯录管理系统完成！&lt;/strong&gt;&lt;/p&gt;
 </content:encoded></item><item><title>1.1操作系统基本概念</title><link>https://www.atsuko.top/posts/408/operating-system/11-basic-concepts-of-operating-system/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/11-basic-concepts-of-operating-system/</guid><pubDate>Fri, 15 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;1.1.1 操作系统的概念&lt;/h3&gt;
 &lt;p&gt;在信息化时代，软件是计算机系统的灵魂，而作为其核心的操作系统，已与现代计算机系统深度融合。从使用层次来看，计算机系统自下而上可分为四层：硬件、操作系统、应用程序和用户（该划分侧重人机交互视角，不同于计算机组成原理中的结构分层）。其中，硬件(如中央处理器、内存、输入/输出设备等)提供基本计算资源；应用程序(如文字处理软件、电子表格、编译器、浏览器等)则利用这些资源解决用户的实际问题。操作系统负责&lt;strong&gt;管理硬件资源&lt;/strong&gt;，&lt;strong&gt;为应用程序提供运行环境&lt;/strong&gt;，并&lt;strong&gt;充当硬件与用户之间的桥梁&lt;/strong&gt;。&lt;/p&gt;
 &lt;p&gt;具体而言，操作系统通过有效协调多个应用程序对硬件资源的访问，确保系统高效、安全地运行。综上所述，&lt;code&gt;操作系统&lt;/code&gt;(Operating System,OS)是控制和管理计算机系统软/硬件资源、合理调度任务与分配资源，并为用户及其他软件提供统一接口与运行环境的最基本的系统软件。&lt;/p&gt;
