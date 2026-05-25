@@ -1,4 +1,221 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>2.4死锁</title><link>https://www.atsuko.top/posts/408/operating-system/24-deadlock/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/24-deadlock/</guid><pubDate>Sun, 24 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;在学习本节时，请读者思考以下问题：&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>3.1内存管理概念1</title><link>https://www.atsuko.top/posts/408/operating-system/31-concept-of-memory-management-1/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/31-concept-of-memory-management-1/</guid><pubDate>Mon, 25 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;在学习本节时，请读者思考以下问题：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;为什么要进行内存管理？&lt;/li&gt;
+&lt;li&gt;多级页表解决了什么问题？又会带来什么问题？&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在学习经典的内存管理方法之前，也建议读者先尝试独立思考，提出自己的内存管理设想，并在后续学习中与经典方案进行比较。本节内容循序渐进，后一种方法通常旨在克服前一种方法的不足。希望读者勤于思考，深入比较各类方法的异同，并着重掌握页式管理。&lt;/p&gt;
+&lt;h3&gt;3.1.1 内存管理的基本原理和要求&lt;/h3&gt;
+&lt;p&gt;内存管理是操作系统中最核心、也最复杂的机制之一。尽管现代计算机的主存容量持续增长，但仍无法同时容纳所有用户进程及其所需的程序与数据。因此，操作系统必须对有限的物理内存进行合理划分，并实施高效的动态分配策略。所谓&lt;code&gt;内存管理&lt;/code&gt;(Memory Management)，正是指操作系统对内存空间的&lt;strong&gt;组织&lt;/strong&gt;、&lt;strong&gt;分配&lt;/strong&gt;、&lt;strong&gt;回收&lt;/strong&gt;以及&lt;strong&gt;地址映射&lt;/strong&gt;等一系列操作。&lt;/p&gt;
+&lt;p&gt;在多道程序环境下，有效的内存管理尤为重要。它不仅提升了内存的利用率，简化了用户对存储资源的使用，还能在逻辑上扩展内存空间。具体而言，内存管理的主要功能包括：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;内存空间的分配与回收&lt;/code&gt;。操作系统需实时跟踪内存使用状态，记录&lt;strong&gt;空闲区域&lt;/strong&gt;，为新创建的进程分配所需空间，并在进程终止后及时回收其所占用的内存。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;地址转换&lt;/code&gt;。用户程序使用的是&lt;strong&gt;逻辑地址&lt;/strong&gt;（也称虚拟地址），而实际访问内存时必须使用&lt;strong&gt;物理地址&lt;/strong&gt;。操作系统需提供机制，将逻辑地址动态转换为对应的物理地址。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;内存空间的扩充&lt;/code&gt;。通过&lt;strong&gt;虚拟存储技术&lt;/strong&gt;，使进程能够使用远大于物理内存容量的地址空间。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;内存共享&lt;/code&gt;。允许多个进程安全地访问同一块物理内存区域，常用于共享库或进程间通信。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;存储保护&lt;/code&gt;。确保各进程只能访问自身被授权的内存区域，防止相互干扰或非法破坏。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;上述功能的实现依赖于内存管理的基本原理，其中逻辑地址与物理地址的区别尤为关键。此处仅作初步介绍，详细机制将在后续结合具体管理方法深入展开。&lt;/p&gt;
+&lt;h4&gt;1. 程序的链接与装入&lt;/h4&gt;
+&lt;p&gt;创建进程时，首先需要将程序和数据装入内存。将用户源程序转换为可在内存中执行的程序，通常需经过以下三个步骤：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;编译&lt;/code&gt;。由编译程序将用户源代码翻译成若干&lt;strong&gt;目标模块&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;链接&lt;/code&gt;。由链接程序将这些目标模块及其所需的&lt;strong&gt;库函数&lt;/strong&gt;合并，形成一个完整的&lt;strong&gt;装入模块&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;装入（加载）&lt;/code&gt;。由装入程序将该装入模块载入内存，并启动其执行。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;2. 逻辑地址与物理地址&lt;/h4&gt;
+&lt;p&gt;编译后的每个目标模块通常从0号单元开始编址，这种地址称为该模块的&lt;code&gt;相对地址&lt;/code&gt;(或&lt;code&gt;逻辑地址&lt;/code&gt;)。链接程序将多个目标模块合并为一个完整的可执行程序时，依次将各模块的相对地址拼接成一个统一的、从0开始编址的&lt;code&gt;逻辑地址空间&lt;/code&gt;（或&lt;code&gt;虚拟地址空间&lt;/code&gt;）。以32位系统为例，该逻辑地址空间的范围为 $0 \sim 2^{32}-1$。进程运行时所使用的地址均为逻辑地址；用户程序和程序员只需关注逻辑地址，而底层的内存管理机制对其完全透明。不同进程可以拥有相同的逻辑地址，因为它们各自拥有独立的逻辑地址空间，这些地址会被映射到主存的不同位置。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;物理地址空间&lt;/code&gt;是指主存中所有物理存储单元的集合，它是地址转换的最终目标。无论进程执行指令还是访问数据，最终都必须通过物理地址从主存中读取或写入信息。在早期系统中，程序装入内存时需将逻辑地址转换为物理地址，这一过程称为&lt;code&gt;地址重定位&lt;/code&gt;；而在现代支持虚拟内存的系统中，该转换由&lt;code&gt;内存管理单元&lt;/code&gt;(MMU)在硬件层面于运行时自动完成。&lt;/p&gt;
+&lt;p&gt;具体而言，现代操作系统为每个进程维护一张&lt;code&gt;页表&lt;/code&gt;，用于&lt;strong&gt;记录逻辑页到物理页框的映射关系&lt;/strong&gt;。当进程访问某个逻辑地址时，MMU会依据当前进程的页表，将其动态转换为相应的物理地址。整个过程对用户程序完全透明，构成了虚拟内存系统的基础。&lt;/p&gt;
+&lt;h4&gt;3. 程序的链接&lt;/h4&gt;
+&lt;p&gt;链接程序的作用是将编译生成的目标模块及其所需的库函数合并，形成一个完整的装入模块，以便后续装入内存并执行。根据链接发生的时机不同，可分为以下三种方式。&lt;/p&gt;
+&lt;h5&gt;(1) 静态链接&lt;/h5&gt;
+&lt;p&gt;在程序运行之前，将各目标模块及其所需的库函数链接成一个完整的装入模块(可执行文件)，此后不再拆分，这种链接方式称为&lt;code&gt;静态链接&lt;/code&gt;。链接过程中需完成两项关键操作。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;地址调整&lt;/code&gt;。各目标模块在编译后均以0为起始地址，链接时需根据其在装入模块中的实际位置，将内部地址统一加上相应的偏移量。例如，若模块A的长度为 $L$，且链接后模块B紧邻在模块A之后存放，则原本从0开始编址的模块B在合并后的装入模块中将从地址 $L$ 处开始，其内部所有地址均需加上偏移量 $L$。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;外部符号解析&lt;/code&gt;。将模块间引用的外部符号（如函数名）替换为确定的地址。若模块A中包含语句 &lt;code&gt;CALL B&lt;/code&gt;，其中B为指向模块B入口的外部调用符号，则链接程序会将其解析为模块B在装入模块中的起始地址 $L$，并将 &lt;code&gt;CALL B&lt;/code&gt; 中的符号B替换为地址 $L$。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h5&gt;(2) 装入时动态链接&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;装入时动态链接&lt;/code&gt;是指：将用户源程序编译后生成的一组目标模块，在装入内存时采用边装入边链接的方式。具体而言，当装入某个目标模块时，若遇到对外部模块的调用，则装入程序会立即查找并装入相应的外部目标模块，并替换其中的外部符号。其优点如下。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;便于修改和更新&lt;/code&gt;。静态链接需将所有目标模块预先装配成一个完整的装入模块，若其中任一模块需要修改或更新，则必须重新生成整个装入模块。若采用装入时动态链接方式，则各目标模块独立存放，只需替换被修改的模块，无须重建整个程序。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;便于实现对目标模块的共享&lt;/code&gt;。在静态链接方式下，每个应用程序都包含其所依赖目标模块的完整副本，无法实现共享。而在装入时动态链接方式下，操作系统可将同一个目标模块链接到多个应用程序中，从而实现多个程序对该目标模块的共享。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h5&gt;(3) 运行时动态链接&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;运行时动态链接&lt;/code&gt;是对装入时动态链接的改进，在程序执行过程中，仅当需要调用某个尚未装入内存的目标模块时，操作系统才动态加载并链接该模块。具体而言，系统会查找该模块，将其装入内存，并完成符号解析，使其可被当前进程调用；而程序运行中未使用的模块，则既不会被装入内存，也不会进行链接。其&lt;strong&gt;优点&lt;/strong&gt;是既能加快程序的装入过程，又可节省内存空间。&lt;/p&gt;
+&lt;h4&gt;4. 程序的装入&lt;/h4&gt;
+&lt;p&gt;将一个装入模块载入内存时，主要有以下三种方式。&lt;/p&gt;
+&lt;h5&gt;(1) 绝对装入&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;绝对装入&lt;/code&gt;仅适用于&lt;strong&gt;单道程序环境&lt;/strong&gt;。由于内存中始终只有一个程序，其驻留位置在编译前即可确定，因此编译程序可以直接生成使用绝对地址的目标代码；装入程序只需按这些地址将程序和数据载入内存。此时，程序中的逻辑地址与实际物理地址完全一致，无须任何修改。&lt;/p&gt;
+&lt;p&gt;程序中通常使用的是符号地址（如变量名、函数名），由编译器或汇编器在编译或汇编阶段将其转换为绝对地址；当然，绝对地址也可由程序员直接指定，但这种方式缺乏灵活性。&lt;/p&gt;
+&lt;h5&gt;(2) 可重定位装入&lt;/h5&gt;
+&lt;p&gt;在&lt;strong&gt;多道程序环境&lt;/strong&gt;下，编译程序无法预知目标模块在内存中的具体位置，因此经编译和链接生成的装入模块通常从地址0开始编址，程序中的地址均为相对于模块起始位置的逻辑地址。此时应采用&lt;code&gt;可重定位装入&lt;/code&gt;方式，它可根据内存的具体情况，将装入模块装入内存的适当位置。&lt;/p&gt;
+&lt;p&gt;装入时，系统根据内存当前的空闲情况，为该模块分配一块&lt;strong&gt;连续的内存区域&lt;/strong&gt;，并将整个模块载入其中。随后，一次性将所有逻辑地址修改为对应的物理地址。这一地址转换过程称为&lt;code&gt;重定位&lt;/code&gt;。由于转换在装入时完成，且在程序运行期间不再改变，故称&lt;code&gt;静态重定位&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;进程必须在装入前一次性获得其所需的全部内存空间；若内存不足，则无法装入。一旦装入，进程在整个运行期间既不能移动位置，也不能动态申请额外内存，限制了内存管理的灵活性。&lt;/p&gt;
+&lt;h5&gt;(3) 动态运行时装入&lt;/h5&gt;
+&lt;p&gt;为克服静态重定位的局限，支持程序在内存中的移动，需采用&lt;code&gt;动态重定位&lt;/code&gt;方式。装入程序将装入模块载入内存后，并不立即转换地址，而是将地址转换推迟到指令实际执行时进行。为此，系统借助一个&lt;code&gt;重定位寄存器&lt;/code&gt;，用于存放该模块在内存中的起始物理地址。程序中保留的仍是逻辑地址，而实际物理地址则由硬件在运行时动态计算得出。&lt;/p&gt;
+&lt;p&gt;动态重定位的优点：支持程序在内存中移动，便于操作系统进行&lt;code&gt;紧凑&lt;/code&gt;，从而有效减少&lt;code&gt;外部碎片&lt;/code&gt;；提高内存分配的灵活性，允许在运行期间根据需要动态调整进程的内存布局。&lt;/p&gt;
+&lt;h4&gt;5. 内存保护&lt;/h4&gt;
+&lt;p&gt;为确保各进程拥有独立的内存空间，内存保护机制需在内存分配前防止用户进程破坏操作系统，同时避免用户进程相互干扰。常用方法主要有以下两种。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;在CPU中设置一对&lt;code&gt;上、下限寄存器&lt;/code&gt;，分别存放用户进程在内存中的下限和上限地址，每当CPU访问一个地址时，硬件自动将其与这两个寄存器的值进行比较，以判断是否越界。&lt;/li&gt;
+&lt;li&gt;采用&lt;code&gt;重定位寄存器&lt;/code&gt;（也称&lt;code&gt;基地址寄存器&lt;/code&gt;）和&lt;code&gt;界地址寄存器&lt;/code&gt;（也称&lt;code&gt;限长寄存器&lt;/code&gt;）实现越界检查。重定位寄存器存放进程在内存中的起始物理地址，界地址寄存器存放进程地址空间的长度。内存管理部件首先将逻辑地址与界地址寄存器的值进行比较，若未越界，则将逻辑地址加上重定位寄存器的值，得到物理地址，并据此访存。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;重定位寄存器与界地址寄存器的作用不同：重定位寄存器用于“加”，即将逻辑地址加上其值，得到物理地址；界地址寄存器用于“比”，即将逻辑地址与其值比较，判断是否越界。&lt;/p&gt;
+&lt;p&gt;重定位寄存器与界地址寄存器的加载必须通过特权指令完成，仅操作系统内核具备此权限。这一机制可确保寄存器内容只能由内核修改，用户程序无法篡改，从而有效保障内存的安全。&lt;/p&gt;
+&lt;h4&gt;6. 内存共享&lt;/h4&gt;
+&lt;p&gt;并非所有进程的内存空间都适合共享，只有&lt;strong&gt;只读区域&lt;/strong&gt;才可以被共享。&lt;code&gt;可重入代码&lt;/code&gt;（也称纯代码）是一种允许多个进程同时访问但不允许被任何进程修改的代码。在实际执行时，每个进程需配备独立的&lt;strong&gt;私有数据区&lt;/strong&gt;，用于存放运行过程中可能修改的数据；程序仅对私有数据区进行写操作，而共享的代码段始终保持不变。例如，考虑一个可同时容纳40个用户的多用户系统，所有用户同时运行同一个文本编辑程序。该程序包含160KB的代码区和40KB的数据区。若不共享代码，则系统共需 $(160\text{KB} + 40\text{KB}) \times 40 = 8000\text{KB}$ 的内存；若代码为可共享代码，则无论采用分页系统还是分段系统，&lt;strong&gt;整个系统只需保留一份副本&lt;/strong&gt;，此时所需内存仅为 $160\text{KB} + 40\text{KB} \times 40 = 1760\text{KB}$。&lt;/p&gt;
+&lt;p&gt;在分页系统中，假设页面大小为4KB，则代码区占用40个页面，数据区占用10个页面。为实现代码共享，每个进程的页表中需设置40个页表项，均指向同一组共享代码页的物理页框；此外，每个进程还需为其私有数据区建立10个页表项，指向各自的数据页。&lt;/p&gt;
+&lt;p&gt;在分段系统中，由于以段为单位进行管理，只需为共享代码段设置一个段表项，记录共享代码段的起始地址和段长(160KB)。每个进程的段表中包含对该共享段的引用。由此可见，&lt;strong&gt;分页与分段均可有效支持内存共享，区别在于共享的粒度和管理机制&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;此外，在第2章中介绍过基于共享内存的进程通信机制，由操作系统提供同步与互斥支持。本章后续还将介绍另一种内存共享的实现方式——&lt;code&gt;内存映射文件&lt;/code&gt;。&lt;/p&gt;
+&lt;h4&gt;7. 内存分配与回收&lt;/h4&gt;
+&lt;p&gt;操作系统的演进持续推动内存管理的发展。随着系统从单道向多道程序发展，单一连续分配逐渐被固定分区分配所取代。然而，固定分区难以适应作业大小的动态变化，因此又被动态分区分配所替代。为进一步提升内存利用率，连续分配方式最终让位于&lt;strong&gt;离散分配方式&lt;/strong&gt;(如页式存储管理)。此外，为满足用户在编程和使用上的更高需求(如支持程序的逻辑结构、实现段级共享与保护等)，&lt;strong&gt;分段存储管理&lt;/strong&gt;应运而生，而这些功能恰是其他分配方式难以有效支持的。&lt;/p&gt;
+</content:encoded></item><item><title>3.3函数提高</title><link>https://www.atsuko.top/posts/dark-horse/c++/core/33-function-improvement/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/core/33-function-improvement/</guid><pubDate>Mon, 25 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;3.1 函数默认参数&lt;/h3&gt;
+&lt;p&gt;在C++中，函数的形参列表中的形参是可以有默认值的。&lt;/p&gt;
+&lt;p&gt;语法：&lt;code&gt; 返回值类型  函数名 （参数= 默认值）{}&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int func1(int a, int b = 10, int c = 10) {
+	return a + b + c;
+}
+
+//1. 如果某个位置参数有默认值，那么从这个位置往后，从左向右，必须都要有默认值
+//2. 如果函数声明有默认值，函数实现的时候就不能有默认参数
+int func12(int a = 10, int b = 10);
+int func12(int a, int b) {
+	return a + b;
+}
+
+int main() {
+
+	std::cout &amp;lt;&amp;lt; &quot;ret = &quot; &amp;lt;&amp;lt; func1(20, 20) &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;ret = &quot; &amp;lt;&amp;lt; func1(100) &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;3.2 函数占位参数&lt;/h3&gt;
+&lt;p&gt;C++中函数的形参列表里可以有占位参数，用来做占位，调用函数时必须填补该位置&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;语法&lt;/strong&gt; : &lt;code&gt;返回值类型 函数名 (数据类型){}&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;在现阶段函数的占位参数存在意义不大，但是后面的课程中会用到该技术&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//函数占位参数 ，占位参数也可以有默认参数
+void func2(int a, int) {
+	std::cout &amp;lt;&amp;lt; &quot;this is func2&quot; &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+	func2(10, 10); //占位参数必须填补
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;3.3 函数重载&lt;/h3&gt;
+&lt;h4&gt;3.3.1 函数重载概述&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt; :函数名可以相同，提高复用性&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;函数重载满足条件&lt;/strong&gt; :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;同一个作用域下&lt;/li&gt;
+&lt;li&gt;函数名称相同&lt;/li&gt;
+&lt;li&gt;函数参数&lt;strong&gt;类型不同&lt;/strong&gt;  或者 &lt;strong&gt;个数不同&lt;/strong&gt; 或者 &lt;strong&gt;顺序不同&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;注意:&lt;/strong&gt;  函数的返回值不可以作为函数重载的条件&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//函数重载需要函数都在同一个作用域下
+void func3()
+{
+	std::cout &amp;lt;&amp;lt; &quot;func3 的调用！&quot; &amp;lt;&amp;lt; std::endl;
+}
+
+void func3(int a)
+{
+	std::cout &amp;lt;&amp;lt; &quot;func3 (int a) 的调用！&quot; &amp;lt;&amp;lt; std::endl;
+}
+
+void func3(double a)
+{
+	std::cout &amp;lt;&amp;lt; &quot;func3 (double a)的调用！&quot; &amp;lt;&amp;lt; std::endl;
+}
+
+void func3(int a, double b)
+{
+	std::cout &amp;lt;&amp;lt; &quot;func3 (int a ,double b) 的调用！&quot; &amp;lt;&amp;lt; std::endl;
+}
+
+void func3(double a, int b)
+{
+	std::cout &amp;lt;&amp;lt; &quot;func3 (double a ,int b)的调用！&quot; &amp;lt;&amp;lt; std::endl;
+}
+
+//函数返回值不可以作为函数重载条件
+//int func3(double a, int b)
+//{
+//	std::cout &amp;lt;&amp;lt; &quot;func3 (double a ,int b)的调用！&quot; &amp;lt;&amp;lt; std::endl;
+//}
+
+
+int main() {
+
+	func3();
+	func3(10);
+	func3(3.14);
+	func3(10, 3.14);
+	func3(3.14, 10);
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;3.3.2 函数重载注意事项&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;引用作为重载条件&lt;/li&gt;
+&lt;li&gt;函数重载碰到函数默认参数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//函数重载注意事项
+//1、引用作为重载条件
+
+void func4(int&amp;amp; a)
+{
+	std::cout &amp;lt;&amp;lt; &quot;func4 (int &amp;amp;a) 调用 &quot; &amp;lt;&amp;lt; std::endl;
+}
+
+void func4(const int&amp;amp; a)
+{
+	std::cout &amp;lt;&amp;lt; &quot;func4 (const int &amp;amp;a) 调用 &quot; &amp;lt;&amp;lt; std::endl;
+}
+
+
+//2、函数重载碰到函数默认参数
+
+void func42(int a, int b = 10)
+{
+	std::cout &amp;lt;&amp;lt; &quot;func42(int a, int b = 10) 调用&quot; &amp;lt;&amp;lt; std::endl;
+}
+
+void func42(int a)
+{
+	std::cout &amp;lt;&amp;lt; &quot;func42(int a) 调用&quot; &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+	int a = 10;
+	func4(a); //调用无const
+	func4(10);//调用有const
+
+	//func42(10); //碰到默认参数产生歧义，需要避免
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>2.4死锁</title><link>https://www.atsuko.top/posts/408/operating-system/24-deadlock/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/24-deadlock/</guid><pubDate>Sun, 24 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;在学习本节时，请读者思考以下问题：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;为什么会产生死锁？产生死锁有什么条件？&lt;/li&gt;
 &lt;li&gt;有什么办法可以解决死锁问题？&lt;/li&gt;
@@ -1668,6 +1885,192 @@ S6() {
 &lt;li&gt;&lt;code&gt;思路梳理&lt;/code&gt;。根据各进程的操作流程，确定关键同步点，并初步规划P、V操作的位置。可参考和类比典型场景，如生产者-消费者、读者-写者、前驱图。&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;信号量设置&lt;/code&gt;。基于上述分析，定义所需的信号量，明确其语义与初值，并将P、V操作嵌入各进程的适当位置，确保逻辑正确，避免死锁与饥饿，且满足所有约束条件。&lt;/li&gt;
 &lt;/ol&gt;
+</content:encoded></item><item><title>3.2引用</title><link>https://www.atsuko.top/posts/dark-horse/c++/core/32-references/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/core/32-references/</guid><pubDate>Tue, 19 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;2 引用&lt;/h2&gt;
+&lt;h3&gt;2.1 引用的基本使用&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;： 给变量起别名&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;语法&lt;/strong&gt;： &lt;code&gt;数据类型 &amp;amp;别名 = 原名&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	int a = 10;
+	int&amp;amp; b = a;
+
+	std::cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;b = &quot; &amp;lt;&amp;lt; b &amp;lt;&amp;lt; std::endl;
+
+	b = 100;
+
+	std::cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;b = &quot; &amp;lt;&amp;lt; b &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;2.2 引用注意事项&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;引用必须初始化&lt;/li&gt;
+&lt;li&gt;引用在初始化后，不可以改变&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;示例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int main() {
+
+	int a = 10;
+	int b = 20;
+	//int &amp;amp;c; //错误，引用必须初始化
+	int&amp;amp; c = a; //一旦初始化后，就不可以更改
+	c = b; //这是赋值操作，不是更改引用
+
+	std::cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;b = &quot; &amp;lt;&amp;lt; b &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;c = &quot; &amp;lt;&amp;lt; c &amp;lt;&amp;lt; std::endl;
+	
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;2.3 引用做函数参数&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：函数传参时，可以利用引用的技术让形参修饰实参&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;优点&lt;/strong&gt;：可以简化指针修改实参&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//1. 值传递
+void mySwap01(int a, int b) {
+	int temp = a;
+	a = b;
+	b = temp;
+}
+
+//2. 地址传递
+void mySwap02(int* a, int* b) {
+	int temp = *a;
+	*a = *b;
+	*b = temp;
+}
+
+//3. 引用传递
+void mySwap03(int&amp;amp; a, int&amp;amp; b) {
+	int temp = a;
+	a = b;
+	b = temp;
+}
+
+int main() {
+
+	int a = 10;
+	int b = 20;
+
+	mySwap01(a, b);
+	std::cout &amp;lt;&amp;lt; &quot;a:&quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; &quot; b:&quot; &amp;lt;&amp;lt; b &amp;lt;&amp;lt; std::endl;
+
+	mySwap02(&amp;amp;a, &amp;amp;b);
+	std::cout &amp;lt;&amp;lt; &quot;a:&quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; &quot; b:&quot; &amp;lt;&amp;lt; b &amp;lt;&amp;lt; std::endl;
+	
+	mySwap03(a, b);
+	std::cout &amp;lt;&amp;lt; &quot;a:&quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; &quot; b:&quot; &amp;lt;&amp;lt; b &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：通过引用参数产生的效果同按地址传递是一样的。引用的语法更清楚简单&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;2.4 引用做函数返回值&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：引用是可以作为函数的返回值存在的&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;：&lt;code&gt;不要返回局部变量引用&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;用法&lt;/strong&gt;：函数调用作为左值&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//返回局部变量引用
+int&amp;amp; test01() {
+	int a = 10; //局部变量
+	return a;
+}
+
+//返回静态变量引用
+int&amp;amp; test02() {
+	static int a = 20;
+	return a;
+}
+
+int main() {
+
+	//不能返回局部变量的引用，局部变量会释放
+	int&amp;amp; ref = test01();
+	std::cout &amp;lt;&amp;lt; &quot;ref = &quot; &amp;lt;&amp;lt; ref &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;ref = &quot; &amp;lt;&amp;lt; ref &amp;lt;&amp;lt; std::endl;
+
+	//如果函数做左值，那么必须返回引用
+	int&amp;amp; ref2 = test02();
+	std::cout &amp;lt;&amp;lt; &quot;ref2 = &quot; &amp;lt;&amp;lt; ref2 &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;ref2 = &quot; &amp;lt;&amp;lt; ref2 &amp;lt;&amp;lt; std::endl;
+
+	test02() = 1000;
+
+	std::cout &amp;lt;&amp;lt; &quot;ref2 = &quot; &amp;lt;&amp;lt; ref2 &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;ref2 = &quot; &amp;lt;&amp;lt; ref2 &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;2.5 引用的本质&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;本质&lt;/strong&gt;：引用的本质在c++内部实现是一个指针常量.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//发现是引用，转换为 int* const ref = &amp;amp;a;
+void func(int&amp;amp; ref) {
+	ref = 100; // ref是引用，转换为*ref = 100
+}
+
+int main() {
+	int a = 10;
+
+	//自动转换为 int* const ref = &amp;amp;a; 指针常量是指针指向不可改，也说明为什么引用不可更改
+	int&amp;amp; ref = a;
+	ref = 20; //内部发现ref是引用，自动帮我们转换为: *ref = 20;
+
+	std::cout &amp;lt;&amp;lt; &quot;a:&quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;ref:&quot; &amp;lt;&amp;lt; ref &amp;lt;&amp;lt; std::endl;
+
+	func(a);
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;结论&lt;/strong&gt;：C++推荐用引用技术，因为语法方便，引用本质是指针常量，但是所有的指针操作编译器都帮我们做了&lt;/p&gt;
+&lt;h3&gt;2.6 常量引用&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt;：常量引用主要用来修饰形参，防止误操作&lt;/p&gt;
+&lt;p&gt;在函数形参列表中，可以加&lt;code&gt;const修饰形参&lt;/code&gt;，防止形参改变实参&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//引用使用的场景，通常用来修饰形参
+void showValue(const int&amp;amp; v) {
+	//v += 10;
+	std::cout &amp;lt;&amp;lt; v &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+	//int&amp;amp; ref = 10;  引用本身需要一个合法的内存空间，因此这行错误
+	//加入const就可以了，编译器优化代码，int temp = 10; const int&amp;amp; ref = temp;
+	const int&amp;amp; ref = 10;
+
+	//ref = 100;  //加入const后不可以修改变量
+	std::cout &amp;lt;&amp;lt; ref &amp;lt;&amp;lt; std::endl;
+
+	//函数中利用常量引用防止误操作修改实参
+	int a = 10;
+	showValue(a);
+
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
 </content:encoded></item><item><title>2.2CPU的调度1</title><link>https://www.atsuko.top/posts/408/operating-system/22-cpu-scheduling-1/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/22-cpu-scheduling-1/</guid><pubDate>Mon, 18 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;在学习本节时，请读者思考以下问题：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;为什么要进行CPU调度？&lt;/li&gt;
@@ -1810,6 +2213,180 @@ $$&lt;/p&gt;
 &lt;p&gt;:::note
 调度和切换的区别：调度是决策行为，即决定将CPU分配给哪个进程；切换是执行行为，即实际完成CPU控制权的转移。通常，先由调度程序做出调度决策，随后触发上下文切换以实现该决策。
 :::&lt;/p&gt;
+</content:encoded></item><item><title>3.1内存分区模型</title><link>https://www.atsuko.top/posts/dark-horse/c++/core/31-memory-partition-model/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/core/31-memory-partition-model/</guid><pubDate>Mon, 18 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;1 内存分区模型&lt;/h2&gt;
+&lt;p&gt;C++程序在执行时，将内存大方向划分为&lt;strong&gt;4个区域&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;代码区：存放函数体的二进制代码，由操作系统进行管理的&lt;/li&gt;
+&lt;li&gt;全局区：存放全局变量和静态变量以及常量&lt;/li&gt;
+&lt;li&gt;栈区：由编译器自动分配释放, 存放函数的参数值,局部变量等&lt;/li&gt;
+&lt;li&gt;堆区：由程序员分配和释放,若程序员不释放,程序结束时由操作系统回收&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;内存四区意义&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;不同区域存放的数据，赋予不同的生命周期, 给我们更大的灵活编程&lt;/p&gt;
+&lt;h3&gt;1.1 程序运行前&lt;/h3&gt;
+&lt;p&gt;​在程序编译后，生成了exe可执行程序，&lt;strong&gt;未执行该程序前&lt;/strong&gt;分为两个区域&lt;/p&gt;
+&lt;p&gt;​&lt;strong&gt;代码区&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;​存放 CPU 执行的机器指令,​代码区是&lt;strong&gt;共享&lt;/strong&gt;的，共享的目的是对于频繁被执行的程序，只需要在内存中有一份代码即可&lt;/p&gt;
+&lt;p&gt;​代码区是&lt;strong&gt;只读&lt;/strong&gt;的，使其只读的原因是防止程序意外地修改了它的指令&lt;/p&gt;
+&lt;p&gt;​&lt;strong&gt;全局区&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;​全局变量和静态变量存放在此.​全局区还包含了常量区, 字符串常量和其他常量也存放在此.​&lt;strong&gt;该区域的数据在程序结束后由操作系统释放&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//全局变量
+int g_a = 10;
+int g_b = 10;
+
+//全局常量
+const int c_g_a = 10;
+const int c_g_b = 10;
+
+int main() {
+
+    //局部变量
+    int a = 10;
+    int b = 10;
+
+    //打印地址
+    std::cout &amp;lt;&amp;lt; &quot;局部变量a地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;a &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;局部变量b地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;b &amp;lt;&amp;lt; std::endl;
+
+    std::cout &amp;lt;&amp;lt; &quot;全局变量g_a地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;g_a &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;全局变量g_b地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;g_b &amp;lt;&amp;lt; std::endl;
+
+    //静态变量
+    static int s_a = 10;
+    static int s_b = 10;
+
+    std::cout &amp;lt;&amp;lt; &quot;静态变量s_a地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;s_a &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;静态变量s_b地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;s_b &amp;lt;&amp;lt; std::endl;
+
+    std::cout &amp;lt;&amp;lt; &quot;字符串常量地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;&quot;hello world&quot; &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;字符串常量地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;&quot;hello world1&quot; &amp;lt;&amp;lt; std::endl;
+
+    std::cout &amp;lt;&amp;lt; &quot;全局常量c_g_a地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;c_g_a &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;全局常量c_g_b地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;c_g_b &amp;lt;&amp;lt; std::endl;
+
+    const int c_l_a = 10;
+    const int c_l_b = 10;
+    std::cout &amp;lt;&amp;lt; &quot;局部常量c_l_a地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;c_l_a &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;局部常量c_l_b地址为： &quot; &amp;lt;&amp;lt; (int)&amp;amp;c_l_b &amp;lt;&amp;lt; std::endl;
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;打印结果：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1545017602518.png&quot; alt=&quot;1545017602518&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;总结：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;C++中在程序运行前分为全局区和代码区&lt;/li&gt;
+&lt;li&gt;代码区特点是共享和只读&lt;/li&gt;
+&lt;li&gt;全局区中存放全局变量、静态变量、常量&lt;/li&gt;
+&lt;li&gt;常量区中存放 const修饰的全局常量和字符串常量&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;1.2 程序运行后&lt;/h3&gt;
+&lt;p&gt;​&lt;strong&gt;栈区&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;​由编译器自动分配释放, 存放函数的参数值,局部变量等&lt;/p&gt;
+&lt;p&gt;​注意事项：不要返回局部变量的地址，栈区开辟的数据由编译器自动释放&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int* func()
+{
+    int a = 10;
+    return &amp;amp;a;
+}
+
+int main() {
+
+    int* p = func();
+
+    // 虽然不能这样做，但是编译器帮你保留了。。。。。
+    std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​&lt;strong&gt;堆区&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;​由程序员分配释放,若程序员不释放,程序结束时由操作系统回收. 在C++中主要利用new在堆区开辟内存&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int* func3()
+{
+    // 这里指针会被回收，但是也成功返回地址了
+    int* a = new int(10);
+    return a;
+}
+
+int main() {
+
+    int* p = func3();
+
+    std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;总结&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;堆区数据由程序员管理开辟和释放,堆区数据利用new关键字进行开辟内存&lt;/p&gt;
+&lt;h3&gt;1.3 new操作符&lt;/h3&gt;
+&lt;p&gt;​C++中利用&lt;code&gt;new&lt;/code&gt;操作符在堆区开辟数据,​堆区开辟的数据，由程序员手动开辟，手动释放，释放利用操作符 &lt;code&gt;delete&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;​语法：&lt;code&gt;new 数据类型&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;​利用new创建的数据，会返回该数据对应的类型的指针&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例1： 基本语法&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+int* func4()
+{
+    int* a = new int(10);
+    return a;
+}
+
+int main() {
+
+    int* p = func4();
+
+    std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl;
+
+    //利用delete释放堆区数据
+    delete p;
+
+    //std::cout &amp;lt;&amp;lt; *p &amp;lt;&amp;lt; std::endl; //报错，释放的空间不可访问
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;示例2：开辟数组&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//堆区开辟数组
+int main() {
+
+    int* arr = new int[10];
+
+    for (int i = 0; i &amp;lt; 10; i++)
+    {
+        arr[i] = i + 100;
+    }
+
+    for (int i = 0; i &amp;lt; 10; i++)
+    {
+        std::cout &amp;lt;&amp;lt; arr[i] &amp;lt;&amp;lt; std::endl;
+    }
+
+    //释放数组 delete 后加 []
+    delete[] arr;
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
 </content:encoded></item><item><title>2.1进程和线程简介1</title><link>https://www.atsuko.top/posts/408/operating-system/21-introduction-to-processes-and-threads-1/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/21-introduction-to-processes-and-threads-1/</guid><pubDate>Sun, 17 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;在学习本节时，请读者思考以下问题：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;为什么要引入进程？&lt;/li&gt;
