@@ -383,6 +383,197 @@ $$&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;学到这里,读者应能体会到:现代操作系统的设计思想中,处处可见面向对象程序设计的影子。本章所学的“文件”,实质上是一种&lt;strong&gt;抽象数据类型&lt;/strong&gt;,即一种数据结构。若读者在此之前已学完数据结构,则面对新数据结构时,自然会关注其逻辑结构、物理结构及所支持的操作。&lt;/p&gt;
+</content:encoded></item><item><title>4.3文件系统</title><link>https://www.atsuko.top/posts/408/operating-system/43-file-system/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/43-file-system/</guid><pubDate>Sat, 30 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;4.3文件系统&lt;/h2&gt;
+&lt;p&gt;在学习本节时，请读者思考以下问题：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;什么是文件系统?&lt;/li&gt;
+&lt;li&gt;文件系统要完成哪些功能?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;本节除“外存空闲空间管理”外，其余内容均为2022年统考大纲新增考点。这些内容较为 抽象，属于“看不见、摸不着”的底层原理，在常见的国内《操作系统》教材中鲜有涉及。若读者感到理解困难，建议结合王道最新课程进行学习，以更好地掌握这些抽象机制。&lt;/p&gt;
+&lt;h3&gt;4.3.1文件系统布局&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;1.文件系统在磁盘中的结构&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;文件系统存放在磁盘上。磁盘通常被划分为一个或多个分区，每个分区中有一个独立的文件系统。文件系统一般包含以下关键信息：引导操作系统的机制、磁盘总块数、空闲块的数量与位置、目录结构，以及所有具体文件的数据。&lt;/p&gt;
+&lt;p&gt;其主要组成部分简述如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;主引导记录&lt;/code&gt;(Master Boot Record,MBR),位于磁盘的0号扇区，负责引导计算机。MBR后紧随一个分区表，用于记录各分区的起始与结束地址，并标记其中一个为&lt;strong&gt;活动分区&lt;/strong&gt;。系统加电后，BIOS将MBR读入内存并执行；MBR首先识别活动分区，随后读取该分区的第一个扇区，即&lt;strong&gt;引导块&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;引导块&lt;/code&gt;(boot block),MBR将控制权移交至引导块中的程序，由其负责加载并启动该分区中的操作系统。注意，每个分区均以引导块开头，即使当前未安装可启动的操作系统，也保留此区域，以便未来部署系统。在Windows中，该区域称为分区引导扇区。除引导块外，磁盘分区的后续布局因文件系统类型而异。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;超级块&lt;/code&gt;(super block),存储文件系统的所有关键信息。当系统启动或首次挂载该文件系统时，超级块会被读入内存。超级块中的典型内容包括：分区的总块数、块大小、空闲块数量及其指针、空闲i节点(inode)数量及指针等。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;空闲块信息&lt;/code&gt;，记录未分配的磁盘块，通常以&lt;code&gt;位示图&lt;/code&gt;或&lt;code&gt;空闲链表&lt;/code&gt;实现。紧随其后的是一组&lt;code&gt;i节点&lt;/code&gt;，每个文件对应一个i节点，其中完整描述了文件的各种属性。之后是&lt;code&gt;根目录&lt;/code&gt;，作为整个目录树的起点。磁盘的其余空间则用于存放所有其他文件和目录的实际数据。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;2.文件系统在内存中的结构&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;为高效管理文件系统并提升性能，系统在内存中维护一组数据结构。这些信息在文件系统&lt;strong&gt;挂载时加载&lt;/strong&gt;，在&lt;strong&gt;运行期间动态更新&lt;/strong&gt;，并在&lt;strong&gt;卸载时释放&lt;/strong&gt;。典型的内存结构包括：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;内存中的&lt;code&gt;挂载表&lt;/code&gt;(mount table),记录每个已挂载文件系统分区的有关信息，如设备标识、挂载点、文件系统类型及挂载选项等。&lt;/li&gt;
+&lt;li&gt;内存中的&lt;code&gt;目录项的缓存&lt;/code&gt;，缓存最近访问过的目录内容，以减少对磁盘的重复读取，加快路径解析速度。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;系统级的打开文件表&lt;/code&gt;，为每个当前打开的文件维护一个FCB的副本，包含文件状态、访问权限、读/写指针、打开计数等全局信息。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;进程级的打开文件表&lt;/code&gt;，每个进程拥有独立的打开文件表，包含该进程所使用的文件描述符及指向系统级打开文件表中对应表项的指针，从而实现进程与全局资源的关联。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;4.3.2文件存储空间管理&lt;/h3&gt;
+&lt;p&gt;如4.2.6节所述，文件的物理结构包含两个方面：&lt;strong&gt;文件的分配方式&lt;/strong&gt;与&lt;strong&gt;文件存储空间管理&lt;/strong&gt;。后者专门负责记录磁盘中的哪些块是空闲的，并提供对这些块进行分配与回收的机制。由于系统以固定大小的物理块为单位进行数据交换，存储空间管理的核心任务是高效组织和管理空闲块。为此，系统需要维护描述空闲块状态的数据结构，而这正是本节要介绍的几种管理方法所要解决的问题。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1.空闲表法&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;空闲表法属于&lt;code&gt;连续分配&lt;/code&gt;方式，其思想源于内存的动态分区分配：为每个文件分配一块物理上连续的磁盘区域。系统为外存中的所有空闲区维护一张&lt;code&gt;空闲表&lt;/code&gt;，每个空闲区对应一个表项，包含&lt;strong&gt;序号&lt;/strong&gt;、&lt;strong&gt;起始盘块号&lt;/strong&gt;和&lt;strong&gt;空闲盘块数&lt;/strong&gt;等信息，并按起始盘块号递增顺序排列，如表4.2所示。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;表4.2 空闲盘块表&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;序号&lt;/th&gt;
+&lt;th&gt;第一个空闲盘块号&lt;/th&gt;
+&lt;th&gt;空闲盘块数&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;9&lt;/td&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;15&lt;/td&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;—&lt;/td&gt;
+&lt;td&gt;—&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;盘块的分配：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;空闲盘区的分配策略与内存动态分区分配一致，通常采用&lt;strong&gt;首次适应&lt;/strong&gt;(First Fit)、&lt;strong&gt;最佳适应&lt;/strong&gt;(Best Fit)等算法。当系统为新创建的文件分配空间时，会顺序扫描空闲表，查找第一个大小满足需求的空闲区；一旦找到，便将其分配给用户，并立即更新空闲表。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;盘块的回收：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;回收用户释放的空间时，也借鉴内存回收机制：需要判断回收区是否与空闲表中相邻的前区或后区在物理上连续。若相邻，则将它们合并为一个更大的空闲区，以减少碎片。&lt;/p&gt;
+&lt;p&gt;空闲表法的&lt;strong&gt;优点&lt;/strong&gt;：具有较高的分配效率，能够显著降低磁盘I/O次数。尤其对于小型文件(如占用1~5个盘块)，连续分配不仅实现简单，还能充分发挥磁盘顺序读/写的性能优势。&lt;/p&gt;
+&lt;h4&gt;2. 空闲链表法&lt;/h4&gt;
+&lt;p&gt;空闲链表法将所有空闲盘区组织成一条链表，根据链表节点的不同，可分为以下两类：&lt;/p&gt;
+&lt;h5&gt;(1) 空闲盘块链&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;空闲盘块链&lt;/code&gt;以&lt;strong&gt;单个盘块&lt;/strong&gt;为单位，将所有空闲盘块链接成一条链，每个盘块包含一个&lt;code&gt;指向下一个空闲盘块的指针&lt;/code&gt;。&lt;strong&gt;分配时&lt;/strong&gt;：从链首依次摘下所需数量的盘块分配给用户。&lt;strong&gt;回收时&lt;/strong&gt;：将释放的盘块逐个插入链尾。&lt;/p&gt;
+&lt;p&gt;空闲盘块链的&lt;strong&gt;优点&lt;/strong&gt;：单个盘块的分配与回收操作极为简单。&lt;strong&gt;缺点&lt;/strong&gt;：为一个文件分配多个盘块需要多次访问链表，效率较低；且由于管理粒度细，空闲盘块链通常较长，管理开销大。&lt;/p&gt;
+&lt;h5&gt;(2) 空闲盘区链&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;空闲盘区链&lt;/code&gt;以&lt;strong&gt;空闲盘区&lt;/strong&gt;(一组连续的盘块)为单位构建链表。每个盘区包含两项信息：&lt;code&gt;本盘区的盘块数&lt;/code&gt;和&lt;code&gt;指向下一个空闲盘区的指针&lt;/code&gt;。&lt;strong&gt;分配时&lt;/strong&gt;：采用与内存动态分区分配类似的策略(如首次适应算法)，查找满足需求的空闲盘区进行分配。&lt;strong&gt;回收时&lt;/strong&gt;：需要判断回收区是否与链表中相邻的空闲盘区在物理上连续，若相邻则合并，从而有效减少外部碎片。&lt;/p&gt;
+&lt;p&gt;空闲盘区链的优缺点与空闲盘块链恰好相反，&lt;strong&gt;优点&lt;/strong&gt;：分配与回收的效率较高，且空闲盘区链的长度较短。&lt;strong&gt;缺点&lt;/strong&gt;：分配与回收的过程较为复杂，需要处理盘区的分割与合并操作。&lt;/p&gt;
+&lt;h4&gt;3. 位示图法&lt;/h4&gt;
+&lt;p&gt;位示图法利用二进制的一位来表示磁盘中一个盘块的使用状态：磁盘上的每个盘块均对应位示图中的一个比特位。当该位为“0”时，表示对应盘块空闲；为“1”时，表示已被分配。因此，一个由 $m \times n$ 位组成的位示图，恰好可描述 $m \times n$ 个盘块的使用情况。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;盘块的分配：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;顺序扫描位示图，查找一个(或一组)值为“0”的位。&lt;/li&gt;
+&lt;li&gt;将找到的一个(或一组)比特位转换为对应的盘块号。假设该位位于位示图中的第 $i$ 行、第 $j$ 列(行、列编号从1开始)，每行包含 $n$ 位，则对应盘块号 $b$ 按下式计算：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;$$
+b = n(i-1) + j
+$$&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;修改位示图，置 $\text{map}[i,j] = 1$。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;盘块的回收：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;将回收盘块的盘块号 $b$ 转换为位示图中的行号和列号。计算公式为&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;$$
+i = (b-1) \text{ DIV } n + 1
+$$&lt;/p&gt;
+&lt;p&gt;$$
+j = (b-1) \text{ MOD } n + 1
+$$&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;修改位示图，置 $\text{map}[i,j] = 0$。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;:::note
+本书中位示图的行和列均从1开始编号。若题目指定从0开始，则上述公式需要相应调整。
+:::&lt;/p&gt;
+&lt;p&gt;位示图法的&lt;strong&gt;优点&lt;/strong&gt;：查找高效，能快速在位示图中找到一个或一组相邻的空闲盘块，便于实现连续分配；位示图结构紧凑，占用内存空间极小，可常驻内存，避免频繁访问磁盘。&lt;strong&gt;缺点&lt;/strong&gt;：位示图大小会随着磁盘容量的增加而增大，因此更适用于小型或中等规模的系统。&lt;/p&gt;
+&lt;h4&gt;4. 成组链接法&lt;/h4&gt;
+&lt;p&gt;空闲表法和空闲链表法均不适用于大型文件系统，因其管理结构随磁盘容量增大而过度膨胀。为此，UNIX系统采用&lt;code&gt;成组链接法&lt;/code&gt;，它融合了二者的思想，有效控制了管理结构的规模。&lt;/p&gt;
+&lt;p&gt;成组链接法的思想：将所有空闲盘块划分为若干组(例如每组100个盘块)。除最后一组外，&lt;strong&gt;每组的第一个盘块用作索引块&lt;/strong&gt;，用于记录下一组中所有空闲盘块的块号及其数量；这些索引块依次链接，形成一条链。文件系统挂载时，第一组的空闲盘块信息(包括块号列表和数量)被预先加载到内存的一个专用栈结构，称为&lt;code&gt;空闲盘块号栈&lt;/code&gt;。例如，若系统空闲区为第 $201 \sim 7999$ 号盘块，则分组如下：第一组为 $201 \sim 300$ 号……次末组为 $7801 \sim 7900$ 号，最末组为 $7901 \sim 7999$ 号(共99个盘块)。最末组的块号由前一组的最后一个盘块(7900号)记录，而该盘块中存放的第一个盘块号为“0”，用作整条空闲链的结束标志。&lt;/p&gt;
+&lt;p&gt;简而言之，成组链接法通过“分组+索引+链接”的设计，既避免了长链表的遍历开销，又无须维护完整的空闲表，从而在可扩展性与性能之间取得了良好平衡。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;盘块的分配：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;从空闲盘块号栈顶取出一个盘块号并分配给用户，栈指针相应上移，栈中空闲盘块数减1。若此时栈指针到达栈底(表示当前组已分配完毕)，则需要读取该栈底盘块号所对应的物理盘块内容——其中保存的是下一组的空闲盘块号列表。此时，&lt;strong&gt;先将该内容整体读入栈以更新空闲盘块号栈，再将原栈底所指的盘块(其索引作用已完成)分配出去。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;例如, 系统先依次分配 $201 \sim 299$ 号盘块；当需要分配300号盘块时，首先将其内容(下一组的块号列表)读入空闲盘块号栈，随后将300号盘块本身分配给用户。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;盘块的回收：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;系统将释放的盘块号压入空闲盘块号栈顶部，栈指针相应下移，栈中空闲盘块数加1。若此时栈已满(如达到100项)，则需要将当前栈中的全部盘块号写入该新回收的盘块，使其成为新的索引块；随后，将该盘块号设为新的栈底，并将栈中空闲盘块数重置为1。&lt;/p&gt;
+&lt;p&gt;描述空闲空间的数据结构(如空闲盘块号栈)以及文件系统的关键信息，通常存储在磁盘的固定位置。在UNIX系统中，这一区域称为&lt;code&gt;超级块&lt;/code&gt;。文件系统挂载时会将其读入内存，并在运行过程中持续维护内存副本与磁盘副本的一致性，从而确保空闲空间管理的正确性与可靠性。&lt;/p&gt;
+&lt;h3&gt;4.3.3 虚拟文件系统&lt;/h3&gt;
+&lt;p&gt;现代操作系统通常需要支持多种文件系统，如 ext4、NTFS、FAT等。这些文件系统在磁盘组织方式、元数据格式和操作方法上各不相同。若应用程序为每种文件系统分别编写代码，则不仅开发困难，系统的可维护性也会显著降低。为此，操作系统引入了&lt;code&gt;虚拟文件系统&lt;/code&gt;(VFS)；它&lt;strong&gt;位于用户程序与具体文件系统之间，向上提供统一的文件操作接口&lt;/strong&gt;。有了VFS，用户程序就无须关心底层使用的是哪种文件系统。无论文件存储在何种设备上、采用何种格式，程序只需调用标准系统调用[如 &lt;code&gt;open()&lt;/code&gt;、&lt;code&gt;write()&lt;/code&gt; 等]即可完成操作。VFS则负责将这些通用请求转发给相应的文件系统进行处理，进而让用户无须察觉底层文件系统的差异。&lt;/p&gt;
+&lt;p&gt;VFS采用面向对象的设计思想，抽象出一个通用的文件系统模型，并将其中的公共特性&lt;strong&gt;封装为四种对象&lt;/strong&gt;。每个对象都包含数据成员和一组操作函数指针，这些函数由具体的文件系统提供。只要新的文件系统实现了VFS定义的接口，就能被系统识别、挂载并使用。这四种对象如下。&lt;/p&gt;
+&lt;h4&gt;(1) 超级块对象&lt;/h4&gt;
+&lt;p&gt;超级块对象表示一个已挂载的文件系统。它对应磁盘上的超级块，记录该文件系统的全局信息，如块大小、总块数、空闲块数量以及文件系统类型等。当文件系统挂载时，VFS将其超级块读入内存，创建对应的超级块对象，并设置好相关的操作函数，如分配inode、同步元数据等。&lt;/p&gt;
+&lt;h4&gt;(2) V节点对象&lt;/h4&gt;
+&lt;p&gt;V节点(vnode)对象是VFS中&lt;strong&gt;最重要的抽象对象&lt;/strong&gt;，用于在内存中表示一个具体的文件或目录。每个 vnode对象关联底层某个具体文件系统的索引节点(如ext4的 inode)，&lt;strong&gt;本质上是对各类文件系统元数据的统一封装&lt;/strong&gt;：向上为系统调用提供统一的文件属性(如权限、大小、时间戳等)，向下通过指针指向该文件系统私有的元数据结构。&lt;strong&gt;vnode 对象仅在文件首次被访问时动态创建于内存&lt;/strong&gt;，引用计数归零后自动释放；其内部包含一组标准操作函数指针(如 &lt;code&gt;read&lt;/code&gt;、&lt;code&gt;write&lt;/code&gt; 等)，VFS通过这些指针将上层请求分发至相应文件系统的具体实现，以屏蔽不同文件系统的差异。&lt;/p&gt;
+&lt;p&gt;:::note
+V节点并不等同于磁盘上的 inode。V节点是VFS为统一管理各类文件而创建的内存对象，它与inode通过指针关联，协同完成文件操作：V节点提供统一接口，inode提供实际存储信息。
+:::&lt;/p&gt;
+&lt;h4&gt;(3) 目录项对象&lt;/h4&gt;
+&lt;p&gt;目录项对象表示路径中的一个组成部分，如 &lt;code&gt;/home/user/file&lt;/code&gt; 中的“user”。目录项对象并不直接对应磁盘上的某个固定结构，而是VFS在解析路径时动态生成的内存缓存；每个目录项保存文件名、指向父目录项和子目录项的指针，以及指向对应V节点的指针；多个目录项组合形成逻辑上的目录树；VFS通过缓存常用目录项，有效加快后续路径查找的速度。&lt;/p&gt;
+&lt;h4&gt;(4) 文件对象&lt;/h4&gt;
+&lt;p&gt;文件对象表示一个进程所打开的文件，可理解为“文件在进程中的运行实例”，正如进程是程序的运行实例。当进程调用 &lt;code&gt;open()&lt;/code&gt; 时，内核为其创建一个文件对象；当调用 &lt;code&gt;close()&lt;/code&gt; 且引用计数归零时，该对象被销毁。文件对象保存当前读/写位置(文件指针)、访问模式(读/写或追加)和引用计数等信息，并包含指向对应V节点和目录项的指针；它提供的 &lt;code&gt;read&lt;/code&gt;、&lt;code&gt;write&lt;/code&gt;、&lt;code&gt;seek&lt;/code&gt; 等操作接口最终由V节点转发至底层文件系统执行。&lt;/p&gt;
+&lt;p&gt;下面以 &lt;code&gt;write()&lt;/code&gt; 为例说明VFS的工作过程：当进程调用 &lt;code&gt;write(fd, buf, n)&lt;/code&gt; 时，内核首先进入VFS层，执行 &lt;code&gt;sys_write()&lt;/code&gt; 函数；随后根据文件描述符 &lt;code&gt;fd&lt;/code&gt; 定位到对应的文件对象，并通过该对象获取其关联的V节点；接着，VFS利用V节点中预置的写操作函数指针，调用目标文件系统的具体写方法；该文件系统将数据写入缓冲区，最终通过设备驱动完成磁盘写入。&lt;code&gt;write()&lt;/code&gt; 系统调用操作。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;总结：&lt;/strong&gt; 对用户程序而言，所有文件操作均通过VFS提供的统一接口完成，无须关心底层使用的是ext4、NTFS还是其他文件系统。VFS借助前述四类对象，屏蔽不同文件系统的实现细节，使其在系统中呈现出一致的行为。需要强调的是，VFS本身并不是一种真正的文件系统——它仅存在于内存之中，不占用磁盘空间，随系统启动而建立，随系统关闭而释放。&lt;/p&gt;
+&lt;h3&gt;4.3.4 文件系统挂载&lt;/h3&gt;
+&lt;p&gt;如同文件在使用之前必须先打开一样，文件系统在被进程访问前也必须先&lt;code&gt;安装&lt;/code&gt;，也称&lt;code&gt;挂载&lt;/code&gt;(Mounting)。将某个设备上的文件系统挂载到目录树中的一个目录后，即可通过该目录访问该设备上的文件。此处的设备是指&lt;code&gt;逻辑上的设备&lt;/code&gt;，如同一磁盘的不同分区可视为多个独立设备。&lt;/p&gt;
+&lt;p&gt;Windows系统采用驱动器号(如C:、D:)标识&lt;code&gt;分区&lt;/code&gt;(也称&lt;code&gt;卷&lt;/code&gt;)，每个分区拥有独立的目录树结构，并关联一个已挂载的文件系统。文件路径通常表示为 &lt;code&gt;drive-letter:\path\to\file&lt;/code&gt;。访问时，操作系统根据驱动器号定位对应的文件系统，再在其目录结构中查找目标文件。较新版本的Windows也支持将文件系统挂载到目录树下的任意目录(称为&lt;code&gt;装入点&lt;/code&gt;)，其行为与UNIX类似。系统启动时，Windows 会自动探测所有存储设备，并挂载其所识别的文件系统。&lt;/p&gt;
+&lt;p&gt;UNIX系统则以单一的根文件系统为基础，该文件系统在系统启动时由内核直接挂载，通常包含内核映像等关键文件。除根文件系统外，所有其他文件系统都必须挂载到根文件系统中的某个目录下才能被访问。这些文件系统可在系统初始化阶段自动挂载，也可由用户手动挂载。用于挂载的目录称为&lt;code&gt;挂载点&lt;/code&gt;(mount point)。需要注意的是：同一个设备可以被挂载到多个不同的挂载点；但同一挂载点在同一时刻只能挂载一个设备。&lt;/p&gt;
+&lt;p&gt;例如，将位于磁盘 &lt;code&gt;/dev/fd0&lt;/code&gt; 上的ext2文件系统，通过 &lt;code&gt;mount&lt;/code&gt; 命令挂载到目录 &lt;code&gt;/flp&lt;/code&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mount -t ext2 /dev/fd0 /flp
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;若需要卸载该文件系统，则使用 &lt;code&gt;umount&lt;/code&gt; 命令。&lt;/p&gt;
+&lt;p&gt;贯穿本章有两条主线：其一，引入一种新的抽象数据类型——&lt;code&gt;文件&lt;/code&gt;，从逻辑结构(如流式、记录式)和物理结构(如连续、链接、索引)两个维度展开；其二，阐述操作系统如何管理文件，包括多文件的组织方式(目录结构)、用户请求的处理机制(如系统调用、VFS分发)以及底层存储的调度策略(磁盘管理)。仅了解宏观框架是远远不够的，其目的正是为了更好地掌握微观细节；读者应通过反复做题与思考，不断深化对知识点的理解与运用。&lt;/p&gt;
+&lt;h3&gt;4.3.5 本节小结&lt;/h3&gt;
+&lt;p&gt;本节开头提出的问题的参考答案如下。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;什么是文件系统？&lt;/p&gt;
+&lt;p&gt;操作系统中负责管理和存储文件信息的软件机构称为&lt;code&gt;文件管理系统&lt;/code&gt;，简称&lt;code&gt;文件系统&lt;/code&gt;。文件系统由三部分组成：与文件管理相关的软件、被管理的文件，以及实现文件管理所需要的数据结构。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;文件系统要完成哪些功能？&lt;/p&gt;
+&lt;p&gt;对用户而言，文件系统最主要的功能是支持对文件的基本操作，使用户能够按名存取和查找文件，将其组织为合适的逻辑结构，并提供基本的文件共享与保护机制。对操作系统而言，文件系统还需要管理与磁盘之间的信息交换，完成文件逻辑结构到物理结构的映射，合理组织文件在磁盘上的存放，并采用高效的文件布局策略与磁盘调度方法，以提升系统整体性能。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;4.4 本章疑难点&lt;/h3&gt;
+&lt;h4&gt;1. 文件的物理分配方式的比较&lt;/h4&gt;
+&lt;p&gt;文件的三种物理分配方式的比较如表4.3所示。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;表4.3 文件三种分配方式的比较&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th&gt;优点&lt;/th&gt;
+&lt;th&gt;缺点&lt;/th&gt;
+&lt;th&gt;访问第n条记录&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;连续分配&lt;/td&gt;
+&lt;td&gt;顺序存取时速度快，文件定长时可根据文件起始地址及记录长度进行随机访问&lt;/td&gt;
+&lt;td&gt;要求连续的存储空间，会产生碎片，不利于文件的动态扩充&lt;/td&gt;
+&lt;td&gt;需要访问磁盘1次&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;链接分配&lt;/td&gt;
+&lt;td&gt;可解决外存的碎片问题，提高外存空间的利用率，动态增长较方便&lt;/td&gt;
+&lt;td&gt;只能按照文件的指针链顺序访问，查找效率低，指针信息存放消耗外存空间&lt;/td&gt;
+&lt;td&gt;需要访问磁盘n次&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;索引分配&lt;/td&gt;
+&lt;td&gt;可以随机访问，文件易于增删&lt;/td&gt;
+&lt;td&gt;索引表增加存储空间的开销，索引表的查找策略对文件系统效率影响较大&lt;/td&gt;
+&lt;td&gt;m级需要访问磁盘m+1次&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4&gt;2. 文件打开的过程描述&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;检索目录，要求打开的文件应该是已经创建的文件，它应登记在文件目录中，否则会出错。在检索到指定文件后，就将其磁盘 inode 复制到活动 inode 表中。&lt;/li&gt;
+&lt;li&gt;将参数 mode 所给出的打开方式与活动 inode 中在创建文件时所记录的文件访问权限相比较，若合法，则此次打开操作成功。&lt;/li&gt;
+&lt;li&gt;当打开合法时，为文件分配用户打开文件表表项和系统打开文件表表项，并为后者设置初值，通过指针建立表项与活动 inode 之间的联系，再将文件描述符 fd 返回给调用者。&lt;/li&gt;
+&lt;/ol&gt;
 </content:encoded></item><item><title>3.2虚拟内存管理1</title><link>https://www.atsuko.top/posts/408/operating-system/32-virtual-memory-management-1/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/32-virtual-memory-management-1/</guid><pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;3.2.1 虚拟内存的基本概念&lt;/h3&gt;
 &lt;h4&gt;1. 传统存储管理方式的特征&lt;/h4&gt;
 &lt;p&gt;3.1节讨论的各种内存管理策略，都是为了将多个进程同时保留在内存中，以支持多道程序设计。它们具有以下两个共同特征。&lt;/p&gt;
@@ -1415,6 +1606,578 @@ $$&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;本节学习了4种页面置换算法，要将它们与处理机调度算法区分开。当然，二者存在内在联系：它们都属于&lt;strong&gt;资源调度机制&lt;/strong&gt;，核心思想是依据某种准则，决定将有限资源分配给哪个请求者。处理机调度的准则包括优先级、响应比、时间片等；而页面置换则聚焦于页面的使用历史，如是否被访问过、近期是否经常使用。事实上，操作系统中几乎每类资源都有相应的调度策略。读者若能以“调度”为线索串联各类算法，则有助于构建对操作系统整体架构的系统性理解。&lt;/p&gt;
+</content:encoded></item><item><title>3.4.2对象的初始化和清理</title><link>https://www.atsuko.top/posts/dark-horse/c++/core/342-initialization-and-cleanup-of-objects/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/core/342-initialization-and-cleanup-of-objects/</guid><pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;4.2 对象的初始化和清理&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;生活中我们买的电子产品都基本会有出厂设置，在某一天我们不用时候也会删除一些自己信息数据保证安全&lt;/li&gt;
+&lt;li&gt;C++中的面向对象来源于生活，每个对象也都会有初始设置以及 对象销毁前的清理数据的设置。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;4.2.1 构造函数和析构函数&lt;/h4&gt;
+&lt;p&gt;对象的&lt;strong&gt;初始化和清理&lt;/strong&gt;也是两个非常重要的安全问题&lt;/p&gt;
+&lt;p&gt;一个对象或者变量没有初始状态，对其使用后果是未知&lt;/p&gt;
+&lt;p&gt;同样的使用完一个对象或变量，没有及时清理，也会造成一定的安全问题&lt;/p&gt;
+&lt;p&gt;c++利用了&lt;strong&gt;构造函数&lt;/strong&gt;和&lt;strong&gt;析构函数&lt;/strong&gt;解决上述问题，这两个函数将会被编译器自动调用，完成对象初始化和清理工作。&lt;/p&gt;
+&lt;p&gt;对象的初始化和清理工作是编译器强制要我们做的事情，因此如果&lt;strong&gt;我们不提供构造和析构，编译器会提供&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;编译器提供的构造函数和析构函数是空实现。&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;构造函数：主要作用在于创建对象时为对象的成员属性赋值，构造函数由编译器自动调用，无须手动调用。&lt;/li&gt;
+&lt;li&gt;析构函数：主要作用在于对象&lt;strong&gt;销毁前&lt;/strong&gt;系统自动调用，执行一些清理工作。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;构造函数语法：&lt;/strong&gt; &lt;code&gt;类名(){}&lt;/code&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;构造函数，没有返回值也不写void&lt;/li&gt;
+&lt;li&gt;函数名称与类名相同&lt;/li&gt;
+&lt;li&gt;构造函数可以有参数，因此可以发生重载&lt;/li&gt;
+&lt;li&gt;程序在调用对象时候会自动调用构造，无须手动调用,而且只会调用一次&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;析构函数语法：&lt;/strong&gt; &lt;code&gt;~类名(){}&lt;/code&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;析构函数，没有返回值也不写void&lt;/li&gt;
+&lt;li&gt;函数名称与类名相同,在名称前加上符号  ~&lt;/li&gt;
+&lt;li&gt;析构函数不可以有参数，因此不可以发生重载&lt;/li&gt;
+&lt;li&gt;程序在对象销毁前会自动调用析构，无须手动调用,而且只会调用一次&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Person1
+{
+public:
+	//构造函数
+	Person1()
+	{
+		std::cout &amp;lt;&amp;lt; &quot;Person1的构造函数调用&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	//析构函数
+	~Person1()
+	{
+		std::cout &amp;lt;&amp;lt; &quot;Person1的析构函数调用&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+};
+
+void test1()
+{
+	Person1 p;
+}
+
+int main() {
+
+	test1();
+
+	Person1 p1;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.2.2 构造函数的分类及调用&lt;/h4&gt;
+&lt;p&gt;两种分类方式：&lt;/p&gt;
+&lt;p&gt;​	按参数分为： 有参构造和无参构造&lt;/p&gt;
+&lt;p&gt;​	按类型分为： 普通构造和拷贝构造&lt;/p&gt;
+&lt;p&gt;三种调用方式：&lt;/p&gt;
+&lt;p&gt;​	括号法&lt;/p&gt;
+&lt;p&gt;​	显示法&lt;/p&gt;
+&lt;p&gt;​	隐式转换法&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//1、构造函数分类
+// 按照参数分类分为 有参和无参构造   无参又称为默认构造函数
+// 按照类型分类分为 普通构造和拷贝构造
+
+class Person2 {
+public:
+	//无参（默认）构造函数
+	Person2() {
+		std::cout &amp;lt;&amp;lt; &quot;无参构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	//有参构造函数
+	Person2(int a) {
+		age = a;
+		std::cout &amp;lt;&amp;lt; &quot;有参构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	//拷贝构造函数
+	Person2(const Person2 &amp;amp;p) {
+		age = p.age;
+		std::cout &amp;lt;&amp;lt; &quot;拷贝构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	//析构函数
+	~Person2() {
+		std::cout &amp;lt;&amp;lt; &quot;析构函数!&quot; &amp;lt;&amp;lt; std::endl;
+	}
+public:
+	int age;
+};
+
+//2、构造函数的调用
+//调用无参构造函数
+void test21() {
+	Person2 p; //调用无参构造函数
+}
+
+//调用有参的构造函数
+void test22() {
+
+	//2.1  括号法，常用
+	Person2 p1(10);
+	//注意1：调用无参构造函数不能加括号，如果加了编译器认为这是一个函数声明
+	//Person2 p2();
+
+	//2.2 显式法
+	Person2 p2 = Person2(10);
+	Person2 p3 = Person2(p2);
+	//Person(10)单独写就是匿名对象  当前行结束之后，马上析构
+
+	//2.3 隐式转换法
+	Person2 p4 = 10; // Person2 p4 = Person2(10); 
+	Person2 p5 = p4; // Person2 p5 = Person2(p4); 
+
+	//注意2：不能利用 拷贝构造函数 初始化匿名对象 编译器认为是对象声明
+	//Person2 p5(p4);
+}
+
+int main() {
+
+	test21();
+	test22();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.2.3 拷贝构造函数调用时机&lt;/h4&gt;
+&lt;p&gt;C++中拷贝构造函数调用时机通常有三种情况&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;使用一个已经创建完毕的对象来初始化一个新对象&lt;/li&gt;
+&lt;li&gt;值传递的方式给函数参数传值&lt;/li&gt;
+&lt;li&gt;以值方式返回局部对象&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Person3 {
+public:
+	Person3() {
+		std::cout &amp;lt;&amp;lt; &quot;无参构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+		mAge = 0;
+	}
+	Person3(int age) {
+		std::cout &amp;lt;&amp;lt; &quot;有参构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+		mAge = age;
+	}
+	Person3(const Person3&amp;amp; p) {
+		std::cout &amp;lt;&amp;lt; &quot;拷贝构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+		mAge = p.mAge;
+	}
+	//析构函数在释放内存之前调用
+	~Person3() {
+		std::cout &amp;lt;&amp;lt; &quot;析构函数!&quot; &amp;lt;&amp;lt; std::endl;
+	}
+public:
+	int mAge;
+};
+
+//1. 使用一个已经创建完毕的对象来初始化一个新对象
+void test31() {
+
+	Person3 man(100); //p对象已经创建完毕
+	Person3 newman(man); //调用拷贝构造函数
+	Person3 newman2 = man; //拷贝构造
+
+	//Person3 newman3;
+	//newman3 = man; //不是调用拷贝构造函数，赋值操作
+}
+
+//2. 值传递的方式给函数参数传值
+//相当于Person3 p1 = p;
+void doWork(Person3 p1) {}
+void test32() {
+	Person3 p; //无参构造函数
+	doWork(p);
+}
+
+//3. 以值方式返回局部对象
+Person3 doWork2()
+{
+	Person3 p1;
+	std::cout &amp;lt;&amp;lt; (int*)&amp;amp;p1 &amp;lt;&amp;lt; std::endl;
+	return p1;
+}
+
+void test33()
+{
+	Person3 p = doWork2();
+	std::cout &amp;lt;&amp;lt; (int*)&amp;amp;p &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+	//test31();
+	//test32();
+	test33();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.2.4 构造函数调用规则&lt;/h4&gt;
+&lt;p&gt;默认情况下，c++编译器至少给一个类添加3个函数&lt;/p&gt;
+&lt;p&gt;1．默认构造函数(无参，函数体为空)
+2．默认析构函数(无参，函数体为空)
+3．默认拷贝构造函数，对属性进行值拷贝&lt;/p&gt;
+&lt;p&gt;构造函数调用规则如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果用户定义有参构造函数，c++不在提供默认无参构造，但是会提供默认拷贝构造&lt;/li&gt;
+&lt;li&gt;如果用户定义拷贝构造函数，c++不会再提供其他构造函数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;示例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Person4 {
+public:
+	//无参（默认）构造函数
+	Person4() {
+		std::cout &amp;lt;&amp;lt; &quot;无参构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	//有参构造函数
+	Person4(int a) {
+		age = a;
+		std::cout &amp;lt;&amp;lt; &quot;有参构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	//拷贝构造函数
+	Person4(const Person4&amp;amp; p) {
+		age = p.age;
+		std::cout &amp;lt;&amp;lt; &quot;拷贝构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	//析构函数
+	~Person4() {
+		std::cout &amp;lt;&amp;lt; &quot;析构函数!&quot; &amp;lt;&amp;lt; std::endl;
+	}
+public:
+	int age;
+};
+
+void test41()
+{
+	Person4 p1(18);
+	//如果不写拷贝构造，编译器会自动添加拷贝构造，并且做浅拷贝操作
+	Person4 p2(p1);
+
+	std::cout &amp;lt;&amp;lt; &quot;p2的年龄为： &quot; &amp;lt;&amp;lt; p2.age &amp;lt;&amp;lt; std::endl;
+}
+
+void test42()
+{
+	//如果用户提供有参构造，编译器不会提供默认构造，会提供拷贝构造
+	Person4 p1; //此时如果用户自己没有提供默认构造，会出错
+	Person4 p2(10); //用户提供的有参
+	Person4 p3(p2); //此时如果用户没有提供拷贝构造，编译器会提供
+
+	//如果用户提供拷贝构造，编译器不会提供其他构造函数
+	Person4 p4; //此时如果用户自己没有提供默认构造，会出错
+	Person4 p5(10); //此时如果用户自己没有提供有参，会出错
+	Person4 p6(p5); //用户自己提供拷贝构造
+}
+
+int main() {
+
+	test41();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.2.5 深拷贝与浅拷贝&lt;/h4&gt;
+&lt;p&gt;深浅拷贝是面试经典问题，也是常见的一个坑&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;浅拷贝：简单的赋值拷贝操作&lt;/li&gt;
+&lt;li&gt;深拷贝：在堆区重新申请空间，进行拷贝操作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Person5 {
+public:
+	//无参（默认）构造函数
+	Person5() {
+		std::cout &amp;lt;&amp;lt; &quot;无参构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	//有参构造函数
+	Person5(int age, int height) {
+
+		std::cout &amp;lt;&amp;lt; &quot;有参构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+
+		m_age = age;
+		m_height = new int(height);
+
+	}
+	//拷贝构造函数  
+	Person5(const Person5&amp;amp; p) {
+		std::cout &amp;lt;&amp;lt; &quot;拷贝构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+		//如果不利用深拷贝在堆区创建新内存，会导致浅拷贝带来的重复释放堆区问题
+		m_age = p.m_age;
+		m_height = new int(*p.m_height);
+
+	}
+
+	//析构函数
+	~Person5() {
+		std::cout &amp;lt;&amp;lt; &quot;析构函数!&quot; &amp;lt;&amp;lt; std::endl;
+		if (m_height != NULL)
+		{
+			delete m_height;
+		}
+	}
+public:
+	int m_age;
+	int* m_height;
+};
+
+void test51()
+{
+	Person5 p1(18, 180);
+
+	Person5 p2(p1);
+
+	std::cout &amp;lt;&amp;lt; &quot;p1的年龄： &quot; &amp;lt;&amp;lt; p1.m_age &amp;lt;&amp;lt; &quot; 身高： &quot; &amp;lt;&amp;lt; *p1.m_height &amp;lt;&amp;lt; std::endl;
+
+	std::cout &amp;lt;&amp;lt; &quot;p2的年龄： &quot; &amp;lt;&amp;lt; p2.m_age &amp;lt;&amp;lt; &quot; 身高： &quot; &amp;lt;&amp;lt; *p2.m_height &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+	test51();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：如果属性有在堆区开辟的，一定要自己提供拷贝构造函数，防止浅拷贝带来的问题&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;4.2.6 初始化列表&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;C++提供了初始化列表语法，用来初始化属性&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;语法：&lt;/strong&gt;&lt;code&gt;构造函数()：属性1(值1),属性2（值2）... {}&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Person6 {
+public:
+
+	////传统方式初始化
+	//Person6(int a, int b, int c) {
+	//	m_A = a;
+	//	m_B = b;
+	//	m_C = c;
+	//}
+
+	//初始化列表方式初始化
+	Person6(int a, int b, int c) :m_A(a), m_B(b), m_C(c) {}
+	void PrintPerson6() {
+		std::cout &amp;lt;&amp;lt; &quot;mA:&quot; &amp;lt;&amp;lt; m_A &amp;lt;&amp;lt; std::endl;
+		std::cout &amp;lt;&amp;lt; &quot;mB:&quot; &amp;lt;&amp;lt; m_B &amp;lt;&amp;lt; std::endl;
+		std::cout &amp;lt;&amp;lt; &quot;mC:&quot; &amp;lt;&amp;lt; m_C &amp;lt;&amp;lt; std::endl;
+	}
+private:
+	int m_A;
+	int m_B;
+	int m_C;
+};
+
+int main() {
+
+	Person6 p(1, 2, 3);
+	p.PrintPerson6();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.2.7 类对象作为类成员&lt;/h4&gt;
+&lt;p&gt;C++类中的成员可以是另一个类的对象，我们称该成员为 对象成员&lt;/p&gt;
+&lt;p&gt;例如：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;class A {}
+class B
+{
+    A a；
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;B类中有对象A作为成员，A为对象成员&lt;/p&gt;
+&lt;p&gt;那么当创建B对象时，A与B的构造和析构的顺序是谁先谁后？&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Phone7
+{
+public:
+	Phone7(std::string name)
+	{
+		m_Phone7Name = name;
+		std::cout &amp;lt;&amp;lt; &quot;Phone7构造&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	~Phone7()
+	{
+		std::cout &amp;lt;&amp;lt; &quot;Phone7析构&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	std::string m_Phone7Name;
+
+};
+
+class Person7
+{
+public:
+
+	//初始化列表可以告诉编译器调用哪一个构造函数
+	Person7(std::string name, std::string pName) :m_Name(name), m_Phone7(pName)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;Person7构造&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	~Person7()
+	{
+		std::cout &amp;lt;&amp;lt; &quot;Person7析构&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	void playGame()
+	{
+		std::cout &amp;lt;&amp;lt; m_Name &amp;lt;&amp;lt; &quot; 使用&quot; &amp;lt;&amp;lt; m_Phone7.m_Phone7Name &amp;lt;&amp;lt; &quot; 牌手机! &quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	std::string m_Name;
+	Phone7 m_Phone7;
+
+};
+void test71()
+{
+	//当类中成员是其他类对象时，我们称该成员为 对象成员
+	//构造的顺序是 ：先调用对象成员的构造，再调用本类构造
+	//析构顺序与构造相反
+	Person7 p(&quot;张三&quot;, &quot;苹果X&quot;);
+	p.playGame();
+}
+
+int main() {
+
+	test71();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.2.8 静态成员&lt;/h4&gt;
+&lt;p&gt;静态成员就是在成员变量和成员函数前加上关键字static，称为静态成员&lt;/p&gt;
+&lt;p&gt;静态成员分为：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;静态成员变量
+&lt;ul&gt;
+&lt;li&gt;所有对象共享同一份数据&lt;/li&gt;
+&lt;li&gt;在编译阶段分配内存&lt;/li&gt;
+&lt;li&gt;类内声明，类外初始化&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;静态成员函数
+&lt;ul&gt;
+&lt;li&gt;所有对象共享同一个函数&lt;/li&gt;
+&lt;li&gt;静态成员函数只能访问静态成员变量&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;**示例1 ：**静态成员变量&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Person8
+{
+
+public:
+
+	static int m_A; //静态成员变量
+
+	//静态成员变量特点：
+	//1 在编译阶段分配内存
+	//2 类内声明，类外初始化
+	//3 所有对象共享同一份数据
+
+private:
+	static int m_B; //静态成员变量也是有访问权限的
+};
+int Person8::m_A = 10;
+int Person8::m_B = 10;
+
+void test81()
+{
+	//静态成员变量两种访问方式
+
+	//1、通过对象
+	Person8 p1;
+	p1.m_A = 100;
+	std::cout &amp;lt;&amp;lt; &quot;p1.m_A = &quot; &amp;lt;&amp;lt; p1.m_A &amp;lt;&amp;lt; std::endl;
+
+	Person8 p2;
+	p2.m_A = 200;
+	std::cout &amp;lt;&amp;lt; &quot;p1.m_A = &quot; &amp;lt;&amp;lt; p1.m_A &amp;lt;&amp;lt; std::endl; //共享同一份数据
+	std::cout &amp;lt;&amp;lt; &quot;p2.m_A = &quot; &amp;lt;&amp;lt; p2.m_A &amp;lt;&amp;lt; std::endl;
+
+	//2、通过类名
+	std::cout &amp;lt;&amp;lt; &quot;m_A = &quot; &amp;lt;&amp;lt; Person8::m_A &amp;lt;&amp;lt; std::endl;
+
+	//std::cout &amp;lt;&amp;lt; &quot;m_B = &quot; &amp;lt;&amp;lt; Person8::m_B &amp;lt;&amp;lt; std::endl; //私有权限访问不到
+}
+
+int main() {
+
+	test81();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;**示例2：**静态成员函数&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Person9
+{
+
+public:
+
+	//静态成员函数特点：
+	//1 程序共享一个函数
+	//2 静态成员函数只能访问静态成员变量
+
+	static void func()
+	{
+		std::cout &amp;lt;&amp;lt; &quot;func调用&quot; &amp;lt;&amp;lt; std::endl;
+		m_A = 100;
+		//m_B = 100; //错误，不可以访问非静态成员变量
+	}
+
+	static int m_A; //静态成员变量
+	int m_B; // 
+private:
+
+	//静态成员函数也是有访问权限的
+	static void func2()
+	{
+		std::cout &amp;lt;&amp;lt; &quot;func2调用&quot; &amp;lt;&amp;lt; std::endl;
+	}
+};
+
+int Person9::m_A = 10;
+
+void test91()
+{
+	//静态成员变量两种访问方式
+
+	//1、通过对象
+	Person9 p1;
+	p1.func();
+
+	//2、通过类名
+	Person9::func();
+
+	//Person9::func2(); //私有权限访问不到
+}
+
+int main() {
+
+	test91();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
 </content:encoded></item><item><title>3.1内存管理概念2</title><link>https://www.atsuko.top/posts/408/operating-system/31-concept-of-memory-management-2/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/31-concept-of-memory-management-2/</guid><pubDate>Tue, 26 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;3.1.3 基本分页存储管理&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;固定分区会产生内部碎片，动态分区会产生外部碎片&lt;/strong&gt;，这两种方式对内存的利用率都较低。为提高内存利用率并彻底消除外部碎片，操作系统引入了&lt;code&gt;分页存储管理&lt;/code&gt;：将物理内存划分为若干大小相等的固定单元，称为&lt;code&gt;页框&lt;/code&gt;（或&lt;code&gt;页帧&lt;/code&gt;、&lt;code&gt;物理块&lt;/code&gt;）；同时将进程的逻辑地址空间划分为&lt;strong&gt;与页框大小相同&lt;/strong&gt;的单元，称为&lt;code&gt;页面&lt;/code&gt;（或&lt;code&gt;页&lt;/code&gt;）。系统以页框为单位为进程分配内存。&lt;/p&gt;
 &lt;p&gt;从形式上看，分页类似于等长的固定分区，但其&lt;strong&gt;本质不同&lt;/strong&gt;：固定分区按作业整体分配，而分页将进程和内存均按固定大小的单元划分，使得内存分配以页为单位进行。因此，分页管理不会产生外部碎片。然而，由于页面大小固定，当进程的某一页未被完全填满时，其对应的页框中会留下未使用的空间，形成页内碎片（内部碎片），每个进程平均产生的页内碎片约为半页。&lt;/p&gt;
