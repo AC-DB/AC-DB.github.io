@@ -1,4 +1,238 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>1.简单句</title><link>https://www.atsuko.top/posts/english/grammar/1-simple-sentence/</link><guid isPermaLink="true">https://www.atsuko.top/posts/english/grammar/1-simple-sentence/</guid><pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;第一章 奋斗的开始——简单句&lt;/h1&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>1.1计算机网络概述</title><link>https://www.atsuko.top/posts/408/computer-network/11-overview-of-computer-networks/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/computer-network/11-overview-of-computer-networks/</guid><pubDate>Sat, 06 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;1.1 计算机网络概述&lt;/h1&gt;
+&lt;h3&gt;1.1.1 计算机网络的概念&lt;/h3&gt;
+&lt;p&gt;一般认为，计算机网络是将众多分散的、自治的计算机系统，通过通信设备与线路连接起来，并由功能完善的软件实现资源共享和信息传递的系统。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;计算机网络&lt;/code&gt;(简称&lt;code&gt;网络&lt;/code&gt;)由若干&lt;code&gt;节点&lt;/code&gt;(Node，或译为&lt;code&gt;结点&lt;/code&gt;)和连接这些节点的&lt;code&gt;链路&lt;/code&gt;(Link)组成。网络中的节点可以是计算机、集线器、交换机或路由器等。多个网络还可通过路由器互连，构成覆盖范围更广的计算机网络，这种网络称为&lt;code&gt;互连网&lt;/code&gt;(internet)。由此可理解为：&lt;strong&gt;网络将多台计算机连接在一起，而互连网则将多个网络通过路由器连接在一起&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;请读者注意两个含义相差很大的名词：internet 与 Internet。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;internet&lt;/strong&gt;(&lt;code&gt;互连网&lt;/code&gt;)是一个通用名词，泛指由多个计算机网络互连而成的网络。这些网络之间可以使用任意通信协议进行通信，并不要求必须采用 TCP/IP。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Internet&lt;/strong&gt;(&lt;code&gt;互联网&lt;/code&gt;或&lt;code&gt;因特网&lt;/code&gt;)则是一个专用名词，特指当前全球最大的、开放的、由众多网络和路由器互连而成的特定计算机网络，它&lt;strong&gt;必须采用 TCP/IP 协议族&lt;/strong&gt;作为通信规则。&lt;/p&gt;
+&lt;p&gt;网络的最终用户通过&lt;code&gt;互联网服务提供商&lt;/code&gt;(Internet Service Provider，ISP)接入互联网，例如中国电信、中国移动等。所谓&lt;code&gt;上网&lt;/code&gt;，是指通过某ISP分配的IP地址接入互联网。ISP可从互联网管理机构申请大量IP地址(互联网上的主机都必须拥有IP地址才能接入互联网，这一点将在第4章中讨论)，并拥有通信线路及路由器等连网设备。因此，任何机构或个人只要向ISP缴纳费用，就可获得所需IP地址的使用权，并通过该ISP接入互联网。&lt;/p&gt;
+&lt;h3&gt;1.1.2 计算机网络的组成&lt;/h3&gt;
+&lt;p&gt;从不同角度看，计算机网络的组成可分为以下几类。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;从组成部分看，计算机网络主要由硬件、软件、协议三大部分组成。&lt;code&gt;硬件&lt;/code&gt;包括主机(如台式机、笔记本电脑、平板电脑、智能手机等)、通信链路(如双绞线、光纤)以及交换设备(如路由器、交换机等)。&lt;code&gt;软件&lt;/code&gt;主要包括实现资源共享的系统软件和便于用户使用的应用工具(如E-mail程序、FTP程序、聊天程序等)。&lt;code&gt;协议&lt;/code&gt;是计算机网络的核心，如同交通规则规范车辆行驶一样，它规定了数据在网络中传输时必须遵循的规则。&lt;/li&gt;
+&lt;li&gt;从工作方式看，计算机网络(此处主要指 Internet，即互联网)可分为边缘部分和核心部分。&lt;code&gt;边缘部分&lt;/code&gt;由所有连接到互联网、供用户直接使用的主机组成，用于通信(如数据传输)和资源共享；&lt;code&gt;核心部分&lt;/code&gt;由大量网络及互连这些网络的路由器组成，为边缘部分提供连通性与交换服务。&lt;/li&gt;
+&lt;li&gt;从功能组成看，计算机网络由通信子网和资源子网组成。&lt;code&gt;通信子网&lt;/code&gt;由传输介质、通信设备及相关网络协议组成，负责数据的传输、交换、控制与存储，实现联网计算机之间的通信。&lt;code&gt;资源子网&lt;/code&gt;则是实现资源共享功能的设备及其软件的集合，向用户提供共享其他计算机上的硬件资源、软件资源和数据资源的服务。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;1.1.3 计算机网络的功能&lt;/h3&gt;
+&lt;p&gt;计算机网络具有多种功能，现今许多应用都依赖于网络的支持。主要有以下五大功能。&lt;/p&gt;
+&lt;h4&gt;1. 数据通信&lt;/h4&gt;
+&lt;p&gt;数据通信是计算机网络最基本且最重要的功能，用来实现联网计算机之间各种信息的传输。例如，文件传输、电子邮件等应用，离开了计算机网络将无法实现。&lt;/p&gt;
+&lt;h4&gt;2. 资源共享&lt;/h4&gt;
+&lt;p&gt;资源共享可以是软件、数据或硬件的共享。它使得网络中的资源能够互通有无、分工协作，从而显著提高硬件资源、软件资源和数据资源的利用率。&lt;/p&gt;
+&lt;h4&gt;3. 分布式处理&lt;/h4&gt;
+&lt;p&gt;当网络中的某个计算机系统负荷过重时，可将其处理的某个复杂任务分配给网络中的其他计算机系统，利用空闲资源来提高整个系统的利用率。&lt;/p&gt;
+&lt;h4&gt;4. 提高可靠性&lt;/h4&gt;
+&lt;p&gt;计算机网络中的各台计算机可以通过网络互为备份。&lt;/p&gt;
+&lt;h4&gt;5. 负载均衡&lt;/h4&gt;
+&lt;p&gt;将工作任务均衡地分配给网络中的各台计算机，避免某些计算机过载而其他计算机闲置。&lt;/p&gt;
+&lt;p&gt;除了上述主要功能外，计算机网络还支持电子化办公与服务、远程教育、娱乐等功能，满足了社会的多样化需求，方便了人们的学习、工作和生活，并带来了巨大的经济效益。&lt;/p&gt;
+&lt;h3&gt;1.1.4 电路交换、报文交换与分组交换&lt;/h3&gt;
+&lt;p&gt;在网络核心部分起关键作用的是&lt;code&gt;路由器&lt;/code&gt;(Router)，其通过对接收到的分组进行&lt;strong&gt;存储转发&lt;/strong&gt;来实现分组交换。要理解分组交换的原理，需先了解电路交换和报文交换的基本概念。&lt;/p&gt;
+&lt;h4&gt;1. 电路交换&lt;/h4&gt;
+&lt;p&gt;最典型的电路交换网络是传统电话网。从通信资源分配的角度看，交换是指按照某种方式动态分配传输线路资源。电路交换分为三个阶段：&lt;strong&gt;建立连接&lt;/strong&gt;(占用通信资源)、&lt;strong&gt;传输数据&lt;/strong&gt;(持续占用通信资源)和&lt;strong&gt;释放连接&lt;/strong&gt;(归还通信资源)。在数据传输前，通信双方必须先建立一条&lt;strong&gt;专用的端到端物理通路&lt;/strong&gt;，该通路由沿途的交换设备和链路逐段连接而成。在通信过程中，这条通路始终被双方&lt;strong&gt;独占&lt;/strong&gt;，直至通信结束才释放。&lt;/p&gt;
+&lt;p&gt;电路建立后，除源节点和目的节点外，中间节点仅提供端到端物理通路，比特流连续地从源端直达目的端，如同通过管道传输。因此，电路交换适用于低频次、连续且大量的数据传输。&lt;/p&gt;
+&lt;p&gt;电路交换技术的&lt;strong&gt;优点&lt;/strong&gt;：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;通信时延小&lt;/code&gt;。通信线路为双方专用，数据直达，传输效率高。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;有序传输&lt;/code&gt;。数据按发送顺序传送，不存在失序问题。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;没有冲突&lt;/code&gt;。不同通信对使用独立信道，不会争用物理信道。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;实时性强&lt;/code&gt;。物理通路一旦建立，双方即可随时通信。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;电路交换技术的&lt;strong&gt;缺点&lt;/strong&gt;：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;建立连接时间长&lt;/code&gt;。平均建立连接的时间对计算机通信而言过长。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;线路利用率低&lt;/code&gt;。物理通路被通信双方独占，即使空闲也无法供其他用户使用。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;灵活性差&lt;/code&gt;。通路中任一节点或链路发生故障，都需重新建立新连接。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;难以实现差错控制&lt;/code&gt;。中间节点不具备存储和检错能力，无法发现或纠正传输错误。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;由于计算机之间的通信通常是&lt;code&gt;突发式&lt;/code&gt;(高频、少量)的，若采用电路交换，已被占用的通信线路在大部分时间内处于空闲状态，其利用率往往不足10%，甚至低于1%。&lt;/p&gt;
+&lt;h4&gt;2. 报文交换&lt;/h4&gt;
+&lt;p&gt;用户数据附加源地址、目的地址等控制信息后，被封装成&lt;code&gt;报文&lt;/code&gt;(Message)。报文交换采用&lt;code&gt;存储转发&lt;/code&gt;技术：整个报文先传送到相邻节点，被完整接收并存储后，节点根据转发表将其转发至下一跳，如此&lt;strong&gt;逐跳转发&lt;/strong&gt;，直至到达目的端。每个报文可&lt;strong&gt;独立选择通往目的端的路径&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;报文交换技术的&lt;strong&gt;优点&lt;/strong&gt;：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;无建立和释放连接的时延&lt;/code&gt;。通信前无须建立连接，用户可随时发送报文。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;线路分配灵活&lt;/code&gt;。交换节点在存储完整报文后，可选择当前最优空闲链路进行转发；若某条路径发生故障，该节点可动态切换至其他路径。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;线路利用率高&lt;/code&gt;。报文仅在一段链路上传输时才占用这段链路的资源。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;支持差错控制&lt;/code&gt;。交换节点可对缓存中的报文进行差错检验。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;报文交换技术的&lt;strong&gt;缺点&lt;/strong&gt;：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;存储转发时延高&lt;/code&gt;。节点必须完整接收整个报文后，才能开始转发。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;缓存开销大&lt;/code&gt;。由于报文大小没有限制，这就要求交换节点配备大容量缓存。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;错误处理低效&lt;/code&gt;。报文越长，出错概率相对更大，重传整个报文的代价较大。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;3. 分组交换&lt;/h4&gt;
+&lt;p&gt;分组交换同样采用&lt;code&gt;存储转发&lt;/code&gt;技术，但有效解决了报文交换中因报文过长带来的问题。报文过长时，不仅对交换节点的缓存容量要求较高，差错处理的效率也会降低。源主机在发送前，先将较长的报文划分为&lt;strong&gt;若干较小的等长数据段&lt;/strong&gt;，并在每个数据段前面添加由必要控制信息(如源地址、目的地址、分组编号等)组成的&lt;code&gt;首部&lt;/code&gt;，构成&lt;code&gt;分组&lt;/code&gt;(Packet)。&lt;/p&gt;
+&lt;p&gt;源主机将分组发送到分组交换网，网络中的&lt;strong&gt;分组交换机&lt;/strong&gt;(如路由器)收到一个分组后，先将其缓存，然后从首部提取目的地址，据此查找转发表，并将分组转发给下一个分组交换机。经过多个分组交换机的&lt;strong&gt;存储转发&lt;/strong&gt;，分组最终到达目的主机。&lt;/p&gt;
+&lt;p&gt;分组交换不仅继承了报文交换的诸多优点，还具有以下&lt;strong&gt;优势&lt;/strong&gt;：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;便于存储管理，转发开销小&lt;/code&gt;。由于分组长度固定，缓冲区大小可预设，管理更高效。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;传输效率高&lt;/code&gt;。分组可逐个发送，实现流水线操作，即后一个分组的接收可与前一个分组的转发并行，从而减少整体传输时间。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;降低出错概率与重传代价&lt;/code&gt;。由于分组较短，出错概率也必然减小，重传数据量大幅减少，既提高了可靠性，又降低了传输时延。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;分组交换技术的&lt;strong&gt;缺点&lt;/strong&gt;：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;存在存储转发时延&lt;/code&gt;。尽管比报文交换的传输时延小，但相比于电路交换仍存在存储转发时延，且要求节点交换机具备更强的处理能力。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;需要传输额外的信息量&lt;/code&gt;。每个数据段都需附加控制信息以构成分组，使得传送的信息量增大约5%～10%，从而增加了控制复杂度，降低了通信效率。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;分组可能失序、丢失或重复&lt;/code&gt;。当采用&lt;strong&gt;数据报&lt;/strong&gt;服务时，分组可能经不同路径到达，需在目的主机按编号重排序，处理较为复杂。若采用&lt;strong&gt;虚电路&lt;/strong&gt;服务，虽可避免失序，但需经历建立连接、数据传输和释放连接三个阶段。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;三种交换方式的比较&lt;/strong&gt;。当需连续传输大量数据，并且传输时间远大于连接建立时间时，采用电路交换更为合适。但从提升网络整体信道利用率角度看，报文交换和分组交换优于电路交换。其中，&lt;strong&gt;分组交换时延更小、更灵活&lt;/strong&gt;，尤其&lt;strong&gt;适合突发式数据通信&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;本书配套视频对三种交换方式的性能进行了详尽分析，其中分组交换网的性能分析是统考高频考点，强烈建议结合视频学习。表1.1总结了三种交换方式的特性对比。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;特性&lt;/th&gt;
+&lt;th&gt;电路交换&lt;/th&gt;
+&lt;th&gt;报文交换&lt;/th&gt;
+&lt;th&gt;分组交换&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;完成传输所需的时间&lt;/td&gt;
+&lt;td&gt;最少&lt;/td&gt;
+&lt;td&gt;最多&lt;/td&gt;
+&lt;td&gt;较少&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;存储转发时延&lt;/td&gt;
+&lt;td&gt;无&lt;/td&gt;
+&lt;td&gt;高&lt;/td&gt;
+&lt;td&gt;较低&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;通信前是否需要建立连接？&lt;/td&gt;
+&lt;td&gt;是&lt;/td&gt;
+&lt;td&gt;否&lt;/td&gt;
+&lt;td&gt;否&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;节点的缓存开销&lt;/td&gt;
+&lt;td&gt;无&lt;/td&gt;
+&lt;td&gt;高&lt;/td&gt;
+&lt;td&gt;低&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;是否支持差错控制？&lt;/td&gt;
+&lt;td&gt;不支持&lt;/td&gt;
+&lt;td&gt;支持&lt;/td&gt;
+&lt;td&gt;支持&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;数据是否有序到达？&lt;/td&gt;
+&lt;td&gt;是&lt;/td&gt;
+&lt;td&gt;是&lt;/td&gt;
+&lt;td&gt;否&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;是否需要额外的控制信息？&lt;/td&gt;
+&lt;td&gt;否&lt;/td&gt;
+&lt;td&gt;是&lt;/td&gt;
+&lt;td&gt;是(且占比较大)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;线路分配的灵活性&lt;/td&gt;
+&lt;td&gt;不灵活&lt;/td&gt;
+&lt;td&gt;灵活&lt;/td&gt;
+&lt;td&gt;非常灵活&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;线路利用率&lt;/td&gt;
+&lt;td&gt;低&lt;/td&gt;
+&lt;td&gt;高&lt;/td&gt;
+&lt;td&gt;非常高&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3&gt;1.1.5 计算机网络的分类&lt;/h3&gt;
+&lt;h4&gt;1. 按分布范围分类&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;广域网&lt;/code&gt;(WAN)。广域网用于长距离通信，覆盖范围通常为几十至数千千米，常用于构建互联网的骨干部分，其节点交换机间通过高速链路互联，通信容量大。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;城域网&lt;/code&gt;(MAN)。城域网的覆盖范围可跨越几个街区乃至整个城市，直径约为5～50km。目前城域网大多采用以太网技术，因此有时也被归入局域网的讨论范畴。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;局域网&lt;/code&gt;(LAN)。局域网通常将主机通过高速线路互连，覆盖范围较小，一般为几十米到几千米。传统上，局域网采用广播技术，而广域网则采用交换技术。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;个人区域网&lt;/code&gt;(PAN)。个人区域网是指在个人工作或活动区域内，利用无线技术将消费电子设备(如平板电脑、智能手机等)互联而成的网络，也称&lt;code&gt;无线个人区域网&lt;/code&gt;(WPAN)。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;2. 按传输技术分类&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;广播式网络&lt;/code&gt;。所有联网计算机共享一个公共通信信道。当一台计算机通过该信道发送报文分组时，所有其他计算机都能“收听”到该分组，并通过检查目的地址决定是否接收。局域网普遍采用广播式通信；此外，广域网中的无线和卫星通信网络也属于广播式网络。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;点对点网络&lt;/code&gt;。每条物理线路连接一对计算机。若两台主机之间无直接连接，则分组需通过中间节点进行存储转发，直至到达目的主机。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;3. 按拓扑结构分类&lt;/h4&gt;
+&lt;p&gt;网络拓扑结构是指网络中节点(如路由器、主机等)与通信线路之间的几何排列关系，主要描述通信子网的结构。常见的拓扑结构包括总线形、星形、环形和网状网络。其中，总线形、星形和环形多用于局域网，网状结构则多用于广域网。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;总线形网络&lt;/code&gt;。使用单根传输线连接所有计算机。优点是建网容易、增减节点方便、节省线路；缺点是重负载下通信效率低，并且总线任意一处故障都会影响全网。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;星形网络&lt;/code&gt;。各终端或计算机通过独立线路连接到中央设备(通常为交换机或路由器)。优点是便于集中控制与管理；缺点是成本较高，且中央设备对故障敏感。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;环形网络&lt;/code&gt;。所有计算机接口设备连接成一个闭合环路，信号沿路环单向传输。典型的例子是令牌环局域网。环可以是单环或双环，以提高可靠性。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;网状网络&lt;/code&gt;。一般情况下，每个节点至少有两条路径与其他节点相连，广泛应用于广域网。优点是可靠性高、容错能力强；缺点是控制复杂、线路成本高。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;上述四种基本拓扑结构可相互组合，构成更复杂的混合网络。&lt;/p&gt;
+&lt;h4&gt;4. 按使用者分类&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;公用网&lt;/code&gt;(Public Network)。由电信运营商出资建设，面向公众开放。任何愿意遵守规定并缴纳费用的用户均可接入使用。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;专用网&lt;/code&gt;(Private Network)。由特定单位为满足自身业务需求而建设，仅限内部使用，不对外提供服务。例如铁路、电力、军队等部门的专用网络。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;5. 按传输介质分类&lt;/h4&gt;
+&lt;p&gt;传输介质分为有线和无线两大类，相应地，网络可分为有线网络和无线网络。有线网络包括双绞线网络、同轴电缆网络、光纤网络等；无线网络包括蓝牙、Wi-Fi、微波、无线电等类型。&lt;/p&gt;
+&lt;h3&gt;1.1.6 计算机网络的性能指标&lt;/h3&gt;
+&lt;p&gt;性能指标从不同方面度量计算机网络的性能。常用的性能指标如下。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;速率&lt;/code&gt;(Speed)。连接到网络上的节点在数字信道上传送数据的速率，也称&lt;code&gt;数据传输速率&lt;/code&gt;、&lt;code&gt;数据率&lt;/code&gt;或&lt;code&gt;比特率&lt;/code&gt;，单位为 $\mathrm{bit/s}$（比特/秒）或 $\mathrm{b/s}$（有时也写作 $\mathrm{bps}$）。当数据率较高时，常用 $\mathrm{kb/s}$（$k = 10^{3}$）、$\mathrm{Mb/s}$（$M = 10^{6}$）或 $\mathrm{Gb/s}$（$G = 10^{9}$）表示。
+:::note
+在描述数据量时，K、M、G常用2的幂次表示，如 $1\mathrm{Kb}=2^{10}\mathrm{b}$；在描述速率时，k、M、G常用10的幂次表示，如 $1\mathrm{kb/s}=10^{3}\mathrm{b/s}$。通常，前者使用大写K，后者使用小写k，但其他前缀均为大写。
+:::&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;带宽&lt;/code&gt;(Bandwidth)。在通信领域，带宽是指通信线路允许通过的信号频率范围，单位是&lt;code&gt;赫兹&lt;/code&gt;(Hz)。但在计算机网络中，带宽表示网络通信线路所能传送数据的能力，指数字信道所能支持的&lt;strong&gt;最高数据传输速率&lt;/strong&gt;，单位为b/s(比特/秒)。注意，节点间的实际可用带宽由双方网卡的性能、各段链路的带宽以及交换设备速率中的最小值决定。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;吞吐量&lt;/code&gt;(Throughput)。指单位时间内通过某个网络(或信道、接口)的&lt;strong&gt;实际数据量&lt;/strong&gt;。吞吐量常用于对实际网络进行测量，以评估&lt;strong&gt;真实可达到的数据传输能力&lt;/strong&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;时延&lt;/code&gt;(Delay)。指数据(一个报文或分组)从网络(或链路)的一端传送到另一端所需的&lt;strong&gt;总时间&lt;/strong&gt;，它由四部分构成：发送时延、传播时延、处理时延和排队时延。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;发送时延&lt;/strong&gt;(也称&lt;strong&gt;传输时延&lt;/strong&gt;)。节点将分组的所有比特推入链路所需的时间，即从发送分组的第一个比特开始，到最后一个比特发送完毕为止的时间。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;$$
+\text{发送时延} = \text{分组长度} / \text{发送速率}
+$$&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;传播时延&lt;/strong&gt;。电磁波在信道(传输介质)中传播一定距离所需的时间，即一个比特从链路一端传播到另一端所需的时间。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;$$
+\text{传播时延} = \text{信道长度} / \text{电磁波在信道上的传播速率}
+$$&lt;/p&gt;
+&lt;p&gt;:::note
+区分传输时延和传播时延：前者取决于分组长度和发送速率，后者取决于链路距离和传输介质。
+:::&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;处理时延&lt;/strong&gt;。分组在交换节点为存储转发而进行必要处理所花费的时间。例如，解析分组的首部、进行差错检验或查找路由等。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;排队时延&lt;/strong&gt;。分组在路由器的输入队列或输出队列中等待处理或转发所花费的时间。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;因此，数据在网络中经历的&lt;strong&gt;总时延&lt;/strong&gt;为上述四部分之和：&lt;/p&gt;
+&lt;p&gt;$$
+\text{总时延} = \text{发送时延} + \text{传播时延} + \text{处理时延} + \text{排队时延}
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;时延带宽积&lt;/code&gt;。指发送端发送的第一个比特即将到达接收端时，发送端已发出的比特总数，即已发出但尚未到达接收端的最大比特数，也称&lt;code&gt;以比特为单位的链路长度&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;$$
+\text{时延带宽积} = \text{传播时延} \times \text{信道带宽}
+$$&lt;/p&gt;
+&lt;p&gt;可将链路想象为一条圆柱形管道：其长度表示传播时延，横截面积表示链路带宽，则时延带宽积表示&lt;strong&gt;该管道可容纳的比特数量&lt;/strong&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;往返时延&lt;/code&gt;(Round-Trip Time，RTT)。指从发送端发出一个短分组，到收到接收端返回的确认信号所经历的&lt;strong&gt;总时间&lt;/strong&gt;。往返时延包括：发送端与接收端之间的往返传播时延；接收端的处理时延；在互联网环境中，还包括各中间节点的处理时延和排队时延。注意，往返时延不包括数据分组本身的发送时延。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;信道利用率&lt;/code&gt;。指信道有数据通过的时间占总时间的百分比。&lt;/p&gt;
+&lt;p&gt;$$
+\text{信道利用率} = \text{有数据通过的时间} / (\text{有数据通过的时间} + \text{无数据通过的时间})
+$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;信道利用率并非越高越好&lt;/strong&gt;：过低会浪费网络资源；过高则会导致排队时延显著增加，引发网络拥塞。这就好比当公路上的车流量很大时，容易出现拥堵。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</content:encoded></item><item><title>1.简单句</title><link>https://www.atsuko.top/posts/english/grammar/1-simple-sentence/</link><guid isPermaLink="true">https://www.atsuko.top/posts/english/grammar/1-simple-sentence/</guid><pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;第一章 奋斗的开始——简单句&lt;/h1&gt;
 &lt;h2&gt;第一节 汉英句子比较&lt;/h2&gt;
 &lt;blockquote&gt;
 &lt;p&gt;英语句子必须具备主谓结构，主语是谓语动作的发出者，宾语是动作的承受者，主谓宾顺序相对固定。&lt;/p&gt;
@@ -3427,6 +3661,190 @@ $$&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;内核缓冲区&lt;/code&gt;则是操作系统在内核空间中维护的缓冲区。当用户进程请求读取磁盘数据时，系统并不会直接访问磁盘，而是先检查内核缓冲区中是否已缓存所需数据：若存在，则将数据从内核缓冲区复制到用户缓冲区；若不存在，内核会发起磁盘I/O请求，并将当前进程挂起，转而调度其他进程执行。磁盘数据被读入内核缓冲区后，系统再将数据复制到用户缓冲区，并唤醒该进程。对于写操作，用户进程提交的数据通常不会立即写入磁盘，而是先写入内核缓冲区；当缓冲区中的数据积累到一定量，或满足特定刷新条件时，内核才会将数据批量写入磁盘。可见，内核缓冲区的核心目的是提升磁盘I/O的整体效率，尤其对写操作具有突出的优化效果。&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
+</content:encoded></item><item><title>3.4.3C++对象模型和this指针</title><link>https://www.atsuko.top/posts/dark-horse/c++/core/343-c-object-model-and-this-pointer/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/core/343-c-object-model-and-this-pointer/</guid><pubDate>Sat, 30 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;4.3 C++对象模型和this指针&lt;/h3&gt;
+&lt;h4&gt;4.3.1 成员变量和成员函数分开存储&lt;/h4&gt;
+&lt;p&gt;在C++中，类内的成员变量和成员函数分开存储&lt;/p&gt;
+&lt;p&gt;只有非静态成员变量才属于类的对象上&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Person1 {
+public:
+	Person1() {
+		mA = 0;
+	}
+	//非静态成员变量占对象空间
+	int mA;
+	//静态成员变量不占对象空间
+	static int mB;
+	//函数也不占对象空间，所有函数共享一个函数实例
+	void func() {
+		std::cout &amp;lt;&amp;lt; &quot;mA:&quot; &amp;lt;&amp;lt; this-&amp;gt;mA &amp;lt;&amp;lt; std::endl;
+	}
+	//静态成员函数也不占对象空间
+	static void sfunc() {
+	}
+};
+
+int main() {
+
+	std::cout &amp;lt;&amp;lt; sizeof(Person1) &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.3.2 this指针概念&lt;/h4&gt;
+&lt;p&gt;通过4.3.1我们知道在C++中成员变量和成员函数是分开存储的&lt;/p&gt;
+&lt;p&gt;每一个非静态成员函数只会诞生一份函数实例，也就是说多个同类型的对象会共用一块代码&lt;/p&gt;
+&lt;p&gt;那么问题是：这一块代码是如何区分那个对象调用自己的呢？&lt;/p&gt;
+&lt;p&gt;c++通过提供特殊的对象指针，this指针，解决上述问题。&lt;strong&gt;this指针指向被调用的成员函数所属的对象&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;this指针是隐含每一个非静态成员函数内的一种指针&lt;/p&gt;
+&lt;p&gt;this指针不需要定义，直接使用即可&lt;/p&gt;
+&lt;p&gt;this指针的用途：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;当形参和成员变量同名时，可用this指针来区分&lt;/li&gt;
+&lt;li&gt;在类的非静态成员函数中返回对象本身，可使用return *this&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Person2
+{
+public:
+
+	Person2(int age)
+	{
+		//1、当形参和成员变量同名时，可用this指针来区分
+		this-&amp;gt;age = age;
+	}
+
+	Person2&amp;amp; Person2AddPerson2(Person2 p)
+	{
+		this-&amp;gt;age += p.age;
+		//返回对象本身
+		return *this;
+	}
+
+	int age;
+};
+
+void test21()
+{
+	Person2 p1(10);
+	std::cout &amp;lt;&amp;lt; &quot;p1.age = &quot; &amp;lt;&amp;lt; p1.age &amp;lt;&amp;lt; std::endl;
+
+	Person2 p2(10);
+	p2.Person2AddPerson2(p1).Person2AddPerson2(p1).Person2AddPerson2(p1);
+	std::cout &amp;lt;&amp;lt; &quot;p2.age = &quot; &amp;lt;&amp;lt; p2.age &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+	test21();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.3.3 空指针访问成员函数&lt;/h4&gt;
+&lt;p&gt;C++中空指针也是可以调用成员函数的，但是也要注意有没有用到this指针&lt;/p&gt;
+&lt;p&gt;如果用到this指针，需要加以判断保证代码的健壮性&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//空指针访问成员函数
+class Person3 {
+public:
+
+	void ShowClassName() {
+		std::cout &amp;lt;&amp;lt; &quot;我是Person3类!&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	void ShowPerson3() {
+		if (this == NULL) {
+			return;
+		}
+		std::cout &amp;lt;&amp;lt; mAge &amp;lt;&amp;lt; std::endl;
+	}
+
+public:
+	int mAge;
+};
+
+void test31()
+{
+	Person3* p = NULL;
+	p-&amp;gt;ShowClassName(); //空指针，可以调用成员函数
+	p-&amp;gt;ShowPerson3();  //但是如果成员函数中用到了this指针，就不可以了
+}
+
+int main() {
+
+	test31();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.3.4 const修饰成员函数&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;常函数&lt;/strong&gt; :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;成员函数后加const后我们称为这个函数为&lt;strong&gt;常函数&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;常函数内不可以修改成员属性&lt;/li&gt;
+&lt;li&gt;成员属性声明时加关键字mutable后，在常函数中依然可以修改&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;常对象&lt;/strong&gt; :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;声明对象前加const称该对象为常对象&lt;/li&gt;
+&lt;li&gt;常对象只能调用常函数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Person4 {
+public:
+	Person4() {
+		m_A = 0;
+		m_B = 0;
+	}
+
+	//this指针的本质是一个指针常量，指针的指向不可修改
+	//如果想让指针指向的值也不可以修改，需要声明常函数
+	void ShowPerson4() const {
+		//const Type* const pointer;
+		//this = NULL; //不能修改指针的指向 Person4* const this;
+		//this-&amp;gt;mA = 100; //但是this指针指向的对象的数据是可以修改的
+
+		//const修饰成员函数，表示指针指向的内存空间的数据不能修改，除了mutable修饰的变量
+		this-&amp;gt;m_B = 100;
+	}
+
+	void MyFunc() const {
+		//mA = 10000;
+	}
+
+public:
+	int m_A;
+	mutable int m_B; //可修改 可变的
+};
+
+
+//const修饰对象  常对象
+void test41() {
+
+	const Person4 Person4; //常量对象  
+	std::cout &amp;lt;&amp;lt; Person4.m_A &amp;lt;&amp;lt; std::endl;
+	//Person4.mA = 100; //常对象不能修改成员变量的值,但是可以访问
+	Person4.m_B = 100; //但是常对象可以修改mutable修饰成员变量
+
+	//常对象访问成员函数
+	Person4.MyFunc(); //常对象不能调用const的函数
+
+}
+
+int main() {
+
+	test41();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
 </content:encoded></item><item><title>3.2虚拟内存管理1</title><link>https://www.atsuko.top/posts/408/operating-system/32-virtual-memory-management-1/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/operating-system/32-virtual-memory-management-1/</guid><pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;3.2.1 虚拟内存的基本概念&lt;/h3&gt;
 &lt;h4&gt;1. 传统存储管理方式的特征&lt;/h4&gt;
 &lt;p&gt;3.1节讨论的各种内存管理策略，都是为了将多个进程同时保留在内存中，以支持多道程序设计。它们具有以下两个共同特征。&lt;/p&gt;
@@ -5162,7 +5580,7 @@ int main() {
 &lt;li&gt;&lt;strong&gt;寻址过程&lt;/strong&gt;。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;搞清这三点，便掌握了各类存储管理方式的核心机制。再次提醒注意区分逻辑地址结构与表项结构。&lt;/p&gt;
-</content:encoded></item><item><title>封装</title><link>https://www.atsuko.top/posts/dark-horse/c++/core/341-packaging/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/core/341-packaging/</guid><pubDate>Tue, 26 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;&lt;strong&gt;4&lt;/strong&gt; 类和对象&lt;/h2&gt;
+</content:encoded></item><item><title>3.4.1封装</title><link>https://www.atsuko.top/posts/dark-horse/c++/core/341-packaging/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/core/341-packaging/</guid><pubDate>Tue, 26 May 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;&lt;strong&gt;4&lt;/strong&gt; 类和对象&lt;/h2&gt;
 &lt;p&gt;C++面向对象的三大特性为：&lt;code&gt;封装、继承、多态&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;C++认为&lt;code&gt;万事万物都皆为对象&lt;/code&gt;，对象上有其属性和行为&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;例如&lt;/strong&gt; :&lt;/p&gt;
