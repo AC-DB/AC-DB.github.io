@@ -1,4 +1,587 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>1.1计算机网络概述</title><link>https://www.atsuko.top/posts/408/computer-network/11-overview-of-computer-networks/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/computer-network/11-overview-of-computer-networks/</guid><pubDate>Sat, 06 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;1.1 计算机网络概述&lt;/h1&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AC_DB</title><description>摆烂ing~</description><link>https://www.atsuko.top/</link><language>zh_CN</language><item><title>3.4.4友元</title><link>https://www.atsuko.top/posts/dark-horse/c++/core/344-youyuan/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/core/344-youyuan/</guid><pubDate>Sun, 07 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;4.4 友元&lt;/h3&gt;
+&lt;p&gt;生活中你的家有客厅(Public)，有你的卧室(Private)&lt;/p&gt;
+&lt;p&gt;客厅所有来的客人都可以进去，但是你的卧室是私有的，也就是说只有你能进去&lt;/p&gt;
+&lt;p&gt;但是呢，你也可以允许你的好闺蜜好基友进去。&lt;/p&gt;
+&lt;p&gt;在程序里，有些私有属性 也想让类外特殊的一些函数或者类进行访问，就需要用到友元的技术&lt;/p&gt;
+&lt;p&gt;友元的目的就是让一个函数或者类 访问另一个类中私有成员&lt;/p&gt;
+&lt;p&gt;友元的关键字为  &lt;code&gt;friend&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;友元的三种实现&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;全局函数做友元&lt;/li&gt;
+&lt;li&gt;类做友元&lt;/li&gt;
+&lt;li&gt;成员函数做友元&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;4.4.1 全局函数做友元&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+class Building1
+{
+	//告诉编译器 goodGay全局函数 是 Building1类的好朋友，可以访问类中的私有内容
+	friend void goodGay(Building1 * Building1);
+
+public:
+
+	Building1()
+	{
+		this-&amp;gt;m_SittingRoom = &quot;客厅&quot;;
+		this-&amp;gt;m_BedRoom = &quot;卧室&quot;;
+	}
+
+public:
+	std::string m_SittingRoom; //客厅
+
+private:
+	std::string m_BedRoom; //卧室
+};
+
+
+void goodGay(Building1 * building1)
+{
+	std::cout &amp;lt;&amp;lt; &quot;好基友正在访问： &quot; &amp;lt;&amp;lt; building1-&amp;gt;m_SittingRoom &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;好基友正在访问： &quot; &amp;lt;&amp;lt; building1-&amp;gt;m_BedRoom &amp;lt;&amp;lt; std::endl;
+}
+
+void test1()
+{
+	Building1 b;
+	goodGay(&amp;amp;b);
+}
+
+int main() {
+
+	test1();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.4.2 类做友元&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+class Building2;
+class goodGay2
+{
+public:
+
+	goodGay2();
+	void visit();
+
+private:
+	Building2* building;
+};
+
+class Building2
+{
+	//告诉编译器 goodGay2类是Building2类的好朋友，可以访问到Building2类中私有内容
+	friend class goodGay2;
+
+public:
+	Building2();
+
+public:
+	std::string m_SittingRoom; //客厅
+private:
+	std::string m_BedRoom;//卧室
+};
+
+Building2::Building2()
+{
+	this-&amp;gt;m_SittingRoom = &quot;客厅&quot;;
+	this-&amp;gt;m_BedRoom = &quot;卧室&quot;;
+}
+
+goodGay2::goodGay2()
+{
+	building = new Building2;
+}
+
+void goodGay2::visit()
+{
+	std::cout &amp;lt;&amp;lt; &quot;好基友正在访问&quot; &amp;lt;&amp;lt; building-&amp;gt;m_SittingRoom &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;好基友正在访问&quot; &amp;lt;&amp;lt; building-&amp;gt;m_BedRoom &amp;lt;&amp;lt; std::endl;
+}
+
+void test2()
+{
+	goodGay2 gg;
+	gg.visit();
+}
+
+int main() {
+
+	test2();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.4.3 成员函数做友元&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+class Building3;
+class goodGay3
+{
+public:
+
+	goodGay3();
+	void visit(); //只让visit函数作为Building3的好朋友，可以发访问Building3中私有内容
+	void visit2();
+
+private:
+	Building3* building;
+};
+
+class Building3
+{
+	//告诉编译器  goodGay3类中的visit成员函数 是Building3好朋友，可以访问私有内容
+	friend void goodGay3::visit();
+
+public:
+	Building3();
+
+public:
+	std::string m_SittingRoom; //客厅
+private:
+	std::string m_BedRoom;//卧室
+};
+
+Building3::Building3()
+{
+	this-&amp;gt;m_SittingRoom = &quot;客厅&quot;;
+	this-&amp;gt;m_BedRoom = &quot;卧室&quot;;
+}
+
+goodGay3::goodGay3()
+{
+	building = new Building3;
+}
+
+void goodGay3::visit()
+{
+	std::cout &amp;lt;&amp;lt; &quot;好基友正在访问&quot; &amp;lt;&amp;lt; building-&amp;gt;m_SittingRoom &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; &quot;好基友正在访问&quot; &amp;lt;&amp;lt; building-&amp;gt;m_BedRoom &amp;lt;&amp;lt; std::endl;
+}
+
+void goodGay3::visit2()
+{
+	std::cout &amp;lt;&amp;lt; &quot;好基友正在访问&quot; &amp;lt;&amp;lt; building-&amp;gt;m_SittingRoom &amp;lt;&amp;lt; std::endl;
+	//std::cout &amp;lt;&amp;lt; &quot;好基友正在访问&quot; &amp;lt;&amp;lt; building-&amp;gt;m_BedRoom &amp;lt;&amp;lt; std::endl;
+}
+
+void test3()
+{
+	goodGay3  gg;
+	gg.visit();
+}
+
+int main() {
+
+	test3();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>3.4.5运算符重载</title><link>https://www.atsuko.top/posts/dark-horse/c++/core/345-operator-overloading/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/core/345-operator-overloading/</guid><pubDate>Sun, 07 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;4.5 运算符重载&lt;/h3&gt;
+&lt;p&gt;运算符重载概念：对已有的运算符重新进行定义，赋予其另一种功能，以适应不同的数据类型&lt;/p&gt;
+&lt;h4&gt;4.5.1 加号运算符重载&lt;/h4&gt;
+&lt;p&gt;作用：实现两个自定义数据类型相加的运算&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Person1 {
+public:
+	Person1() {};
+	Person1(int a, int b)
+	{
+		this-&amp;gt;m_A = a;
+		this-&amp;gt;m_B = b;
+	}
+	//成员函数实现 + 号运算符重载
+	Person1 operator+(const Person1&amp;amp; p) {
+		Person1 temp;
+		temp.m_A = this-&amp;gt;m_A + p.m_A;
+		temp.m_B = this-&amp;gt;m_B + p.m_B;
+		return temp;
+	}
+
+public:
+	int m_A;
+	int m_B;
+};
+
+//全局函数实现 + 号运算符重载
+//Person1 operator+(const Person1&amp;amp; p1, const Person1&amp;amp; p2) {
+//	Person1 temp(0, 0);
+//	temp.m_A = p1.m_A + p2.m_A;
+//	temp.m_B = p1.m_B + p2.m_B;
+//	return temp;
+//}
+
+//运算符重载 可以发生函数重载 
+Person1 operator+(const Person1&amp;amp; p2, int val)
+{
+	Person1 temp;
+	temp.m_A = p2.m_A + val;
+	temp.m_B = p2.m_B + val;
+	return temp;
+}
+
+void test1() {
+
+	Person1 p1(10, 10);
+	Person1 p2(20, 20);
+
+	//成员函数方式
+	Person1 p3 = p2 + p1;  //相当于 p2.operaor+(p1)
+	std::cout &amp;lt;&amp;lt; &quot;mA:&quot; &amp;lt;&amp;lt; p3.m_A &amp;lt;&amp;lt; &quot; mB:&quot; &amp;lt;&amp;lt; p3.m_B &amp;lt;&amp;lt; std::endl;
+
+
+	Person1 p4 = p3 + 10; //相当于 operator+(p3,10)
+	std::cout &amp;lt;&amp;lt; &quot;mA:&quot; &amp;lt;&amp;lt; p4.m_A &amp;lt;&amp;lt; &quot; mB:&quot; &amp;lt;&amp;lt; p4.m_B &amp;lt;&amp;lt; std::endl;
+
+}
+
+int main() {
+
+	test1();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结1：对于内置的数据类型的表达式的的运算符是不可能改变的&lt;/p&gt;
+&lt;p&gt;总结2：不要滥用运算符重载&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;4.5.2 左移运算符重载&lt;/h4&gt;
+&lt;p&gt;作用：可以输出自定义数据类型&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Person2 {
+	friend std::ostream&amp;amp; operator&amp;lt;&amp;lt;(std::ostream&amp;amp; out, Person2&amp;amp; p);
+
+public:
+
+	Person2(int a, int b)
+	{
+		this-&amp;gt;m_A = a;
+		this-&amp;gt;m_B = b;
+	}
+
+	//成员函数 实现不了  p &amp;lt;&amp;lt; std::cout 不是我们想要的效果
+	//void operator&amp;lt;&amp;lt;(Person&amp;amp; p){
+	//}
+
+private:
+	int m_A;
+	int m_B;
+};
+
+//全局函数实现左移重载
+//ostream对象只能有一个
+std::ostream&amp;amp; operator&amp;lt;&amp;lt;(std::ostream&amp;amp; out, Person2&amp;amp; p) {
+	out &amp;lt;&amp;lt; &quot;a:&quot; &amp;lt;&amp;lt; p.m_A &amp;lt;&amp;lt; &quot; b:&quot; &amp;lt;&amp;lt; p.m_B;
+	return out;
+}
+
+void test2() {
+
+	Person2 p1(10, 20);
+
+	std::cout &amp;lt;&amp;lt; p1 &amp;lt;&amp;lt; &quot;hello world&quot; &amp;lt;&amp;lt; std::endl; //链式编程
+}
+
+int main() {
+
+	test2();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：重载左移运算符配合友元可以实现输出自定义数据类型&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;4.5.3 递增运算符重载&lt;/h4&gt;
+&lt;p&gt;作用： 通过重载递增运算符，实现自己的整型数据&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class MyInteger3 {
+
+	friend std::ostream&amp;amp; operator&amp;lt;&amp;lt;(std::ostream&amp;amp; out, MyInteger3 myint);
+
+public:
+	MyInteger3() {
+		m_Num = 0;
+	}
+	//前置++
+	MyInteger3&amp;amp; operator++() {
+		//先++
+		m_Num++;
+		//再返回
+		return *this;
+	}
+
+	//后置++
+	MyInteger3 operator++(int) {
+		//先返回
+		MyInteger3 temp = *this; //记录当前本身的值，然后让本身的值加1，但是返回的是以前的值，达到先返回后++；
+		m_Num++;
+		return temp;
+	}
+
+private:
+	int m_Num;
+};
+
+std::ostream&amp;amp; operator&amp;lt;&amp;lt;(std::ostream&amp;amp; out, MyInteger3 myint) {
+	out &amp;lt;&amp;lt; myint.m_Num;
+	return out;
+}
+
+//前置++ 先++ 再返回
+void test31() {
+	MyInteger3 myInt;
+	std::cout &amp;lt;&amp;lt; ++myInt &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; myInt &amp;lt;&amp;lt; std::endl;
+}
+
+//后置++ 先返回 再++
+void test32() {
+
+	MyInteger3 myInt;
+	std::cout &amp;lt;&amp;lt; myInt++ &amp;lt;&amp;lt; std::endl;
+	std::cout &amp;lt;&amp;lt; myInt &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+	test31();
+	//test32();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结： 前置递增返回引用，后置递增返回值&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;4.5.4 赋值运算符重载&lt;/h4&gt;
+&lt;p&gt;c++编译器至少给一个类添加4个函数&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;默认构造函数(无参，函数体为空)&lt;/li&gt;
+&lt;li&gt;默认析构函数(无参，函数体为空)&lt;/li&gt;
+&lt;li&gt;默认拷贝构造函数，对属性进行值拷贝&lt;/li&gt;
+&lt;li&gt;赋值运算符 operator=, 对属性进行值拷贝&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;如果类中有属性指向堆区，做赋值操作时也会出现深浅拷贝问题&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Person4
+{
+public:
+
+	Person4(int age)
+	{
+		//将年龄数据开辟到堆区
+		m_Age = new int(age);
+	}
+
+	//重载赋值运算符 
+	Person4&amp;amp; operator=(Person4 &amp;amp;p)
+	{
+		if (m_Age != NULL)
+		{
+			delete m_Age;
+			m_Age = NULL;
+		}
+		//编译器提供的代码是浅拷贝
+		//m_Age = p.m_Age;
+
+		//提供深拷贝 解决浅拷贝的问题
+		m_Age = new int(*p.m_Age);
+
+		//返回自身
+		return *this;
+	}
+
+	~Person4()
+	{
+		if (m_Age != NULL)
+		{
+			delete m_Age;
+			m_Age = NULL;
+		}
+	}
+
+	//年龄的指针
+	int *m_Age;
+
+};
+
+void test41()
+{
+	Person4 p1(18);
+
+	Person4 p2(20);
+
+	Person4 p3(30);
+
+	p3 = p2 = p1; //赋值操作
+
+	std::cout &amp;lt;&amp;lt; &quot;p1的年龄为：&quot; &amp;lt;&amp;lt; *p1.m_Age &amp;lt;&amp;lt; std::endl;
+
+	std::cout &amp;lt;&amp;lt; &quot;p2的年龄为：&quot; &amp;lt;&amp;lt; *p2.m_Age &amp;lt;&amp;lt; std::endl;
+
+	std::cout &amp;lt;&amp;lt; &quot;p3的年龄为：&quot; &amp;lt;&amp;lt; *p3.m_Age &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+	test41();
+
+	//int a = 10;
+	//int b = 20;
+	//int c = 30;
+
+	//c = b = a;
+	//std::cout &amp;lt;&amp;lt; &quot;a = &quot; &amp;lt;&amp;lt; a &amp;lt;&amp;lt; std::endl;
+	//std::cout &amp;lt;&amp;lt; &quot;b = &quot; &amp;lt;&amp;lt; b &amp;lt;&amp;lt; std::endl;
+	//std::cout &amp;lt;&amp;lt; &quot;c = &quot; &amp;lt;&amp;lt; c &amp;lt;&amp;lt; std::endl;
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.5.5 关系运算符重载&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;作用&lt;/strong&gt; ：重载关系运算符，可以让两个自定义类型对象进行对比操作&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+class Person5
+{
+public:
+	Person5(std::string name, int age)
+	{
+		this-&amp;gt;m_Name = name;
+		this-&amp;gt;m_Age = age;
+	};
+
+	bool operator==(Person5&amp;amp; p)
+	{
+		if (this-&amp;gt;m_Name == p.m_Name &amp;amp;&amp;amp; this-&amp;gt;m_Age == p.m_Age)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	bool operator!=(Person5&amp;amp; p)
+	{
+		if (this-&amp;gt;m_Name == p.m_Name &amp;amp;&amp;amp; this-&amp;gt;m_Age == p.m_Age)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	std::string m_Name;
+	int m_Age;
+};
+
+void test51()
+{
+	//int a = 0;
+	//int b = 0;
+
+	Person5 a(&quot;孙悟空&quot;, 18);
+	Person5 b(&quot;孙悟空&quot;, 18);
+
+	if (a == b)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;a和b相等&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	else
+	{
+		std::cout &amp;lt;&amp;lt; &quot;a和b不相等&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	if (a != b)
+	{
+		std::cout &amp;lt;&amp;lt; &quot;a和b不相等&quot; &amp;lt;&amp;lt; std::endl;
+	}
+	else
+	{
+		std::cout &amp;lt;&amp;lt; &quot;a和b相等&quot; &amp;lt;&amp;lt; std::endl;
+	}
+}
+
+int main() {
+
+	test51();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.5.6 函数调用运算符重载&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;函数调用运算符 ()  也可以重载&lt;/li&gt;
+&lt;li&gt;由于重载后使用的方式非常像函数的调用，因此称为仿函数&lt;/li&gt;
+&lt;li&gt;仿函数没有固定写法，非常灵活&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+class MyPrint
+{
+public:
+	void operator()(std::string text)
+	{
+		std::cout &amp;lt;&amp;lt; text &amp;lt;&amp;lt; std::endl;
+	}
+
+};
+void test61()
+{
+	//重载的（）操作符 也称为仿函数
+	MyPrint myFunc;
+	myFunc(&quot;hello world&quot;);
+}
+
+
+class MyAdd6
+{
+public:
+	int operator()(int v1, int v2)
+	{
+		return v1 + v2;
+	}
+};
+
+void test62()
+{
+	MyAdd6 add;
+	int ret = add(10, 10);
+	std::cout &amp;lt;&amp;lt; &quot;ret = &quot; &amp;lt;&amp;lt; ret &amp;lt;&amp;lt; std::endl;
+
+	//匿名对象调用  
+	std::cout &amp;lt;&amp;lt; &quot;MyAdd6()(100,100) = &quot; &amp;lt;&amp;lt; MyAdd6()(100, 100) &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+	test61();
+	test62();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>1.1计算机网络概述</title><link>https://www.atsuko.top/posts/408/computer-network/11-overview-of-computer-networks/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/computer-network/11-overview-of-computer-networks/</guid><pubDate>Sat, 06 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;1.1 计算机网络概述&lt;/h1&gt;
 &lt;h3&gt;1.1.1 计算机网络的概念&lt;/h3&gt;
 &lt;p&gt;一般认为，计算机网络是将众多分散的、自治的计算机系统，通过通信设备与线路连接起来，并由功能完善的软件实现资源共享和信息传递的系统。&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;计算机网络&lt;/code&gt;(简称&lt;code&gt;网络&lt;/code&gt;)由若干&lt;code&gt;节点&lt;/code&gt;(Node，或译为&lt;code&gt;结点&lt;/code&gt;)和连接这些节点的&lt;code&gt;链路&lt;/code&gt;(Link)组成。网络中的节点可以是计算机、集线器、交换机或路由器等。多个网络还可通过路由器互连，构成覆盖范围更广的计算机网络，这种网络称为&lt;code&gt;互连网&lt;/code&gt;(internet)。由此可理解为：&lt;strong&gt;网络将多台计算机连接在一起，而互连网则将多个网络通过路由器连接在一起&lt;/strong&gt;。&lt;/p&gt;
@@ -230,6 +813,192 @@ $$&lt;/p&gt;
 \text{信道利用率} = \text{有数据通过的时间} / (\text{有数据通过的时间} + \text{无数据通过的时间})
 $$&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;信道利用率并非越高越好&lt;/strong&gt;：过低会浪费网络资源；过高则会导致排队时延显著增加，引发网络拥塞。这就好比当公路上的车流量很大时，容易出现拥堵。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</content:encoded></item><item><title>1.2计算机网络体系结构与参考模型</title><link>https://www.atsuko.top/posts/408/computer-network/12-computer-network-architecture-and-reference-model/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/computer-network/12-computer-network-architecture-and-reference-model/</guid><pubDate>Sat, 06 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;1.2 计算机网络体系结构与参考模型&lt;/h1&gt;
+&lt;h3&gt;1.2.1 计算机网络分层结构&lt;/h3&gt;
+&lt;p&gt;计算机网络是一个非常复杂的系统，因此在早期就采用了分层的设计思想。分层可将庞大而复杂的问题转换为若干较小的局部问题，而这些局部问题更易于研究和处理。&lt;/p&gt;
+&lt;p&gt;计算机网络的各层及其协议的集合称为网络的&lt;code&gt;体系结构&lt;/code&gt;(Architecture)。换言之，计算机网络的体系结构是对该网络及其所应完成功能的精确定义。需要强调的是，这些功能究竟由何种硬件或软件实现，属于&lt;code&gt;实现&lt;/code&gt;(Implementation)问题。&lt;strong&gt;体系结构是抽象的，而实现是具体的&lt;/strong&gt;，体现在实际运行的计算机硬件和软件中。计算机网络体系结构通常具有可分层的特性，能将复杂的大系统分解为若干较易实现的层次。&lt;/p&gt;
+&lt;p&gt;分层的&lt;strong&gt;基本原则&lt;/strong&gt;如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;每层实现一种相对独立的功能，以降低整个系统的复杂度。&lt;/li&gt;
+&lt;li&gt;各层之间的接口清晰、简洁，相互依赖尽可能少，便于理解与维护。&lt;/li&gt;
+&lt;li&gt;各层功能的定义独立于具体实现方法，可采用最合适的技术来实现。&lt;/li&gt;
+&lt;li&gt;保持下层对上层的独立性，上层单向使用下层提供的服务。&lt;/li&gt;
+&lt;li&gt;整个分层结构应有利于标准化工作。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在网络分层结构中，第n层的活动元素通常称为&lt;code&gt;第n层实体&lt;/code&gt;。具体而言，&lt;code&gt;实体&lt;/code&gt;指任何可发送或接收信息的硬件或软件进程，通常是某个特定的软件模块。不同机器上的同一层称为&lt;code&gt;对等层&lt;/code&gt;，同一层的实体互为&lt;code&gt;对等实体&lt;/code&gt;。第n层向第n+1层提供的服务，实际上是其自身及以下所有层&lt;strong&gt;所提供服务的总和&lt;/strong&gt;。第n层的实体称为&lt;code&gt;服务提供者&lt;/code&gt;，第n+1层的实体称为&lt;code&gt;服务用户&lt;/code&gt;。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;协议数据单元&lt;/code&gt;(PDU)：对等层之间传送的数据单位。第n层的PDU记为n-PDU。各层的PDU均由服务数据单元和协议控制信息两部分组成。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;服务数据单元&lt;/code&gt;(SDU)：相邻层之间交换的数据单位。第n层的SDU记为n-SDU。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;协议控制信息&lt;/code&gt;(PCI)：用于控制协议操作的信息。第n层的PCI记为n-PCI。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;每层的 PDU 都有其通俗的名称：物理层的 PDU 称为&lt;code&gt;比特流&lt;/code&gt;，数据链路层的 PDU 称为&lt;code&gt;帧&lt;/code&gt;，网络层的 PDU 称为 &lt;code&gt;IP 分组&lt;/code&gt;，传输层的 PDU 称为 &lt;code&gt;TCP 报文段&lt;/code&gt;或 &lt;code&gt;UDP 数据报&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;当数据在各层之间传递时，将从第 $n+1$ 层接收到的PDU作为第n层的SDU，加上第n层的PCI后封装成第n层的PDU，再交由第n-1层作为其SDU发送。接收方收到后做相反的处理。&lt;/p&gt;
+&lt;p&gt;因此，三者的关系可表示为  $n\text{-SDU} + n\text{-PCI} = n\text{-PDU} = (n-1)\text{-SDU}$。&lt;/p&gt;
+&lt;p&gt;具体而言，&lt;strong&gt;分层结构的含义&lt;/strong&gt;包括以下几个方面：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;第 n 层的实体不仅要利用第 n-1 层的服务来实现自身功能，还向第 $n+1$ 层提供本层的服务，该服务是第 n 层及其下面各层所提供服务的总和。&lt;/li&gt;
+&lt;li&gt;最低层只提供服务，是整个层次结构的基础；最高层面向用户提供服务。&lt;/li&gt;
+&lt;li&gt;上层只能通过相邻层的接口使用下层的服务，不能跨层调用。&lt;/li&gt;
+&lt;li&gt;通信时，对等层在逻辑上如同存在一条直接信道，表现为能够直接交换信息。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;1.2.2 计算机网络协议、服务、接口的概念&lt;/h3&gt;
+&lt;h4&gt;1. 协议&lt;/h4&gt;
+&lt;p&gt;要有条不紊地在网络中实现数据交换，就必须遵循一些事先约定好的规则，这些规则规定了所交换数据的格式以及相关的同步问题。为在网络中进行数据交换而建立的这些规则、标准或约定称为&lt;code&gt;网络协议&lt;/code&gt;(Network Protocol)。协议是&lt;strong&gt;控制对等实体之间通信的规则集合&lt;/strong&gt;，是水平的。&lt;strong&gt;不对等实体之间不存在协议&lt;/strong&gt;，例如，在使用 TCP/IP 协议栈通信的两个节点 A 和 B，节点 A 的传输层与节点 B 的传输层之间存在协议，但节点 A 的传输层与节点 B 的网络层之间则没有协议。&lt;/p&gt;
+&lt;p&gt;协议由语法、语义和同步三部分组成。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;语法&lt;/code&gt;。规定数据与控制信息的格式。例如，TCP 报文段的结构由其语法定义。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;语义&lt;/code&gt;。规定需要发出何种控制信息、完成何种动作以及做出何种应答。例如，TCP 连接建立过程中每次握手所执行的操作由其语义定义。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;同步&lt;/code&gt;(或&lt;code&gt;时序&lt;/code&gt;)。规定执行各种操作的条件及事件发生的先后顺序。例如，TCP 连接建立过程中三次握手的时序关系由其同步机制定义。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;2. 接口&lt;/h4&gt;
+&lt;p&gt;同一节点内相邻两层实体交换信息的逻辑接口称为&lt;code&gt;服务访问点&lt;/code&gt;(Service Access Point，SAP)。每层只能与紧邻的上下层定义接口，&lt;strong&gt;不允许跨层定义接口&lt;/strong&gt;。服务是通过 SAP 提供给上层的，第 n 层的 SAP 即为第 $n+1$ 层访问第 n 层服务的入口。&lt;/p&gt;
+&lt;h4&gt;3. 服务&lt;/h4&gt;
+&lt;p&gt;服务是指下层为紧邻的上层提供的功能调用，是垂直的。对等实体在协议的控制下协同工作，使得本层能够向上层提供服务；但要实现本层协议，又必须依赖下层所提供的服务。&lt;/p&gt;
+&lt;p&gt;需注意，&lt;strong&gt;协议与服务在概念上有本质区别&lt;/strong&gt;。首先，只有本层协议的正确实现，才能保证向上一层提供服务。上层的服务用户只能感知到服务本身，而无法看到底层协议的细节，即&lt;strong&gt;下层协议对上层是透明的&lt;/strong&gt;。其次，协议是&lt;strong&gt;水平的&lt;/strong&gt;，用于规范对等实体之间的通信；服务是&lt;strong&gt;垂直的&lt;/strong&gt;，由下层通过层间接口向上层提供。此外，并非某一层完成的全部功能都能称为服务，只有那些能被上层实体感知并调用的功能，才构成&lt;code&gt;服务&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;计算机网络提供的服务可按以下三种方式分类。&lt;/p&gt;
+&lt;h5&gt;(1) 面向连接服务与无连接服务&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;面向连接服务&lt;/code&gt;要求通信双方在传输前先建立连接并分配资源(如缓冲区)，传输结束后，释放连接与资源，全过程包括连接建立、数据传输和连接释放三个阶段，以保障通信可靠性。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;无连接服务&lt;/code&gt;无须预先建立连接，发送方可直接发送包含目的地址的分组，由网络动态选择路径，各分组独立传输。该服务通常称为“尽最大努力交付”，属于不可靠服务。&lt;/p&gt;
+&lt;h5&gt;(2) 可靠服务和不可靠服务&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;可靠服务&lt;/code&gt;是指网络具备检错、纠错和应答机制，能确保数据正确、完整、有序地送达目的地。&lt;code&gt;不可靠服务&lt;/code&gt;是指网络仅提供“尽最大努力交付”，不保证可靠性。&lt;/p&gt;
+&lt;p&gt;对于提供不可靠服务的网络，数据的可靠性需由高层保障。例如，接收方校验数据完整性，出错时通知发送方重传，从而通过高层机制将不可靠服务转化为可靠服务。&lt;/p&gt;
+&lt;h5&gt;(3) 有应答服务和无应答服务&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;有应答服务&lt;/code&gt;是指接收方在收到数据后，由传输系统自动向发送方返回应答(肯定或否定)。例如，文件传输通常采用有应答服务，以确保数据完整。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;无应答服务&lt;/code&gt;是指接收方不自动返回应答；若需确认，须由高层协议或应用实现。例如，在WWW服务中，客户端收到网页后通常不向服务器发送应答。&lt;/p&gt;
+&lt;h3&gt;1.2.3 OSI 参考模型和 TCP/IP 模型&lt;/h3&gt;
+&lt;h4&gt;1. OSI 参考模型&lt;/h4&gt;
+&lt;p&gt;国际标准化组织(ISO)提出的网络体系结构模型称为&lt;code&gt;开放系统互连参考模型&lt;/code&gt;(OSI/RM)，简称&lt;code&gt;OSI参考模型&lt;/code&gt;。该模型包含7层，自下而上(第1～7层)依次为：物理层、数据链路层、网络层、传输层、会话层、表示层、应用层。&lt;/p&gt;
+&lt;p&gt;:::tip
+物联网叔会使用
+:::&lt;/p&gt;
+&lt;p&gt;下面详述各层功能。&lt;/p&gt;
+&lt;h5&gt;1. 物理层 (Physical Layer)&lt;/h5&gt;
+&lt;p&gt;物理层的传输单位是&lt;code&gt;比特&lt;/code&gt;。其功能是在物理介质上为数据端设备&lt;strong&gt;透明地传输原始比特流&lt;/strong&gt;。物理层主要研究以下内容：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;通信链路与节点的连接需通过电路接口，物理层规定了接口的机械特性(如形状、尺寸等)和电气特性(如引脚数量与排列等)，例如笔记本电脑上的网线接口。&lt;/li&gt;
+&lt;li&gt;物理层还规定了通信链路上的编码意义与电气特征。例如，若约定信号 X 表示比特 0，则发送方发出 X 代表 0，接收方收到 X 即解读为 0。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;注意，传输所用的物理介质(如双绞线、光缆、无线信道等)&lt;strong&gt;不属于物理层协议范畴&lt;/strong&gt;，而是位于其下方。因此，有人将物理介质视为“第0层”。&lt;/p&gt;
+&lt;h5&gt;2. 数据链路层 (Data Link Layer)&lt;/h5&gt;
+&lt;p&gt;数据链路层的传输单位是&lt;code&gt;帧&lt;/code&gt;。主机间的数据传输总是在一段段链路上进行的，数据链路层的主要作用是：将物理层提供的可能出错的物理连接，&lt;strong&gt;改造为逻辑上无差错的数据链路&lt;/strong&gt;，将网络层交来的分组封装成帧，并可靠地传送到相邻节点的网络层，实现节点间的&lt;strong&gt;差错控制&lt;/strong&gt;与&lt;strong&gt;流量控制&lt;/strong&gt;。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;差错控制&lt;/code&gt;：因噪声干扰，传输比特流时可能出错(例如，节点A向B发送的信号由X变为Y，导致比特0被误判为1)。差错控制机制可检测差错并丢弃错误帧。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;流量控制&lt;/code&gt;：若发送方的发送速率高于接收方的接收速率，如果不加以控制，将导致接收方丢弃来不及接收的帧。流量控制可协调双方的速率，从而提升链路效率。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在广播式网络的数据链路层中，还需解决对&lt;strong&gt;共享信道的访问控制问题&lt;/strong&gt;。&lt;/p&gt;
+&lt;h5&gt;3. 网络层 (Network Layer)&lt;/h5&gt;
+&lt;p&gt;网络层的传输单位是&lt;code&gt;数据报&lt;/code&gt;(或&lt;code&gt;分组&lt;/code&gt;)。其&lt;strong&gt;主要任务&lt;/strong&gt;是将分组从源主机传送到目的主机，为不同主机提供通信服务。&lt;strong&gt;核心功能&lt;/strong&gt;包括：路由选择、拥塞控制、差错控制、流量控制、网际互联等。网络层既提供有连接的虚电路服务，又提供无连接的数据报服务。&lt;/p&gt;
+&lt;p&gt;:::note
+无论哪一层的协议数据单元，均可笼统称为“分组”。
+:::&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;流量控制&lt;/code&gt;：协调源主机与目的主机的收发速率(与数据链路层的流量控制类似)。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;拥塞控制&lt;/code&gt;：当网络节点因过载而大量丢弃分组时，网络处于拥塞状态，需采取措施缓解。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;差错控制&lt;/code&gt;：通过检错机制确保向上层提交的都是无差错的分组，无法纠正则丢弃。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5&gt;4. 传输层 (Transport Layer)&lt;/h5&gt;
+&lt;p&gt;传输层(又称运输层)负责不同主机中进程之间的端到端通信，提供连接管理、可靠传输、流量控制、差错控制等服务。OSI 参考模型的传输层仅提供面向连接的可靠服务。&lt;/p&gt;
+&lt;p&gt;需要注意的是，数据链路层实现&lt;strong&gt;节点到节点通信&lt;/strong&gt;(基于 MAC 地址)，网络层实现&lt;strong&gt;主机到主机通信&lt;/strong&gt;(基于 IP 地址)，而传输层实现&lt;strong&gt;端到端通信&lt;/strong&gt;(基于端口号)。&lt;/p&gt;
+&lt;p&gt;由于一台主机可同时运行多个进程，传输层需具备&lt;strong&gt;复用与分用&lt;/strong&gt;的功能：&lt;code&gt;复用&lt;/code&gt;是指多个应用进程可同时使用传输层的服务，&lt;code&gt;分用&lt;/code&gt;是指传输层能将接收到的数据准确交付给对应的上层进程。&lt;/p&gt;
+&lt;h5&gt;5. 会话层 (Session Layer)&lt;/h5&gt;
+&lt;p&gt;会话层管理&lt;strong&gt;不同主机上进程之间的&lt;/strong&gt;&lt;code&gt;会话&lt;/code&gt;(Session)，包括建立、维护和终止会话连接。它为表示层或用户进程提供&lt;code&gt;同步机制&lt;/code&gt;(SYN)，支持在连接上有序地传输数据，并引入&lt;code&gt;检查点&lt;/code&gt;功能，即当通信中断时，可从最近的检查点恢复会话，实现类似“断点续传”的可靠性。&lt;/p&gt;
+&lt;h5&gt;6. 表示层 (Presentation Layer)&lt;/h5&gt;
+&lt;p&gt;表示层解决&lt;strong&gt;异构系统间信息表示不一致的问题&lt;/strong&gt;。它采用标准抽象语法定义数据结构，并通过标准编码(如 ASN.1)实现跨平台数据交换。此外，数据压缩、加密与解密也由该层处理。&lt;/p&gt;
+&lt;h5&gt;7. 应用层 (Application Layer)&lt;/h5&gt;
+&lt;p&gt;应用层是 OSI 参考模型的最高层，作为&lt;strong&gt;用户与网络的接口&lt;/strong&gt;，为各类网络应用(如文件传输、邮件、浏览)提供访问网络环境的手段。由于应用类型多样，应用层协议最为丰富且复杂。&lt;/p&gt;
+&lt;p&gt;OSI 参考模型各层次的功能是统考高频考点，表 1.2 给出了其各层的任务和功能对比。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;层&lt;/th&gt;
+&lt;th&gt;功能&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;应用层&lt;/td&gt;
+&lt;td&gt;提供应用与网络的接口&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;表示层&lt;/td&gt;
+&lt;td&gt;数据格式转换&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;会话层&lt;/td&gt;
+&lt;td&gt;会话管理&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;传输层&lt;/td&gt;
+&lt;td&gt;复用和分用、差错控制、流量控制、连接管理、可靠传输管理&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;网络层&lt;/td&gt;
+&lt;td&gt;路由选择、拥塞控制、网际互联、差错控制、流量控制、连接管理、可靠传输管理&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;数据链路层&lt;/td&gt;
+&lt;td&gt;差错控制、流量控制&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;物理层&lt;/td&gt;
+&lt;td&gt;定义电路接口参数、信号的含义/电气特性等&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4&gt;2. TCP/IP 模型&lt;/h4&gt;
+&lt;p&gt;TCP/IP 模型从低到高依次为：网络接口层(对应 OSI 参考模型的物理层和数据链路层)、网际层、传输层和应用层(对应OSI参考模型的会话层、表示层和应用层)。因其广泛应用，TCP/IP模型已成为&lt;strong&gt;事实上的国际标准&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;网络接口层&lt;/code&gt;的功能类似于 OSI 参考模型的物理层和数据链路层，其作用是从主机或节点接收 IP 分组，并将其发送到指定的物理网络上。&lt;strong&gt;TCP/IP 模型并未规定该层的具体功能或协议细节&lt;/strong&gt;，仅要求主机能通过某种底层协议接入网络以传送 IP 分组。实际使用的物理网络可以是各类局域网(如以太网、无线局域网等)，也可以是电话网、广域网等。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;网际层&lt;/code&gt;是 TCP/IP 体系结构的核心部分，功能上与 OSI 参考模型的网络层非常相似。它负责将分组发往任意网络，并&lt;strong&gt;为每个分组独立选择路由&lt;/strong&gt;，但&lt;strong&gt;不保证分组有序到达&lt;/strong&gt;，分组的有序性和可靠性由高层(如传输层)负责。网际层的核心协议是网际协议(IP)，提供无连接、不可靠的服务，其传输单位为 &lt;code&gt;IP 数据报&lt;/code&gt;。当前广泛使用的版本是 IPv4，其下一个版本是 IPv6。网际层还包括地址解析协议(ARP)、网际控制报文协议(ICMP)和网际组管理协议(IGMP)等辅助协议。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;传输层&lt;/code&gt;的功能同样与OSI参考模型的传输层类似，旨在实现&lt;strong&gt;发送端与接收端主机上对等进程之间的逻辑通信&lt;/strong&gt;。传输层主要采用两种协议：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;传输控制协议&lt;/code&gt;(Transmission Control Protocol，TCP)。它是面向连接的，传输之前需先建立连接，提供可靠交付，数据传输的单位为报文段。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;用户数据报协议&lt;/code&gt;(User Datagram Protocol，UDP)。它是无连接的，不保证可靠性，仅提供“尽最大努力交付”，数据传输的单位为用户数据报。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;code&gt;应用层&lt;/code&gt;(用户-用户)集成了 OSI 参考模型中会话层、表示层和应用层的功能，包含所有高层协议，例如，文件传输协议(FTP)、域名解析服务(DNS)和超文本传输协议(HTTP)等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;IP 是互联网的核心协议&lt;/strong&gt;。TCP/IP 体系体现了两大设计哲学：Everything over IP，即各种应用均可构建于 IP 之上；IP over Everything，即 IP 可运行于任意底层网络之上。正是这种高度的通用性与灵活性，推动了互联网发展至今日的规模。&lt;/p&gt;
+&lt;h4&gt;3. TCP/IP 模型与 OSI 参考模型的比较&lt;/h4&gt;
+&lt;p&gt;TCP/IP 模型与 OSI 参考模型有许多相似之处。&lt;/p&gt;
+&lt;p&gt;首先，二者均采用分层体系结构，且各层功能大体相似。&lt;/p&gt;
+&lt;p&gt;其次，二者均基于独立协议栈的概念。&lt;/p&gt;
+&lt;p&gt;最后，二者均可解决异构网络互联问题，实现不同厂商生产的计算机之间的通信。&lt;/p&gt;
+&lt;p&gt;:::tip
+接网叔用
+:::&lt;/p&gt;
+&lt;p&gt;尽管有这些相似之处，两个模型在设计理念与结构上仍有显著差异。&lt;/p&gt;
+&lt;p&gt;第一，OSI 参考模型的最大贡献在于精确定义了“服务”“协议”“接口”这三个核心概念，其分层思想与现代面向对象程序设计高度契合；而 TCP/IP 模型对这三者未做明确区分。&lt;/p&gt;
+&lt;p&gt;第二，OSI 参考模型是一个 7 层模型，而 TCP/IP 模型采用 4 层结构：它将 OSI 参考模型中的表示层和会话层功能合并为应用层，同时将物理层与数据链路层合并为网络接口层。&lt;/p&gt;
+&lt;p&gt;第三，OSI 参考模型先有模型，后制定具体协议，通用性良好，适合描述各类网络。TCP/IP 模型正好相反，即先有协议栈，后归纳出模型，因此不适用于任何其他的非 TCP/IP 模型。&lt;/p&gt;
+&lt;p&gt;第四，OSI 参考模型在网络层同时支持无连接和面向连接的通信模式，但在传输层仅提供面向连接的服务；而 TCP/IP 模型认为可靠性应由端到端机制保障，因此其网际层仅提供无连接服务，而传输层则同时支持无连接(UDP)和面向连接(TCP)两种模式。&lt;/p&gt;
+&lt;p&gt;OSI 参考模型与 TCP/IP 模型均非完美，二者都曾受到诸多批评。OSI 参考模型的设计者从一开始就致力于构建一个全球统一的计算机网络标准。从技术角度看，这种对理想化架构的追求，导致其软件实现结构复杂、运行效率低下。加之缺乏市场与商业驱动力，最终使其未能实现预期目标。相比之下，TCP/IP 模型凭借简洁高效的设计，在实际应用中占据了主导地位。&lt;/p&gt;
+&lt;p&gt;为了兼顾理论与实践，学习计算机网络时，通常采用一种5层协议体系结构，该结构融合了OSI参考模型和TCP/IP模型的优点。本书也将采用此结构进行讨论。&lt;/p&gt;
+&lt;p&gt;最后，简单介绍使用协议栈进行通信的过程。每个协议栈的顶端是一个面向用户的接口。用户首先将数据交给本主机的应用层，应用层加上必要的控制信息，组成应用层的PDU；然后下放到传输层，作为传输层的SDU，加上传输层的PCI，组成传输层的PDU；接着下放到网络层，组成网络层的SDU，加上网络层的PCI，再次组成网络层的PDU；继续下放到数据链路层……如此层层下放，层层封装，最终形成的数据帧(或数据包)经过物理链路传输。到达接收方节点后，协议栈逆向逐层拆开“包裹”，并将收到的数据递交给用户。&lt;/p&gt;
+&lt;h2&gt;1.3 本章小结及疑难点&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;互联网使用的 IP 是无连接的，因此其传输是不可靠的。这容易让人觉得互联网很不可靠。为什么当初不把互联网的传输设计为可靠的呢？&lt;/p&gt;
+&lt;p&gt;传统电信网主要用于电话通信，而普通电话机是“哑终端”(不具备智能处理能力)，因此电信公司必须将网络本身设计得高度可靠，以保障通信质量。&lt;/p&gt;
+&lt;p&gt;数据传输显然需要可靠性。但在设计 ARPAnet(互联网的前身)时，一个关键争论是“&lt;strong&gt;谁应该负责保证传输的可靠性？&lt;/strong&gt;”一种观点认为，应像电信网那样，由通信网络本身确保可靠传输——毕竟当时的技术已能构建高可靠的网络。另一种观点则主张，由用户主机(端系统)来负责可靠性，理由是这样可以让网络结构更简单、成本更低、扩展性更强。&lt;/p&gt;
+&lt;p&gt;计算机网络的先驱们注意到，&lt;strong&gt;计算机与电话机有本质区别&lt;/strong&gt;：计算机是智能终端，具备强大的处理能力。因此，他们最终采纳了&lt;strong&gt;端到端可靠传输&lt;/strong&gt;的设计哲学：在网络层使用简单、无连接、不可靠的IP协议，而在传输层通过面向连接的TCP协议实现端到端的可靠性。&lt;/p&gt;
+&lt;p&gt;这样既降低了网络基础设施的复杂性和成本，又确保了应用所需的可靠通信。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;端到端通信和点到点通信有什么区别？&lt;/p&gt;
+&lt;p&gt;本质上，由物理层、数据链路层和网络层构成的通信子网负责提供主机到主机的通信服务，而传输层则负责为主机上的应用进程提供端到端的通信服务。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;点到点通信&lt;/code&gt;指的是&lt;strong&gt;主机到主机&lt;/strong&gt;之间的数据传递，不涉及具体的应用进程。它只负责将数据从一台主机传送到另一台主机，但&lt;strong&gt;无法识别是哪两个进程在通信&lt;/strong&gt;——这一任务由更高层完成。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;端到端通信&lt;/code&gt;建立在点到点通信的基础之上，通过多段点到点链路串联，最终实现&lt;strong&gt;不同主机上应用进程之间的通信&lt;/strong&gt;。这里的“&lt;strong&gt;端&lt;/strong&gt;”指的是应用进程的端口，而端口号用于标识应用层中的不同进程。因此，端到端通信真正面向的是用户程序之间的交互，而非仅仅是机器之间的连接。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如何理解传输速率和传播速率？&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;传输速率&lt;/code&gt;是指主机或路由器在数字信道上&lt;strong&gt;发送数据的速率&lt;/strong&gt;，单位是比特/秒(b/s)。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;传播速率&lt;/code&gt;是指电磁波在物理介质中&lt;strong&gt;向前传播的速度&lt;/strong&gt;，单位是米/秒(m/s)。&lt;/p&gt;
+&lt;p&gt;例如，假定链路的传播速率为  $2 \times 10^8 , \text{m/s}$，即电磁波  $1,\mu\text{s}$ 可向前传播 200m。若链路带宽为  $1,\text{Mb/s}$，则主机  $1,\mu\text{s}$ 可向链路发送 1 比特数据。&lt;/p&gt;
+&lt;p&gt;在 t=0 时，开始发送数据；&lt;/p&gt;
+&lt;p&gt;到  $t=1\mu\text{s}$ 时，第一个比特已沿链路传播约 200m；&lt;/p&gt;
+&lt;p&gt;到  $t=2\mu\text{s}$ 时，第二个比特发出，第一个比特到达 400m 处；&lt;/p&gt;
+&lt;p&gt;到  $t=3\mu\text{s}$ 时，第三个比特发出，第一个比特到达 600m 处。&lt;/p&gt;
+&lt;p&gt;由此可见：链路上同时存在多少比特，取决于传输速率(带宽)；而每个比特在某一时刻位于何处，取决于传播速率。&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
 </content:encoded></item><item><title>1.简单句</title><link>https://www.atsuko.top/posts/english/grammar/1-simple-sentence/</link><guid isPermaLink="true">https://www.atsuko.top/posts/english/grammar/1-simple-sentence/</guid><pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;第一章 奋斗的开始——简单句&lt;/h1&gt;
@@ -764,11 +1533,21 @@ $$&lt;/p&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;h3&gt;2. 表示逻辑关系的其他词（副词和介词短语）&lt;/h3&gt;
-&lt;p&gt;&lt;strong&gt;平行/递进关系&lt;/strong&gt;：equally, similarly, likewise, furthermore, moreover, additionally, in addition 等。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;转折关系&lt;/strong&gt;：however, nevertheless, nonetheless, conversely, unfortunately, on the contrary, by contrast, on the other hand 等。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;因果关系&lt;/strong&gt;：therefore, consequently, hence, thus, as a result, as a consequence, because of, due to, owing to 等。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;总结关系&lt;/strong&gt;：overall, in conclusion, to sum up, in short, in a word 等。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;引出新对象&lt;/strong&gt;：concerning, regarding, with regard to, as for, in terms of 等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;平行关系&lt;/strong&gt;：equally, similarly, likewise, simultaneously, at the same time, in the meanwhile, in the same way 等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;递进关系&lt;/strong&gt;：then, also, besides, furthermore, moreover, additionally, subsequently, in addition 等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;转折关系&lt;/strong&gt;：however, nevertheless, nonetheless, conversely, contrarily, unfortunately, on the contrary, by contrast, on the other hand 等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;选择关系&lt;/strong&gt;：alternatively 等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;因果关系&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;因为：because of, be responsible for, due to, owing to, thanks to 等。&lt;/li&gt;
+&lt;li&gt;所以：thus, hence, consequently, therefore, as a result, as a consequence 等。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;总结关系&lt;/strong&gt;：on the whole, all in all, overall, in conclusion/summary/general, generally(speaking), as a whole, mainly, substantially, to sum up, to conclude, in short/brief, in a word 等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;引出新对象&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;关于：about = concerning = regarding = with regard to = as for/to 等。&lt;/li&gt;
+&lt;li&gt;就··· 而论,在···方面：in terms of, in respect of 等。&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h3&gt;3. 连词与逻辑关系词的区别&lt;/h3&gt;
 &lt;blockquote&gt;
 &lt;p&gt;并列连词连接句子时，逗号可加可不加；副词或介词短语不能连接两个句子，其前须用句号，或在其前加 and。&lt;/p&gt;
@@ -795,13 +1574,13 @@ $$&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;《天净沙·秋思》译文对比&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;逐字堆砌版（不合英语表达习惯）：Withered vines, an old tree, a crow at dusk...&lt;/li&gt;
-&lt;li&gt;添加逻辑关系词版：:tex[There, in the distance, are withered vines around an old tree, and a crow is sitting on it at dusk. Not far from it, near a cottage, there exists a small bridge with running water under it. Besides, a lean horse is walking on an ancient path in the west wind...]&lt;/li&gt;
+&lt;li&gt;添加逻辑关系词版：:tex[There, in the distance, are withered vines, around an old tree, :u[and] a crow is sitting on it at dusk. Not far from it, near a cottage, there exists a small bridge with running water under it. :u[Besides], a lean horse is walking on an ancient path in the west wind...]&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;strong&gt;写作实例&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;并列连词 not only...but also...：:tex[Learning English not only allows us to learn more about foreign cultures, but also helps us communicate smoothly with foreigners.] （学习英语不但能让我们更多地了解外国文化，还能帮助我们和外国人顺畅地交流。）&lt;/li&gt;
-&lt;li&gt;逻辑关系词 However：:tex[The woman he loved has already been married. However, he still silently misses this love.] （他爱的人早已经结婚了，他却依然默默地怀念着这份爱情。）&lt;/li&gt;
-&lt;li&gt;逻辑关系词 Consequently：:tex[The development of a large number of mobile apps makes it possible for people to read novels and other forms of literary works on their mobile phones. Consequently, the sales of paper books have been affected.] （大量移动应用程序的开发使人们能用手机读小说和其他形式的文学作品。因此，纸质书籍的销售受到了影响。）&lt;/li&gt;
+&lt;li&gt;并列连词 not only...but also...：:tex[Learning English :u[not only] allows us to learn more about foreign cultures, :u[but also] helps us communicate smoothly with foreigners.] （学习英语不但能让我们更多地了解外国文化，还能帮助我们和外国人顺畅地交流。）&lt;/li&gt;
+&lt;li&gt;逻辑关系词 However：:tex[The woman he loved has already been married. :u[However], he still silently misses this love.] （他爱的人早已经结婚了，他却依然默默地怀念着这份爱情。）&lt;/li&gt;
+&lt;li&gt;逻辑关系词 Consequently：:tex[The development of a large number of mobile apps makes it possible for people to read novels and other forms of literary works on their mobile phones. :u[Consequently], the sales of paper books have been affected.] （大量移动应用程序的开发使人们能用手机读小说和其他形式的文学作品。因此，纸质书籍的销售受到了影响。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;二、长难句分析&lt;/h3&gt;
 &lt;blockquote&gt;
@@ -809,21 +1588,23 @@ $$&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;h4&gt;1. 并列连词前后内容的对应关系&lt;/h4&gt;
 &lt;blockquote&gt;
-&lt;p&gt;词性对应：连词前后单词词性、单复数、时态语态一致。&lt;br /&gt;
+&lt;p&gt;词性对应：连词前后单词词性、单复数、时态语态一致。
 成分对应：连词连接相同性质的句子成分。&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[He opened the door, walked in and put down his schoolbag.] （他打开门，走了进去，放下了书包。）— 过去式并列&lt;/li&gt;
-&lt;li&gt;:tex[She is a humble and motivated girl.] （她是一个谦虚又上进的女孩。）— 形容词并列&lt;/li&gt;
-&lt;li&gt;:tex[My girlfriend is pleased with what I have said and what I have done.] （我女朋友对我所说的和我所做的都很满意。）— 宾语从句并列&lt;/li&gt;
-&lt;li&gt;:tex[It is a big problem for me to be a teacher or to start a business.] （对我来说当老师或创业都是一个大问题。）— 不定式短语并列&lt;/li&gt;
+&lt;li&gt;:tex[He opened the door, walked in :u[and] put down his schoolbag.] （他打开门，走了进去，放下了书包。）— 过去式并列&lt;/li&gt;
+&lt;li&gt;:tex[She is a humble :u[and] motivated girl.] （她是一个谦虚又上进的女孩。）— 形容词并列&lt;/li&gt;
+&lt;li&gt;:tex[My girlfriend is pleased with what I have said :u[and] what I have done.] （我女朋友对我所说的和我所做的都很满意。）— 宾语从句并列&lt;/li&gt;
+&lt;li&gt;:tex[It is a big problem for me to be a teacher :u[or] to start a business.] （对我来说当老师或创业都是一个大问题。）— 不定式短语并列&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h4&gt;2. 并列句中的省略现象&lt;/h4&gt;
-&lt;p&gt;&lt;strong&gt;常见省略类型&lt;/strong&gt;
-① 省略主语：:tex[She is poor, but has great ambitions.] （她虽然穷，但有着远大的志向。）省略 she&lt;br /&gt;
-② 省略 be 动词：:tex[Its scientists were the world&apos;s best, and its workers the most skilled.] （它的科学家是世界上最好的，它的工人是世界上最熟练的。）省略 were&lt;br /&gt;
-③ 省略主语和谓语：:tex[The news made John happy but Mary sad.] （这个消息让约翰很开心，但是却让玛丽很伤心。）省略 The news made&lt;br /&gt;
-④ 省略重复的其他内容：:tex[Meanwhile, this policy does nothing to ensure that the homework students receive is meaningful or appropriate to their age and the subject, or that teachers are not assigning more than they are willing to review and correct.] 第二个 or 后省略 to ensure&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;常见省略类型&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;省略主语：:tex[She is poor, :u[but] has great ambitions.] （她虽然穷，但有着远大的志向。）省略 she&lt;/li&gt;
+&lt;li&gt;省略 be 动词：:tex[Its scientists were the world&apos;s best, :u[and] its workers the most skilled.] （它的科学家是世界上最好的，它的工人是世界上最熟练的。）省略 were&lt;/li&gt;
+&lt;li&gt;省略主语和谓语：:tex[The news made John happy :u[but] Mary sad.] （这个消息让约翰很开心，但是却让玛丽很伤心。）省略 The news made&lt;/li&gt;
+&lt;li&gt;省略重复的其他内容：:tex[Meanwhile, this policy does nothing to ensure that the homework students receive is meaningful or appropriate to their age and the subject, :u[or] that teachers are not assigning more than they are willing to review and correct.] 第二个 or 后省略 to ensure&lt;/li&gt;
+&lt;/ol&gt;
 &lt;p&gt;&lt;strong&gt;找省略内容三步法&lt;/strong&gt;&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;找并列连词（省略常发生在其后）&lt;/li&gt;
@@ -832,36 +1613,36 @@ $$&lt;/p&gt;
 &lt;/ol&gt;
 &lt;p&gt;&lt;strong&gt;经典例句分析&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[I was beaten and you too.] → :tex[I was beaten and you were beaten too.] （我挨打了，你也挨打了。）&lt;/li&gt;
-&lt;li&gt;:tex[Reading makes a full man, conference a ready man, and writing an exact man.] → :tex[Reading makes a full man, conference makes a ready man, and writing makes an exact man.] （读书使人充实，讨论使人机智，写作使人严谨。）&lt;/li&gt;
+&lt;li&gt;:tex[I was beaten :u[and] you too.] → :tex[I was beaten and you were beaten too.] （我挨打了，你也挨打了。）&lt;/li&gt;
+&lt;li&gt;:tex[Reading makes a full man, conference a ready man, :u[and] writing an exact man.] → :tex[Reading makes a full man, conference makes a ready man, and writing makes an exact man.] （读书使人充实，讨论使人机智，写作使人严谨。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h4&gt;3. 综合运用（真题例句）&lt;/h4&gt;
-&lt;p&gt;&lt;strong&gt;例句一&lt;/strong&gt;：:tex[Under modern conditions, this requires varying measures of centralized control and hence the help of specialized scientists such as economists and operational research experts.]&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;例句一&lt;/strong&gt;：:tex[Under modern conditions, this requires varying measures of centralized control &lt;strong&gt;and&lt;/strong&gt; hence the help of specialized scientists such as economists &lt;strong&gt;and&lt;/strong&gt; operational research experts.]&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;结构：and 后省略 requires，补全为 requires the help of...&lt;/li&gt;
 &lt;li&gt;译文：在现代条件下，这需要不同程度的中央控制措施，从而也需要诸如经济学和运筹学等领域的专家的帮助。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;例句二&lt;/strong&gt;：:tex[They fear that it hurts their economies, depriving them of much-needed skilled workers who could have taught at their universities, worked in their hospitals and come up with clever new products for their factories to make.]&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;例句二&lt;/strong&gt;：:tex[They fear that it hurts their economies, depriving them of much-needed skilled workers who could have taught at their universities, worked in their hospitals &lt;strong&gt;and&lt;/strong&gt; come up with clever new products for their factories to make.]&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;结构：and 连接三个并列谓语，worked 和 come 前省略 could have&lt;/li&gt;
 &lt;li&gt;译文：他们担心这种情况会危及其经济发展，夺去他们紧缺的技术人才，而这些人才本该在他们自己的大学任教，在他们自己的医院工作，为他们自己的工厂研发有创意的新产品。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;例句三&lt;/strong&gt;：:tex[Darwin was convinced that the loss of these tastes for pictures or music was not only a loss of happiness, but might possibly be injurious to the intellect, and more probably to the moral character.]&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;例句三&lt;/strong&gt;：:tex[Darwin was convinced that the loss of these tastes for pictures or music was &lt;strong&gt;not only&lt;/strong&gt; a loss of happiness, &lt;strong&gt;but&lt;/strong&gt; might possibly be injurious to the intellect, &lt;strong&gt;and&lt;/strong&gt; more probably to the moral character.]&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;结构：and 后省略 be injurious，补全为 be injurious to the moral character&lt;/li&gt;
 &lt;li&gt;译文：达尔文相信，失去对音乐或绘画的爱好不仅会失去快乐，而且可能会损害智力，更有可能损害品德。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;例句四&lt;/strong&gt;：:tex[As families move away from their stable community, their friends of many years, and their extended family relationships, the informal flow of information is cut off, and with it the confidence that information will be available when needed and will be trustworthy and reliable.]&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;例句四&lt;/strong&gt;：:tex[As families move away from their stable community, their friends of many years, &lt;strong&gt;and&lt;/strong&gt; their extended family relationships, the informal flow of information is cut off, &lt;strong&gt;and&lt;/strong&gt; with it the confidence that information will be available when needed &lt;strong&gt;and&lt;/strong&gt; will be trustworthy &lt;strong&gt;and&lt;/strong&gt; reliable.]&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;结构：第二个 and 后省略 is cut off；第三个 and 后省略 information&lt;/li&gt;
 &lt;li&gt;译文：随着家庭搬离他们稳定的社区、远离多年的朋友和大家庭的种种关系，非正式的信息交流就被切断了；随之而去的是对在需要时就能获得可靠和值得信赖的信息的信心。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;例句五&lt;/strong&gt;：:tex[Until these issues are resolved, a technology of behavior will continue to be rejected, and with it possibly the only way to solve our problems.]&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;例句五&lt;/strong&gt;：:tex[Until these issues are resolved, a technology of behavior will continue to be rejected, &lt;strong&gt;and&lt;/strong&gt; with it possibly the only way to solve our problems.]&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;结构：and 后省略 will continue to be rejected&lt;/li&gt;
 &lt;li&gt;译文：除非这些问题得以解决，否则行为技术将会继续受到排斥，并且解决我们问题的唯一方法可能也随之继续受到排斥。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;例句六&lt;/strong&gt;：:tex[Social psychologists have amassed oceans of research into what they call the &quot;above average effect,&quot; or &quot;illusory superiority,&quot; and shown that, for example, 70% of us rate ourselves as above average in leadership, 93% in driving and 85% at getting on well with others—all obviously statistical impossibilities.]&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;例句六&lt;/strong&gt;：:tex[Social psychologists have amassed oceans of research into what they call the &quot;above average effect,&quot; &lt;strong&gt;or&lt;/strong&gt; &quot;illusory superiority,&quot; &lt;strong&gt;and&lt;/strong&gt; shown that, for example, 70% of us rate ourselves as above average in leadership, 93% in driving &lt;strong&gt;and&lt;/strong&gt; 85% at getting on well with others—all obviously statistical impossibilities.]&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;结构：第二个分句省略主语和 have，补全为 social psychologists have shown that...；that 从句中后两部分省略 of us rate ourselves as above average&lt;/li&gt;
 &lt;li&gt;译文：社会心理学家针对所谓的“高于平均数效应”或“虚幻的优越感”进行了大量研究，并指出我们中有70%的人自认为领导能力高于常人，93%的人自认为驾驶水平高于常人，85%的人自认为与人相处的能力高于常人——很显然，所有这些在统计学上是不可能的。&lt;/li&gt;
