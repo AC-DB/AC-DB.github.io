@@ -581,6 +581,672 @@ int main() {
 	return 0;
 }
 &lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>3.4.6继承</title><link>https://www.atsuko.top/posts/dark-horse/c++/core/346-inheritance/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/core/346-inheritance/</guid><pubDate>Sun, 07 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;4.6 继承&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;继承是面向对象三大特性之一&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;有些类与类之间存在特殊的关系，例如下图中：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1544861202252.png&quot; alt=&quot;1544861202252&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;我们发现，定义这些类时，下级别的成员除了拥有上一级的共性，还有自己的特性。&lt;/p&gt;
+&lt;p&gt;这个时候我们就可以考虑利用继承的技术，减少重复代码&lt;/p&gt;
+&lt;h4&gt;4.6.1 继承的基本语法&lt;/h4&gt;
+&lt;p&gt;例如我们看到很多网站中，都有公共的头部，公共的底部，甚至公共的左侧列表，只有中心内容不同&lt;/p&gt;
+&lt;p&gt;接下来我们分别利用普通写法和继承的写法来实现网页中的内容，看一下继承存在的意义以及好处&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;普通实现&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//Java页面
+class Java
+{
+public:
+    void header()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;首页、公开课、登录、注册...（公共头部）&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    void footer()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;帮助中心、交流合作、站内地图...(公共底部)&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    void left()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Java,Python,C++...(公共分类列表)&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    void content()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;JAVA学科视频&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+//Python页面
+class Python
+{
+public:
+    void header()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;首页、公开课、登录、注册...（公共头部）&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    void footer()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;帮助中心、交流合作、站内地图...(公共底部)&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    void left()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Java,Python,C++...(公共分类列表)&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    void content()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Python学科视频&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+//C++页面
+class CPP
+{
+public:
+    void header()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;首页、公开课、登录、注册...（公共头部）&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    void footer()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;帮助中心、交流合作、站内地图...(公共底部)&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    void left()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Java,Python,C++...(公共分类列表)&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    void content()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;C++学科视频&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+
+void test1()
+{
+    //Java页面
+    std::cout &amp;lt;&amp;lt; &quot;Java下载视频页面如下： &quot; &amp;lt;&amp;lt; std::endl;
+    Java ja;
+    ja.header();
+    ja.footer();
+    ja.left();
+    ja.content();
+    std::cout &amp;lt;&amp;lt; &quot;--------------------&quot; &amp;lt;&amp;lt; std::endl;
+
+    //Python页面
+    std::cout &amp;lt;&amp;lt; &quot;Python下载视频页面如下： &quot; &amp;lt;&amp;lt; std::endl;
+    Python py;
+    py.header();
+    py.footer();
+    py.left();
+    py.content();
+    std::cout &amp;lt;&amp;lt; &quot;--------------------&quot; &amp;lt;&amp;lt; std::endl;
+
+    //C++页面
+    std::cout &amp;lt;&amp;lt; &quot;C++下载视频页面如下： &quot; &amp;lt;&amp;lt; std::endl;
+    CPP cp;
+    cp.header();
+    cp.footer();
+    cp.left();
+    cp.content();
+
+}
+
+int main() {
+
+    test1();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;继承实现&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//公共页面
+class BasePage
+{
+public:
+    void header()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;首页、公开课、登录、注册...（公共头部）&quot; &amp;lt;&amp;lt; std::endl;
+    }
+
+    void footer()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;帮助中心、交流合作、站内地图...(公共底部)&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    void left()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Java,Python,C++...(公共分类列表)&quot; &amp;lt;&amp;lt; std::endl;
+    }
+
+};
+
+//Java页面
+class Java : public BasePage
+{
+public:
+    void content()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;JAVA学科视频&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+//Python页面
+class Python : public BasePage
+{
+public:
+    void content()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Python学科视频&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+//C++页面
+class CPP : public BasePage
+{
+public:
+    void content()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;C++学科视频&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+
+void test1()
+{
+    //Java页面
+    std::cout &amp;lt;&amp;lt; &quot;Java下载视频页面如下： &quot; &amp;lt;&amp;lt; std::endl;
+    Java ja;
+    ja.header();
+    ja.footer();
+    ja.left();
+    ja.content();
+    std::cout &amp;lt;&amp;lt; &quot;--------------------&quot; &amp;lt;&amp;lt; std::endl;
+
+    //Python页面
+    std::cout &amp;lt;&amp;lt; &quot;Python下载视频页面如下： &quot; &amp;lt;&amp;lt; std::endl;
+    Python py;
+    py.header();
+    py.footer();
+    py.left();
+    py.content();
+    std::cout &amp;lt;&amp;lt; &quot;--------------------&quot; &amp;lt;&amp;lt; std::endl;
+
+    //C++页面
+    std::cout &amp;lt;&amp;lt; &quot;C++下载视频页面如下： &quot; &amp;lt;&amp;lt; std::endl;
+    CPP cp;
+    cp.header();
+    cp.footer();
+    cp.left();
+    cp.content();
+
+}
+
+int main() {
+
+    test1();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;总结&lt;/strong&gt; ：&lt;/p&gt;
+&lt;p&gt;继承的好处：&lt;strong&gt;可以减少重复的代码&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;class A : public B;&lt;/p&gt;
+&lt;p&gt;A 类称为子类 或 派生类&lt;/p&gt;
+&lt;p&gt;B 类称为父类 或 基类&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;派生类中的成员，包含两大部分&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;一类是从基类继承过来的，一类是自己增加的成员。&lt;/p&gt;
+&lt;p&gt;从基类继承过过来的表现其共性，而新增的成员体现了其个性。&lt;/p&gt;
+&lt;h4&gt;4.6.2 继承方式&lt;/h4&gt;
+&lt;p&gt;继承的语法：&lt;code&gt;class 子类 : 继承方式  父类&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;继承方式一共有三种&lt;/strong&gt; ：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;公共继承&lt;/li&gt;
+&lt;li&gt;保护继承&lt;/li&gt;
+&lt;li&gt;私有继承&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&quot;assets/clip_image002.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Base31
+{
+public:
+    int m_A;
+protected:
+    int m_B;
+private:
+    int m_C;
+};
+
+//公共继承
+class Son31 :public Base31
+{
+public:
+    void func()
+    {
+        m_A; //可访问 public权限
+        m_B; //可访问 protected权限
+        //m_C; //不可访问
+    }
+};
+
+void myClass()
+{
+    Son31 s1;
+    s1.m_A; //其他类只能访问到公共权限
+}
+
+//保护继承
+class Base32
+{
+public:
+    int m_A;
+protected:
+    int m_B;
+private:
+    int m_C;
+};
+
+class Son2 :protected Base32
+{
+public:
+    void func()
+    {
+        m_A; //可访问 protected权限
+        m_B; //可访问 protected权限
+        //m_C; //不可访问
+    }
+};
+void myClass2()
+{
+    Son2 s;
+    //s.m_A; //不可访问
+}
+
+//私有继承
+class Base33
+{
+public:
+    int m_A;
+protected:
+    int m_B;
+private:
+    int m_C;
+};
+
+class Son33 :private Base33
+{
+public:
+    void func()
+    {
+        m_A; //可访问 private权限
+        m_B; //可访问 private权限
+        //m_C; //不可访问
+    }
+};
+
+class GrandSon33 :public Son33
+{
+public:
+    void func()
+    {
+        //Son3是私有继承，所以继承Son3的属性在GrandSon3中都无法访问到
+        //m_A;
+        //m_B;
+        //m_C;
+    }
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.6.3 继承中的对象模型&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;问题&lt;/strong&gt; ：从父类继承过来的成员，哪些属于子类对象中？&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Base3
+{
+public:
+    int m_A;
+protected:
+    int m_B;
+private:
+    int m_C; //私有成员只是被隐藏了，但是还是会继承下去
+};
+
+//公共继承
+class Son3 :public Base3
+{
+public:
+    int m_D;
+};
+
+void test31()
+{
+    std::cout &amp;lt;&amp;lt; &quot;sizeof Son = &quot; &amp;lt;&amp;lt; sizeof(Son3) &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+    test31();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;利用工具查看：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1545881904150.png&quot; alt=&quot;1545881904150&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;打开工具窗口后，定位到当前CPP文件的盘符&lt;/p&gt;
+&lt;p&gt;然后输入： cl /d1 reportSingleClassLayout查看的类名   所属文件名&lt;/p&gt;
+&lt;p&gt;例如 &lt;code&gt;cl /d1 reportSingleClassLayoutSon3 03.继承中的对象模型.cpp&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;效果如下图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1545882158050.png&quot; alt=&quot;1545882158050&quot; /&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;结论： 父类中私有成员也是被子类继承下去了，只是由编译器给隐藏后访问不到&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;4.6.4 继承中构造和析构顺序&lt;/h4&gt;
+&lt;p&gt;子类继承父类后，当创建子类对象，也会调用父类的构造函数&lt;/p&gt;
+&lt;p&gt;问题：父类和子类的构造和析构顺序是谁先谁后？&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Base4
+{
+public:
+    Base4()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Base4构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    ~Base4()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Base4析构函数!&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+
+class Son4 : public Base4
+{
+public:
+    Son4()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Son4构造函数!&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    ~Son4()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Son4析构函数!&quot; &amp;lt;&amp;lt; std::endl;
+    }
+
+};
+
+void test41()
+{
+    //继承中 先调用父类构造函数，再调用子类构造函数，析构顺序与构造相反
+    Son4 s;
+}
+
+int main() {
+
+    test41();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：继承中 先调用父类构造函数，再调用子类构造函数，析构顺序与构造相反&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;4.6.5 继承同名成员处理方式&lt;/h4&gt;
+&lt;p&gt;问题：当子类与父类出现同名的成员，如何通过子类对象，访问到子类或父类中同名的数据呢？&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;访问子类同名成员   直接访问即可&lt;/li&gt;
+&lt;li&gt;访问父类同名成员   需要加作用域&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Base5 {
+public:
+    Base5()
+    {
+        m_A = 100;
+    }
+
+    void func()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Base5 - func()调用&quot; &amp;lt;&amp;lt; std::endl;
+    }
+
+    void func(int a)
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Base5 - func(int a)调用&quot; &amp;lt;&amp;lt; std::endl;
+    }
+
+public:
+    int m_A;
+};
+
+class Son5 : public Base5 {
+public:
+    Son5()
+    {
+        m_A = 200;
+    }
+
+    //当子类与父类拥有同名的成员函数，子类会隐藏父类中所有版本的同名成员函数
+    //如果想访问父类中被隐藏的同名成员函数，需要加父类的作用域
+    void func()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Son5 - func()调用&quot; &amp;lt;&amp;lt; std::endl;
+    }
+public:
+    int m_A;
+};
+
+void test51()
+{
+    Son5 s;
+
+    std::cout &amp;lt;&amp;lt; &quot;Son5下的m_A = &quot; &amp;lt;&amp;lt; s.m_A &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;Base5下的m_A = &quot; &amp;lt;&amp;lt; s.Base5::m_A &amp;lt;&amp;lt; std::endl;
+
+    s.func();
+    s.Base5::func();
+    s.Base5::func(10);
+
+}
+int main() {
+
+    test51();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;总结：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;子类对象可以直接访问到子类中同名成员&lt;/li&gt;
+&lt;li&gt;子类对象加作用域可以访问到父类同名成员&lt;/li&gt;
+&lt;li&gt;当子类与父类拥有同名的成员函数，子类会隐藏父类中同名成员函数，加作用域可以访问到父类中同名函数&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;4.6.6 继承同名静态成员处理方式&lt;/h4&gt;
+&lt;p&gt;问题：继承中同名的静态成员在子类对象上如何进行访问？&lt;/p&gt;
+&lt;p&gt;静态成员和非静态成员出现同名，处理方式一致&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;访问子类同名成员   直接访问即可&lt;/li&gt;
+&lt;li&gt;访问父类同名成员   需要加作用域&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Base6 {
+public:
+    static void func()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Base6 - static void func()&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    static void func(int a)
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Base6 - static void func(int a)&quot; &amp;lt;&amp;lt; std::endl;
+    }
+
+    static int m_A;
+};
+
+int Base6::m_A = 100;
+
+class Son6 : public Base6 {
+public:
+    static void func()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Son6 - static void func()&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    static int m_A;
+};
+
+int Son6::m_A = 200;
+
+//同名成员属性
+void test61()
+{
+    //通过对象访问
+    std::cout &amp;lt;&amp;lt; &quot;通过对象访问： &quot; &amp;lt;&amp;lt; std::endl;
+    Son6 s;
+    std::cout &amp;lt;&amp;lt; &quot;Son6  下 m_A = &quot; &amp;lt;&amp;lt; s.m_A &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;Base6 下 m_A = &quot; &amp;lt;&amp;lt; s.Base6::m_A &amp;lt;&amp;lt; std::endl;
+
+    //通过类名访问
+    std::cout &amp;lt;&amp;lt; &quot;通过类名访问： &quot; &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;Son6  下 m_A = &quot; &amp;lt;&amp;lt; Son6::m_A &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;Base6 下 m_A = &quot; &amp;lt;&amp;lt; Son6::Base6::m_A &amp;lt;&amp;lt; std::endl;
+}
+
+//同名成员函数
+void test62()
+{
+    //通过对象访问
+    std::cout &amp;lt;&amp;lt; &quot;通过对象访问： &quot; &amp;lt;&amp;lt; std::endl;
+    Son6 s;
+    s.func();
+    s.Base6::func();
+
+    std::cout &amp;lt;&amp;lt; &quot;通过类名访问： &quot; &amp;lt;&amp;lt; std::endl;
+    Son6::func();
+    Son6::Base6::func();
+    //出现同名，子类会隐藏掉父类中所有同名成员函数，需要加作作用域访问
+    Son6::Base6::func(100);
+}
+int main() {
+
+    //test61();
+    test62();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：同名静态成员处理方式和非静态处理方式一样，只不过有两种访问的方式（通过对象 和 通过类名）&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;4.6.7 多继承语法&lt;/h4&gt;
+&lt;p&gt;C++允许&lt;strong&gt;一个类继承多个类&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;语法：&lt;code&gt; class 子类 ：继承方式 父类1 ， 继承方式 父类2...&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;多继承可能会引发父类中有同名成员出现，需要加作用域区分&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;C++实际开发中不建议用多继承&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Base71 {
+public:
+    Base71()
+    {
+        m_A = 100;
+    }
+public:
+    int m_A;
+};
+
+class Base72 {
+public:
+    Base72()
+    {
+        m_A = 200;  //开始是m_B 不会出问题，但是改为mA就会出现不明确
+    }
+public:
+    int m_A;
+};
+
+//语法：class 子类：继承方式 父类1 ，继承方式 父类2 
+class Son7 : public Base72, public Base71
+{
+public:
+    Son7()
+    {
+        m_C = 300;
+        m_D = 400;
+    }
+public:
+    int m_C;
+    int m_D;
+};
+
+
+//多继承容易产生成员同名的情况
+//通过使用类名作用域可以区分调用哪一个基类的成员
+void test71()
+{
+    Son7 s;
+    std::cout &amp;lt;&amp;lt; &quot;sizeof Son7 = &quot; &amp;lt;&amp;lt; sizeof(s) &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; s.Base71::m_A &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; s.Base72::m_A &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+    test71();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结： 多继承中如果父类中出现了同名情况，子类使用时候要加作用域&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;4.6.8 菱形继承&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;菱形继承概念&lt;/strong&gt; ：&lt;/p&gt;
+&lt;p&gt;​两个派生类继承同一个基类&lt;/p&gt;
+&lt;p&gt;​又有某个类同时继承者两个派生类&lt;/p&gt;
+&lt;p&gt;​这种继承被称为菱形继承，或者钻石继承&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;典型的菱形继承案例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/clip_image002.jpg&quot; alt=&quot;IMG_256&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;菱形继承问题&lt;/strong&gt; ：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;羊继承了动物的数据，驼同样继承了动物的数据，当草泥马使用数据时，就会产生二义性。&lt;/li&gt;
+&lt;li&gt;草泥马继承自动物的数据继承了两份，其实我们应该清楚，这份数据我们只需要一份就可以。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Animal
+{
+public:
+    int m_Age;
+};
+
+//继承前加virtual关键字后，变为虚继承
+//此时公共的父类Animal称为虚基类
+class Sheep : virtual public Animal {};
+class Tuo : virtual public Animal {};
+class SheepTuo : public Sheep, public Tuo {};
+
+void test81()
+{
+    SheepTuo st;
+    st.Sheep::m_Age = 100;
+    st.Tuo::m_Age = 200;
+
+    std::cout &amp;lt;&amp;lt; &quot;st.Sheep::m_Age = &quot; &amp;lt;&amp;lt; st.Sheep::m_Age &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;st.Tuo::m_Age = &quot; &amp;lt;&amp;lt; st.Tuo::m_Age &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;st.m_Age = &quot; &amp;lt;&amp;lt; st.m_Age &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+    test81();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;总结：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;菱形继承带来的主要问题是子类继承两份相同的数据，导致资源浪费以及毫无意义&lt;/li&gt;
+&lt;li&gt;利用虚继承可以解决菱形继承问题&lt;/li&gt;
+&lt;/ul&gt;
 </content:encoded></item><item><title>1.1计算机网络概述</title><link>https://www.atsuko.top/posts/408/computer-network/11-overview-of-computer-networks/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/computer-network/11-overview-of-computer-networks/</guid><pubDate>Sat, 06 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;1.1 计算机网络概述&lt;/h1&gt;
 &lt;h3&gt;1.1.1 计算机网络的概念&lt;/h3&gt;
 &lt;p&gt;一般认为，计算机网络是将众多分散的、自治的计算机系统，通过通信设备与线路连接起来，并由功能完善的软件实现资源共享和信息传递的系统。&lt;/p&gt;
@@ -1001,6 +1667,231 @@ $$&lt;/p&gt;
 &lt;p&gt;由此可见：链路上同时存在多少比特，取决于传输速率(带宽)；而每个比特在某一时刻位于何处，取决于传播速率。&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
+</content:encoded></item><item><title>2.1通信基础</title><link>https://www.atsuko.top/posts/408/computer-network/21-communication-fundamentals/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/computer-network/21-communication-fundamentals/</guid><pubDate>Sat, 06 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h4&gt;2.1.1 基本概念&lt;/h4&gt;
+&lt;h5&gt;1. 数据、信号与码元&lt;/h5&gt;
+&lt;p&gt;通信的目的是传输信息，如文字、图像和视频等。数据是信息的载体，即用于传送信息的实体。&lt;code&gt;信号&lt;/code&gt;则是数据的电气或电磁表现，是数据在传输过程中的存在形式。数据和信号均可分为模拟和数字两类：&lt;code&gt;模拟信号&lt;/code&gt;的取值是连续的；&lt;code&gt;数字信号&lt;/code&gt;的取值是离散的。&lt;/p&gt;
+&lt;p&gt;在通信系统中，通常用一个固定时长的信号波形表示一个 &lt;code&gt;k 进制符号&lt;/code&gt;，该波形称为&lt;code&gt;码元&lt;/code&gt;(也称 &lt;code&gt;k 进制码元&lt;/code&gt;)，而该时长称为&lt;code&gt;码元宽度&lt;/code&gt;(或&lt;code&gt;信号周期&lt;/code&gt;)。每个码元能够承载的信息量与其所表示的信号状态数量直接相关，&lt;strong&gt;1 码元可以携带若干比特的信息量&lt;/strong&gt;。例如，若一个信号周期内可能出现 2 种信号，则每种信号可表示 1 位二进制数，意味着 1 码元可携带 1 比特信息；若可能出现 4 种信号，则每种信号可表示 2 位二进制数，意味着 1 码元携带 2 比特信息。&lt;/p&gt;
+&lt;h5&gt;2. 信源、信道与信宿&lt;/h5&gt;
+&lt;p&gt;实际的通信系统大多数是双向的，可进行双向通信。数据通信系统主要划分为&lt;strong&gt;信源&lt;/strong&gt;、&lt;strong&gt;信道&lt;/strong&gt;和&lt;strong&gt;信宿&lt;/strong&gt;三部分。&lt;code&gt;信源&lt;/code&gt;是产生和发送数据的源头，&lt;code&gt;信宿&lt;/code&gt;是接收数据的终点，它们通常都是计算机或其他数字终端装置。&lt;code&gt;信道&lt;/code&gt;是信号的传输介质，一条双向通信的线路包含一个发送信道和一个接收信道。信源发出信息后，需经发送变换器转换为适合在信道传输的信号；该信号经信道传至接收端后，由接收变换器还原为原始信息，再交付给信宿。&lt;code&gt;噪声源&lt;/code&gt;是信道上的噪声及分散在通信系统其他各处的噪声的集中表示。&lt;/p&gt;
+&lt;p&gt;按传输信号形式的不同，信道分为传送模拟信号的&lt;strong&gt;模拟信道&lt;/strong&gt;和传送数字信号的&lt;strong&gt;数字信道&lt;/strong&gt;；按传输介质的不同，分为&lt;strong&gt;无线信道&lt;/strong&gt;和&lt;strong&gt;有线信道&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;信道上传送的信号有&lt;code&gt;基带信号&lt;/code&gt;和&lt;code&gt;宽带信号&lt;/code&gt;之分。&lt;code&gt;基带信号&lt;/code&gt;是由信源发出的未经过调制的原始电信号，当在信道中直接传送基带信号时，称为&lt;code&gt;基带传输&lt;/code&gt;；&lt;code&gt;宽带信号&lt;/code&gt;是将基带信号调制到高频载波上形成的信号，然后其在信道上传输，这种方式称为&lt;code&gt;宽带传输&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;数据传输方式分为&lt;strong&gt;串行传输&lt;/strong&gt;和&lt;strong&gt;并行传输&lt;/strong&gt;。&lt;code&gt;串行传输&lt;/code&gt;是指逐比特地按序依次传输，&lt;code&gt;并行传输&lt;/code&gt;是指若干比特通过多个通信信道同时传输。串行传输适用于长距离通信，如计算机网络。并行传输适用于短距离通信，常用于计算机内部，如CPU与主存之间。&lt;/p&gt;
+&lt;p&gt;从通信双方信息的交互方式看，可分为三种基本方式：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;单向通信&lt;/code&gt;。只有一个方向的通信而没有反方向的交互，如无线电广播、电视广播等。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;半双工通信&lt;/code&gt;。通信双方都可发送或接收信息，但任何一方都不能同时发送和接收。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;全双工通信&lt;/code&gt;。通信双方可同时发送和接收信息。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;单向通信&lt;/strong&gt;只需一个信道；&lt;strong&gt;全双工通信&lt;/strong&gt;需要两个独立信道(每个方向一个)；而&lt;strong&gt;半双工通信&lt;/strong&gt;可在同一信道上分时双向传输，无须两个物理信道。&lt;/p&gt;
+&lt;h5&gt;3. 速率、波特与带宽&lt;/h5&gt;
+&lt;p&gt;速率是指数据传输速率，表示单位时间内传输的数据量，常有两种描述形式。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;码元传输速率&lt;/code&gt;。也称&lt;code&gt;波特率&lt;/code&gt;或&lt;code&gt;调制速率&lt;/code&gt;，表示数字通信系统每秒传输的码元数，单位是&lt;code&gt;波特&lt;/code&gt;(Baud)。码元既可以是多进制的，也可以是二进制的，&lt;strong&gt;码元速率与进制无关&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;信息传输速率&lt;/code&gt;。也称&lt;code&gt;比特率&lt;/code&gt;，表示数字通信系统每秒传输的比特数，单位是 b/s。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;:::note
+波特和比特是两个不同的概念，但波特率与比特率在数量上又有一定的关系。若一个码元携带 n 比特的信息量，则波特率 MBaud 对应的比特率为 $M \times n$ b/s。
+:::&lt;/p&gt;
+&lt;p&gt;在模拟通信中，&lt;code&gt;带宽&lt;/code&gt;(也称&lt;code&gt;频率带宽&lt;/code&gt;)表示信道所能传输信号的频率范围，即最高频率与最低频率之差，单位是赫兹(Hz)。而在数字通信或计算机网络中，&lt;code&gt;带宽&lt;/code&gt;用来表示通信线路所能传输数据的能力，即&lt;strong&gt;最大数据传输速率&lt;/strong&gt;，此时带宽的单位不再是 Hz，而是 b/s。&lt;/p&gt;
+&lt;h4&gt;2.1.2 信道的极限容量&lt;/h4&gt;
+&lt;p&gt;任何实际的信道都不是理想的，信号在信道上传输时会不可避免地产生失真。只要接收端能够从失真的信号波形中识别出原始信号，这种失真对通信质量就没有影响；然而，若信号失真严重，则接收端就无法正确识别每个码元。码元传输速率越高、传输距离越远、噪声干扰越大或传输介质质量越差，接收端波形的失真就越严重。&lt;/p&gt;
+&lt;h5&gt;1. 奈奎斯特定理(奈氏准则)&lt;/h5&gt;
+&lt;p&gt;实际信道所能通过的频率范围总是有限的。信号中的许多高频分量往往无法通过信道，会在传输中衰减，导致接收端收到的信号波形失去码元之间的清晰界限，这种现象称为&lt;code&gt;码间串扰&lt;/code&gt;。&lt;code&gt;奈奎斯特定理&lt;/code&gt;指出：在&lt;strong&gt;理想低通信道&lt;/strong&gt;(无噪声、带宽有限)中，为避免码间串扰，&lt;code&gt;极限码元传输速率为2W波特&lt;/code&gt;，其中W是信道的频率带宽(单位为Hz)。若用V表示每个码元的离散电平数量(不同码元的种类数；例如，若有16种不同的码元，则需用4个二进制位来表示，此时数据传输速率是码元传输速率的4倍)，则有&lt;/p&gt;
+&lt;p&gt;$$
+\text{理想低通信道的极限数据传输速率} =2W\log_{2}V\quad( \text{单位为 } \text{b/s})
+$$&lt;/p&gt;
+&lt;p&gt;对于奈氏准则，有以下结论：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;在任何信道中，&lt;strong&gt;码元传输速率存在上限&lt;/strong&gt;。若超过该上限，则会产生严重码间串扰，导致接收端无法正确识别码元。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;信道带宽越大&lt;/strong&gt;，其传输码元的能力越强。&lt;/li&gt;
+&lt;li&gt;奈氏准则仅限制码元传输速率，&lt;strong&gt;并未限制每个码元所能承载的信息量&lt;/strong&gt;(比特数)，因此信息传输速率仍可采用&lt;strong&gt;多元调制&lt;/strong&gt;(如QAM-16、QAM-64)来提升。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h5&gt;2. 香农定理&lt;/h5&gt;
+&lt;p&gt;实际信道存在&lt;strong&gt;高斯白噪声&lt;/strong&gt;。&lt;code&gt;香农定理&lt;/code&gt;给出了&lt;strong&gt;带宽受限且有高斯噪声干扰的信道&lt;/strong&gt;的极限数据传输速率。当速率不超过该极限值时，理论上可以实现任意低的误码率。香农定理定义为&lt;/p&gt;
+&lt;p&gt;$$
+\text{信道的极限数据传输速率} =W\log_{2}(1+S/N)\quad( \text{单位为 } \text{b/s})
+$$&lt;/p&gt;
+&lt;p&gt;式中，W 为信道的频率带宽(单位为 Hz)，S 为信号的平均功率，N 为噪声功率。S/N 为&lt;code&gt;信噪比&lt;/code&gt;，即信号的平均功率与噪声的平均功率之比。&lt;/p&gt;
+&lt;p&gt;信噪比有两种表示形式：无单位记法和分贝(dB)记法。当采用&lt;strong&gt;无单位记法&lt;/strong&gt;时，信噪比 = S/N；当采用&lt;strong&gt;分贝记法&lt;/strong&gt;时，信噪比 = $10\log_{10}(S/N)$ (单位为 dB)，例如，当 S/N = 1000 时，信噪比为 30dB。注意，使用香农定理计算信道的极限数据传输速率时，信噪比应采用无单位记法。&lt;/p&gt;
+&lt;p&gt;对于香农定理，有以下结论：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;信道带宽或信噪比越大&lt;/strong&gt;，信息的极限传输速率越高。&lt;/li&gt;
+&lt;li&gt;对于给定的带宽和信噪比，&lt;strong&gt;信息传输速率的上限是确定的&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;只要实际信息传输速率低于该极限值，就能找到某种方法实现近似无差错传输。&lt;/li&gt;
+&lt;li&gt;香农定理得出的是&lt;strong&gt;理论极限&lt;/strong&gt;，实际信道能达到的传输速率要比它低不少。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;奈氏准则仅考虑带宽对码元速率的限制，适用于无噪声的理想信道；而香农定理同时考虑了带宽和信噪比，适用于有噪声的实际信道。香农定理表明，在给定带宽和信噪比下，信息传输速率存在上限，即&lt;strong&gt;每个码元所能可靠携带的比特数是有限的&lt;/strong&gt;。&lt;/p&gt;
+&lt;h4&gt;2.1.3 编码与调制&lt;/h4&gt;
+&lt;p&gt;信号是数据的具体表示形式，数据无论是数字的还是模拟的，为了传输的目的，都要转换成信号。将数据转换为数字信号的过程称为&lt;code&gt;编码&lt;/code&gt;，将数据转换为模拟信号的过程称为&lt;code&gt;调制&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;数字数据可以通过数字发送器转换为数字信号进行传输，也可以通过调制器转换为模拟信号进行传输；同样，模拟数据既可通过 PCM 编码器转换为数字信号进行传输，也可直接以模拟信号形式传输(例如传统电话中的语音信号)。由此形成了以下四种编码与调制方式。&lt;/p&gt;
+&lt;h5&gt;1. 数字数据编码为数字信号&lt;/h5&gt;
+&lt;p&gt;数字数据编码用于基带传输，即在基本不改变信号频率的情况下直接传输数字信号。编码的核心在于&lt;strong&gt;如何用电平或跳变来表示二进制数0和1&lt;/strong&gt;。常用编码方式有以下几种。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;归零(RZ)编码&lt;/code&gt;。用高电平表示1，低电平表示0(或相反)，&lt;strong&gt;每个码元中间都会跳变回零电平&lt;/strong&gt;(“归零”)。接收方可利用这一跳变来调整自身的时钟基准，从而实现收发双方的自同步。但由于归零过程占用了一部分带宽，传输效率会受到一定影响。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;非归零(NRZ)编码&lt;/code&gt;。与RZ编码的区别是&lt;strong&gt;不进行归零&lt;/strong&gt;，整个周期都可用于传输数据，因此&lt;strong&gt;编码效率最高&lt;/strong&gt;。但由于缺乏内在时钟信息，收发双方需额外时钟线来实现同步。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;反向非归零(NRZI)编码&lt;/code&gt;。以&lt;strong&gt;码元起始处是否有跳变&lt;/strong&gt;来表示数据：无跳变表示1(或依协议约定)，有跳变表示0。跳变本身可用于辅助时钟恢复，兼顾了NRZ的高效率与一定的自同步能力，并且避免了RZ的带宽浪费。USB 2.0等标准采用此编码。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;曼彻斯特编码&lt;/code&gt;。&lt;strong&gt;每个码元中间都有一次电平跳变&lt;/strong&gt;，该跳变同时承担&lt;strong&gt;时钟同步&lt;/strong&gt;与&lt;strong&gt;数据表示&lt;/strong&gt;功能。常用下降沿(高→低)表示1，上升沿(低→高)表示0，或采用相反的约定。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;差分曼彻斯特编码&lt;/code&gt;。同样，&lt;strong&gt;每个码元中间都有电平跳变&lt;/strong&gt;，与曼彻斯特编码&lt;strong&gt;不同的是&lt;/strong&gt;，该跳变仅用于时钟同步，而不表示数据。数据由&lt;strong&gt;码元起始处是否有跳变&lt;/strong&gt;决定：无跳变表示1，有跳变表示0。这种方式具有更强的抗干扰能力。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;:::tip
+上述编码技巧:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;低0高1，中不变&lt;/li&gt;
+&lt;li&gt;低0高1，中归零&lt;/li&gt;
+&lt;li&gt;跳0不跳1，看起点，中不变&lt;/li&gt;
+&lt;li&gt;跳0反跳1，看中间，中必变&lt;/li&gt;
+&lt;li&gt;跳0不跳1，看起点，中必变
+:::&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;传统以太网采用的就是曼彻斯特编码&lt;/strong&gt;，而差分曼彻斯特编码常用于令牌环网等高速网络。常见数字编码方式的特性对比如表2.1所示。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;特性&lt;/th&gt;
+&lt;th&gt;归零编码&lt;/th&gt;
+&lt;th&gt;非归零编码&lt;/th&gt;
+&lt;th&gt;反向非归零编码&lt;/th&gt;
+&lt;th&gt;曼彻斯特编码&lt;/th&gt;
+&lt;th&gt;差分曼彻斯特编码&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;自同步能力&lt;/td&gt;
+&lt;td&gt;有&lt;/td&gt;
+&lt;td&gt;无&lt;/td&gt;
+&lt;td&gt;需增加冗余位&lt;/td&gt;
+&lt;td&gt;有&lt;/td&gt;
+&lt;td&gt;有&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;浪费带宽&lt;/td&gt;
+&lt;td&gt;浪费&lt;/td&gt;
+&lt;td&gt;无&lt;/td&gt;
+&lt;td&gt;不太浪费&lt;/td&gt;
+&lt;td&gt;浪费&lt;/td&gt;
+&lt;td&gt;浪费&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;抗干扰能力&lt;/td&gt;
+&lt;td&gt;弱&lt;/td&gt;
+&lt;td&gt;弱&lt;/td&gt;
+&lt;td&gt;弱&lt;/td&gt;
+&lt;td&gt;强&lt;/td&gt;
+&lt;td&gt;强&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h5&gt;2. 模拟数据编码为数字信号&lt;/h5&gt;
+&lt;p&gt;该过程通常采用 PCM(脉冲编码调制)，包含三个步骤。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;采样&lt;/code&gt;：对模拟信号进行周期性采样，将其从时间连续变为时间离散。根据奈奎斯特定理，采样频率不得低于信号最高频率的两倍。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;量化&lt;/code&gt;：将采样所得的幅值按预设分级取整，将连续的模拟电平转换为离散的数值。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;编码&lt;/code&gt;：将量化后的整数转换为对应的二进制码。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h5&gt;3. 数字数据调制为模拟信号&lt;/h5&gt;
+&lt;p&gt;数字数据调制技术在发送端将数字信号转换为模拟信号，在接收端则将模拟信号还原为数字信号，分别对应于调制解调器的调制和解调过程。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;幅移键控&lt;/code&gt;(Amplitude Shift Keying，ASK)。通过改变载波的振幅来表示数字信号1和0。例如，用有载波和无载波输出分别表示1和0。这种方式容易实现，但抗干扰能力差。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;频移键控&lt;/code&gt;(Frequency Shift Keying，FSK)。通过改变载波的频率来表示数字信号1和0。例如，用频率 $f_{1}$ 和频率 $f_{2}$ 分别表示1和0。这种方式容易实现，并且抗干扰能力强。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;相移键控&lt;/code&gt;(Phase Shift Keying，PSK)。通过改变载波的相位来表示数字信号1和0。例如，用相位0和 $\pi$ 分别表示1和0，它是一种绝对调相方式。&lt;/p&gt;
+&lt;p&gt;:::note
+与 PSK 不同，DPSK(差分相移键控)是一种相对调相方式，它通过检测当前码元与前一个码元的载波相位差来传输数字信息。例如，用相位是否发生变化分别表示 1 和 0。
+:::&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;正交幅度调制&lt;/code&gt;(Quadrature Amplitude Modulation，QAM)。在载波频率相同的前提下，通过&lt;strong&gt;同时调制振幅和相位&lt;/strong&gt;，形成复合信号，从而在有限带宽内实现更高的数据传输速率。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;QAM 基于正交载波，通常使用两路载波，分别对应正弦波和余弦波。两路载波的频率相同，但相位相差 $90^{\circ}$，因此可在同一频带上独立传输而不会相互干扰。以 QAM-16 为例，常用星座图表示：每路载波均有 4 种不同的振幅，其中横轴表示余弦波的幅度，纵轴表示正弦波的幅度。两路信号组合后可形成 16 种不同的信号状态，每个状态对应星座图上的一个点，并且代表一个 4 位二进制数。接收端收到信号后，通过判断该信号最接近哪个星座点，即可恢复出原始数据。若将每路载波的振幅调制成 8 种，则可组合成 64 种不同的信号状态(QAM-64)，每个状态对应一个 6 位二进制数。&lt;/p&gt;
+&lt;p&gt;假设波特率为 $B$，采用 $m$ 个相位，每个相位有 $n$ 种振幅，则该 QAM 的数据传输速率 $R$ 为&lt;/p&gt;
+&lt;p&gt;$$
+R = B\log_{2}(m \times n) \quad (\text{单位为 b/s})
+$$&lt;/p&gt;
+&lt;h5&gt;4. 模拟数据直接传输为模拟信号&lt;/h5&gt;
+&lt;p&gt;在某些场景下，模拟数据直接以模拟信号形式传输，无须数字化。例如，传统电话系统中，语音信号通过双绞线直接传送到本地交换机。此外，若需通过高频信道(如无线电波)传输，则可采用调幅(AM)、调频(FM)或调相(PM)等模拟调制技术，将信号加载到高频载波上。&lt;/p&gt;
+</content:encoded></item><item><title>2.2传输介质</title><link>https://www.atsuko.top/posts/408/computer-network/22-transmission-medium/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/computer-network/22-transmission-medium/</guid><pubDate>Sat, 06 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h4&gt;2.2.1 双绞线、同轴电缆、光纤与无线传输介质&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;传输介质&lt;/code&gt;也称&lt;code&gt;传输媒体&lt;/code&gt;，是数据传输系统中发送器和接收器之间的物理通路。传输介质可分为两类：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;导向传输介质&lt;/code&gt;，如铜线或光纤等，电磁波被约束沿固体介质传播；&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;非导向传输介质&lt;/code&gt;，如自由空间(空气、真空或海水)，电磁波在其中的传播称为&lt;code&gt;无线传输&lt;/code&gt;。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h5&gt;1. 双绞线&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;双绞线&lt;/code&gt;是最常用的传输介质，在局域网和传统电话网中广泛使用。它由两根相互绝缘、按一定规则绞合在一起的铜导线组成。绞合结构可有效减少相邻导线间的电磁干扰。为进一步提升抗干扰能力，可在双绞线外加一层金属丝编织的屏蔽层，称为&lt;code&gt;屏蔽双绞线&lt;/code&gt;(STP)；无屏蔽层的则称为&lt;code&gt;非屏蔽双绞线&lt;/code&gt;(UTP)。&lt;/p&gt;
+&lt;p&gt;双绞线价格低廉，既可用于模拟传输，也可用于数字传输，通信距离通常为几千米至数十千米。其带宽取决于铜线的粗细和传输的距离。距离太远时，对于模拟传输，要用放大器放大衰减的信号；对于数字传输，要用中继器来对失真的信号进行整形。&lt;/p&gt;
+&lt;h5&gt;2. 同轴电缆&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;同轴电缆&lt;/code&gt;由内导体、绝缘层、外导体屏蔽层和绝缘保护套层构成。通常分为两类：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;50Ω同轴电缆，主要用于基带数字信号传输，曾广泛应用于早期局域网；&lt;/li&gt;
+&lt;li&gt;75Ω同轴电缆，主要用于宽带信号传输，广泛应用于有线电视系统。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;得益于外导体的屏蔽作用，同轴电缆具有良好的抗干扰性能，适合较高速率的数据传输。&lt;/p&gt;
+&lt;p&gt;随着交换技术和集线器的普及，局域网领域已基本采用双绞线作为主流传输介质。&lt;/p&gt;
+&lt;h5&gt;3. 光纤&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;光纤通信&lt;/code&gt;利用&lt;code&gt;光导纤维&lt;/code&gt;(简称&lt;code&gt;光纤&lt;/code&gt;)传输光脉冲来传递通信：有光脉冲表示1，无光脉冲表示0。可见光的频率约为 $10^{14} \text{MHz}$，因此光纤系统具有极大的带宽潜力。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;光纤&lt;/code&gt;主要由纤芯和包层构成。纤芯直径极细，通常为8～100μm；包层的折射率略低于纤芯，光波通过纤芯进行传导。当光从高折射率介质射向低折射率介质时，若入射角大于临界角，将会发生全反射，使光线在纤芯与包层界面反复反射而向前传播。&lt;/p&gt;
+&lt;p&gt;利用全反射原理，允许多条不同角度入射的光线在同一根光纤中传输的类型称为&lt;code&gt;多模光纤&lt;/code&gt;。光脉冲在多模光纤中的损耗较大，因此更适合短距离通信。&lt;/p&gt;
+&lt;p&gt;当光纤直径减小至接近光波波长时，仅允许单一模式的光传播，几乎无反射，此类光纤称为&lt;code&gt;单模光纤&lt;/code&gt;。其纤芯极细，需使用定向性优良的半导体激光器作为光源。单模光纤衰减小，可实现数千米乃至数十千米的无中继传输，适用于远距离通信。&lt;/p&gt;
+&lt;p&gt;光纤不仅通信容量极大，还具备以下优势：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;传输损耗小，中继距离长，对远距离传输特别经济。&lt;/li&gt;
+&lt;li&gt;抗雷电和电磁干扰性能强，在有大电流脉冲干扰的环境下，这尤为重要。&lt;/li&gt;
+&lt;li&gt;无串音干扰，保密性好，不易被窃听或截取数据。&lt;/li&gt;
+&lt;li&gt;体积小，重量轻，在现有电缆管道已拥塞不堪的情况下，这特别有利。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h5&gt;4. 无线传输介质&lt;/h5&gt;
+&lt;p&gt;无线通信已广泛应用于蜂窝移动通信。随着便携式计算机的普及，以及军事、野外等特殊场景对移动互联网的需求不断增长，无线局域网(WLAN)得到了迅速发展。&lt;/p&gt;
+&lt;h6&gt;(1) 无线电波&lt;/h6&gt;
+&lt;p&gt;&lt;strong&gt;无线电波&lt;/strong&gt;具有较强的穿透能力，传播距离远，被广泛用于移动通信和 WLAN。其信号以全向方式扩散，接收端无须对准发射源即可建立连接，这是无线电波通信的重要优势。&lt;/p&gt;
+&lt;h6&gt;(2) 微波、红外线和激光&lt;/h6&gt;
+&lt;p&gt;高带宽无线通信主要采用微波、红外线和激光三种技术，它们均需视距，具有强指向性。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;微波通信&lt;/strong&gt;工作在较高频段，带宽大、通信容量高。例如，一个2MHz带宽的信道可容纳约500路语音信号。但由于微波沿直线传播，在地面传输时距离受限，通常需要中继站进行接力。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;卫星通信&lt;/strong&gt;利用地球同步卫星作为中继节点，有效突破了地面微波传输的距离限制。其优点是通信容量大、覆盖范围广、传输距离远；缺点是保密性较差，并且端到端传播时延较大。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;红外线&lt;/strong&gt;与&lt;strong&gt;激光通信&lt;/strong&gt;将电信号转换为相应的光信号，在自由空间中直接传播，常用于短距离点对点链路(如遥控器)或室内通信。但这类通信极易受障碍物阻挡，且无法穿透墙壁。&lt;/p&gt;
+&lt;h4&gt;2.2.2 物理层接口的特性&lt;/h4&gt;
+&lt;p&gt;物理层关注的是如何在各种传输介质上传输比特流，而非介质本身。由于网络中的硬件设备和传输介质种类繁多，通信方式也各不相同，&lt;strong&gt;物理层应尽可能屏蔽底层差异，使数据链路层感知不到这些差异&lt;/strong&gt;，从而专注于本层协议与服务的实现。&lt;/p&gt;
+&lt;p&gt;物理层的主要任务是定义与传输介质接口相关的一些特性：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;机械特性&lt;/code&gt;。规定接口所用接线器的形状和尺寸、引脚数目和排列、固定和锁定装置等。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;电气特性&lt;/code&gt;。规定接口电缆中各线路应遵循的电压范围、传输速率和距离限制等。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;功能特性&lt;/code&gt;。定义每条线路上特定电平所代表的意义，并定义各线路的具体功能。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;过程特性&lt;/code&gt;，也称规程特性。描述各种功能事件发生的顺序和时序关系。&lt;/li&gt;
+&lt;/ol&gt;
+</content:encoded></item><item><title>2.3物理层设备</title><link>https://www.atsuko.top/posts/408/computer-network/23-physical-layer-equipment/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/computer-network/23-physical-layer-equipment/</guid><pubDate>Sat, 06 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h4&gt;2.3.1 中继器&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;中继器的&lt;/code&gt;主要功能是&lt;strong&gt;整形、放大并转发&lt;/strong&gt;信号，以消除信号经过一长段电缆后产生的失真和衰减，使信号的波形和强度达到所需的要求，从而扩大网络的传输距离。其原理是&lt;strong&gt;信号再生&lt;/strong&gt;(而非简单放大衰减的信号)。中继器有两个端口，数据从一个端口输入，从另一个端口输出。&lt;/p&gt;
+&lt;p&gt;中继器连接的两端属于&lt;strong&gt;同一局域网中的不同网段&lt;/strong&gt;(而非不同子网)，因此所连网段仍构成一个局域网。如果中继器发生故障，将影响相邻两个网段的正常工作。&lt;/p&gt;
+&lt;p&gt;从理论上讲，中继器的使用数量是无限的，网络因而也可无限延长。但事实上这是不可能的，因为网络标准中对信号的传播延迟范围有明确规定，中继器只能在此范围内有效工作，否则会引起网络故障。例如，在采用粗同轴电缆的10Base-5以太网规范中，互相串联的中继器数量不能超过4个，而且由4个中继器串联的5段电缆中，仅有3段可挂接主机，其余2段只能用作扩展通信范围的链路段，不能挂接主机。这就是所谓的“5-4-3规则”。&lt;/p&gt;
+&lt;h4&gt;2.3.2 集线器&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;集线器&lt;/code&gt;(Hub)实质上是一个&lt;strong&gt;多端口的中继器&lt;/strong&gt;。当集线器工作时，一个端口接收到数据信号后，由于信号在传输过程中已有衰减，集线器便对该信号进行整形和放大，将其再生为接近原始发送时的信号，紧接着转发到其他所有(除输入端口外)处于工作状态的端口。若两个或多个端口所连节点同时发送信号，则会发生&lt;code&gt;冲突&lt;/code&gt;，导致所有相关帧传输失败。由此可见，集线器在网络中只起信号放大和转发作用，目的是扩大网络的传输范围，而不具备信号的定向传送能力，即信息广播至所有端口，是标准的&lt;strong&gt;共享式设备&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;:::note
+中继器和集线器:u[不具备缓存能力]，当其连接两个不同链路层协议的网段时可能会出问题。若两个网段的速率分别为10Mb/s和10/100Mb/s，采用集线器连接后，则整个网络只能以速率10Mb/s工作。
+:::&lt;/p&gt;
+&lt;p&gt;使用集线器组网灵活，它将所有节点的通信集中在以其为中心的节点上，由集线器组成的网络在物理上是星形网络，但&lt;strong&gt;逻辑上仍是总线形网络&lt;/strong&gt;。集线器的每个端口连接的是同一网络的不同网段。此外，集线器只能工作在&lt;strong&gt;半双工&lt;/strong&gt;模式，网络的吞吐率因而受到限制。&lt;/p&gt;
+&lt;p&gt;:::note
+集线器:u[不能分割冲突域]，其所有端口都属于同一个冲突域。集线器在一个时钟周期内只能传输一组信息。当一台集线器连接的主机数量较多且多台主机频繁同时通信时，将导致大量冲突，使得集线器的工作效率很差。例如，一个带宽为10Mb/s的集线器上连接了8台计算机，当它们同时工作时，每台计算机平均可用的带宽仅为10/8Mb/s=1.25Mb/s。
+:::&lt;/p&gt;
+&lt;h3&gt;2.4 本章小结及疑难点&lt;/h3&gt;
+&lt;h4&gt;1. 传输介质属于物理层吗？它与物理层有何区别？&lt;/h4&gt;
+&lt;p&gt;传输介质不属于物理层。尽管与物理层紧密相关，但从网络体系结构看，它位于物理层之下，常被非正式称为“第0层”。区别在于：&lt;strong&gt;传输介质&lt;/strong&gt;只承载电信号或光信号，&lt;strong&gt;无法区分信号所代表的比特值&lt;/strong&gt;——即无法判断某一电平对应的是1还是0；&lt;strong&gt;物理层&lt;/strong&gt;通过定义&lt;strong&gt;电气、机械、功能和过程特性&lt;/strong&gt;(如电压、时序、接口规范等)，将原始信号解释为有意义的比特流，供上层使用。图2.10直观展示了这一关系：传输介质是信号的“通道”，物理层是赋予其语义的“规则制定者”。&lt;/p&gt;
+&lt;h4&gt;2. 什么是基带传输、频带传输和宽带传输？它们有什么区别？&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;基带传输&lt;/code&gt;：直接发送原始的数字信号(如高、低电平)，&lt;strong&gt;不经过调制&lt;/strong&gt;。它占用整个信道带宽，通常用于&lt;strong&gt;短距离通信&lt;/strong&gt;，比如局域网或计算机内部连接。常用的编码方法包括不归零编码和曼彻斯特编码。不归零编码的做法是用高电平表示1、低电平表示0。例如，要传输“1010”，若高电平代表1、低电平代表0，则线路上依次传送(高、低、高、低)这一电平序列。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;频带传输&lt;/code&gt;：当需要远距离或无线传输时，必须把数字信号“搭载”到一个高频载波上，这个过程叫调制，转换后的信号更适合在模拟信道(如电话线)上传输，称为频带传输。它不仅让数字信号能在传统电话系统中传输，还支持多路复用，提高信道利用率。例如，仍然传输“1010”，经过调制后，一个码元可能代表4位二进制数据；若码元A对应“1010”，则在模拟信道上只需发送码元A，就相当于完成了该数据的传输。电话线上网、Wi-Fi等都属于频带传输。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;宽带传输&lt;/code&gt;：在传统通信语境中，宽带传输指利用&lt;strong&gt;频分复用&lt;/strong&gt;等技术，将一条物理线路划分为多个频带信道，每个信道可独立进行频带传输，互不干扰。这样，多个信号可以并行传送，显著提升链路容量。例如，有线电视网络能一边上网、一边看电视，正是利用了宽带传输技术。&lt;/p&gt;
+&lt;h4&gt;3. 奈氏准则和香农定理的主要区别是什么？它们对数据通信的意义是什么？&lt;/h4&gt;
+&lt;p&gt;奈氏准则与香农定理从不同角度揭示了信道传输能力的极限。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;奈氏准则仅考虑信道带宽限制&lt;/strong&gt;，指出在给定带宽下，&lt;strong&gt;码元传输速率存在上限&lt;/strong&gt;(与噪声无关)，超过该上限将因码间串扰而无法正确识别信号；但它不限制每个码元所携带的比特数，因此可通过高阶调制(如一个码元表示多位)提升信息传输速率。&lt;strong&gt;香农定理则适用于有噪声的实际信道&lt;/strong&gt;，指出对于确定的带宽和信噪比，&lt;strong&gt;信息传输速率存在一个不可逾越的理论上限&lt;/strong&gt;，无论采用何种技术都无法突破。这意味着，要提高通信速率，只能通过增加带宽或改善信噪比，但二者在现实中均有物理限制。它们共同构成了数据通信系统设计的理论基础。&lt;/p&gt;
+&lt;h4&gt;4. 信噪比明明是 S/N，为什么还要用 $10\log_{10}(S/N)$ 表示？&lt;/h4&gt;
+&lt;p&gt;信噪比可以用两种方式表示：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;线性比值&lt;/code&gt;(无单位)：如信号功率为100，噪声功率为1，则信噪比S/N=100。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;分贝形式&lt;/code&gt;(单位 dB)：此时信噪比为 $10\log_{10}(S/N)=10\log_{10}100=20\text{dB}$。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;两者在数学上&lt;strong&gt;等价&lt;/strong&gt;，但&lt;strong&gt;分贝形式更实用&lt;/strong&gt;。因为在通信中，信号与噪声的功率差异往往极大，例如信号可能是噪声的10亿倍。若用线性值表示，则1后面有9个0，不仅冗长，还容易数错；而用分贝表示仅为90dB，简洁且不易出错。因此，分贝能高效、清晰地表达极大或极小的比值。&lt;/p&gt;
 </content:encoded></item><item><title>1.简单句</title><link>https://www.atsuko.top/posts/english/grammar/1-simple-sentence/</link><guid isPermaLink="true">https://www.atsuko.top/posts/english/grammar/1-simple-sentence/</guid><pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;第一章 奋斗的开始——简单句&lt;/h1&gt;
 &lt;h2&gt;第一节 汉英句子比较&lt;/h2&gt;
 &lt;blockquote&gt;
@@ -1741,36 +2632,36 @@ $$&lt;/p&gt;
 &lt;p&gt;名词（短语）在句子中主要充当主语、宾语、表语、同位语。&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;ul&gt;
-&lt;li&gt;主语：:tex[The movie is very encouraging.] （这部电影很鼓舞人心。）&lt;/li&gt;
-&lt;li&gt;宾语：:tex[I appreciate the hero.] （我欣赏这位男主人公。）&lt;/li&gt;
-&lt;li&gt;表语：:tex[Andy is a tough guy.] （安迪是一个坚强的人。）&lt;/li&gt;
-&lt;li&gt;同位语：:tex[I like the movie, The Shawshank Redemption.] （我喜欢电影《肖申克的救赎》。）&lt;/li&gt;
+&lt;li&gt;主语：:tex[:u[The movie] is very encouraging.] （这部电影很鼓舞人心。）&lt;/li&gt;
+&lt;li&gt;宾语：:tex[I appreciate :u[the hero].] （我欣赏这位男主人公。）&lt;/li&gt;
+&lt;li&gt;表语：:tex[Andy is :u[a tough guy].] （安迪是一个坚强的人。）&lt;/li&gt;
+&lt;li&gt;同位语：:tex[I like the movie, :u[The Shawshank Redemption].] （我喜欢电影《肖申克的救赎》。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;二、什么是同位语&lt;/h3&gt;
 &lt;blockquote&gt;
 &lt;p&gt;同位语是用来解释或补充说明名词的成分，通常直接跟在名词之后。&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[Dayan, my teacher, is so beautiful!] （大雁，我老师，太漂亮了！）&lt;/li&gt;
-&lt;li&gt;:tex[We, Chinese people, are brave and hard-working.] （我们中国人民是勤劳勇敢的。）&lt;/li&gt;
+&lt;li&gt;:tex[Dayan, :u[my teacher], is so beautiful!] （大雁，我老师，太漂亮了！）&lt;/li&gt;
+&lt;li&gt;:tex[We, :u[Chinese people], are brave and hard-working.] （我们中国人民是勤劳勇敢的。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;三、什么可以作同位语&lt;/h3&gt;
 &lt;h4&gt;1. 代词作同位语&lt;/h4&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[We all have strengths and weaknesses.] （我们所有人都有优点和缺点。） all 作 We 的同位语。&lt;/li&gt;
+&lt;li&gt;:tex[We :u[all] have strengths and weaknesses.] （我们所有人都有优点和缺点。） all 作 We 的同位语。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h4&gt;2. 名词（短语）作同位语&lt;/h4&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[Tiechui, a handsome boy, never fails to fascinate me.] （铁锤，一个帅气的男生，总是能让我着迷。） a handsome boy 作 Tiechui 的同位语。&lt;/li&gt;
+&lt;li&gt;:tex[Tiechui, :u[a handsome boy], never fails to fascinate me.] （铁锤，一个帅气的男生，总是能让我着迷。） a handsome boy 作 Tiechui 的同位语。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h4&gt;3. 动词 -ing 形式短语和动词不定式短语作同位语&lt;/h4&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[I enjoy this sport, playing basketball.] （我喜欢篮球这项运动。） playing basketball 作 sport 的同位语。&lt;/li&gt;
-&lt;li&gt;:tex[He has a dream to travel round the world.] （他有一个梦想——环游世界。） to travel round the world 作 a dream 的同位语。&lt;/li&gt;
+&lt;li&gt;:tex[I enjoy this sport, :u[playing basketball].] （我喜欢篮球这项运动。） playing basketball 作 sport 的同位语。&lt;/li&gt;
+&lt;li&gt;:tex[He has a dream :u[to travel round the world].] （他有一个梦想——环游世界。） to travel round the world 作 a dream 的同位语。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h4&gt;4. 从句作同位语&lt;/h4&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[The news that our volleyball team had won the championship encouraged us all greatly.] （我们排球队赢得冠军的消息大大地鼓舞了我们所有人。） that 从句作 The news 的同位语。&lt;/li&gt;
+&lt;li&gt;:tex[The news :u[that our volleyball team had won the championship] encouraged us all greatly.] （我们排球队赢得冠军的消息大大地鼓舞了我们所有人。） that 从句作 The news 的同位语。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;四、同位语在写作中的应用&lt;/h3&gt;
 &lt;blockquote&gt;
@@ -1778,13 +2669,13 @@ $$&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;ul&gt;
 &lt;li&gt;素颜：:tex[Persistence is the key to success.] （坚持是成功的关键。）&lt;/li&gt;
-&lt;li&gt;化妆：:tex[Persistence, a positive attitude, is the key to success.] （坚持，一种积极的态度，是成功的关键。）&lt;/li&gt;
+&lt;li&gt;化妆：:tex[Persistence, :u[a positive attitude], is the key to success.] （坚持，一种积极的态度，是成功的关键。）&lt;/li&gt;
 &lt;li&gt;素颜：:tex[The Palace Museum receives tens of millions of tourists every year.] （故宫博物院每年接待上千万的游客。）&lt;/li&gt;
-&lt;li&gt;化妆：:tex[The Palace Museum, one of the famous tourist attractions in China, receives tens of millions of tourists every year.] （故宫博物院，中国著名旅游景点之一，每年接待游客上千万。）&lt;/li&gt;
+&lt;li&gt;化妆：:tex[The Palace Museum, :u[one of the famous tourist attractions in China], receives tens of millions of tourists every year.] （故宫博物院，中国著名旅游景点之一，每年接待游客上千万。）&lt;/li&gt;
 &lt;li&gt;素颜：:tex[We should support our domestic products.] （我们应该支持国货。）&lt;/li&gt;
-&lt;li&gt;化妆：:tex[We, Chinese customers, should support our domestic products.] （我们中国的消费者应该支持国货。）&lt;/li&gt;
+&lt;li&gt;化妆：:tex[We, :u[Chinese customers], should support our domestic products.] （我们中国的消费者应该支持国货。）&lt;/li&gt;
 &lt;li&gt;素颜：:tex[A boy wrote the name of Beckham on his face.] （一个男孩把贝克汉姆的名字写在了自己的脸上。）&lt;/li&gt;
-&lt;li&gt;化妆：:tex[A boy wrote the name of Beckham, a well-known British football player, on his face.] （一个男孩把贝克汉姆——一位著名的英国足球运动员——的名字写在了自己的脸上。）&lt;/li&gt;
+&lt;li&gt;化妆：:tex[A boy wrote the name of Beckham, :u[a well-known British football player], on his face.] （一个男孩把贝克汉姆——一位著名的英国足球运动员——的名字写在了自己的脸上。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2&gt;第二节 名词性从句概述&lt;/h2&gt;
 &lt;h3&gt;一、什么是从句&lt;/h3&gt;
@@ -1796,10 +2687,10 @@ $$&lt;/p&gt;
 &lt;p&gt;名词（短语）能充当的成分（主语、宾语、表语、同位语），名词性从句都能充当。因此名词性从句分为主语从句、宾语从句、表语从句和同位语从句。&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;ul&gt;
-&lt;li&gt;主语从句：:tex[What I saw last night is very encouraging.] （昨天我看的东西很鼓舞人心。）&lt;/li&gt;
-&lt;li&gt;宾语从句：:tex[I appreciate what the hero said in the movie.] （我欣赏男主人公在电影中说的话。）&lt;/li&gt;
-&lt;li&gt;表语从句：:tex[Andy is who we should learn from.] （安迪是我们应该学习的。）&lt;/li&gt;
-&lt;li&gt;同位语从句：:tex[I like the plot of the movie that Andy escaped from prison successfully.] （我喜欢这部电影里安迪成功越狱的情节。）&lt;/li&gt;
+&lt;li&gt;主语从句：:tex[:u[What I saw last night] is very encouraging.] （昨天我看的东西很鼓舞人心。）&lt;/li&gt;
+&lt;li&gt;宾语从句：:tex[I appreciate :u[what the hero said in the movie].] （我欣赏男主人公在电影中说的话。）&lt;/li&gt;
+&lt;li&gt;表语从句：:tex[Andy is :u[who we should learn from].] （安迪是我们应该学习的。）&lt;/li&gt;
+&lt;li&gt;同位语从句：:tex[I like the plot of the movie :u[that Andy escaped from prison successfully].] （我喜欢这部电影里安迪成功越狱的情节。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;三、名词性从句的引导词&lt;/h3&gt;
 &lt;blockquote&gt;
@@ -1827,7 +2718,7 @@ $$&lt;/p&gt;
 &lt;tr&gt;
 &lt;td&gt;特殊疑问句&lt;/td&gt;
 &lt;td&gt;特殊疑问词&lt;/td&gt;
-&lt;td&gt;when, where, why, how, who, what, which 等。有固定意思，不可省略。&lt;/td&gt;
+&lt;td&gt;when, where, why, how, who, whom, what, which, whose 等。有固定意思，不可省略。&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -1838,16 +2729,16 @@ $$&lt;/p&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;strong&gt;翻译练习&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[I wonder why human beings live on the earth.] （我想知道人类为什么生活在地球上。）&lt;/li&gt;
-&lt;li&gt;:tex[Whether aliens exist is really vital.] （外星人存在与否真的很重要。）&lt;/li&gt;
-&lt;li&gt;:tex[That people are quite indifferent to you when you are at a low point is self-evident.] （当你身处低谷时，周围的人会对你很冷漠是显而易见的。）&lt;/li&gt;
-&lt;li&gt;:tex[Why they left Henan for Xinjiang at the beginning is a secret.] （他们当初为什么离开河南去新疆是一个秘密。）&lt;/li&gt;
-&lt;li&gt;:tex[That reading can purify our souls is beyond dispute.] （读书能净化我们的灵魂是毋庸置疑的。）&lt;/li&gt;
-&lt;li&gt;:tex[Someday, you will find that your career, kinship and friendship are more important than love.] （总有一天你会发现，你的事业、亲情和友情都比爱情重要。）&lt;/li&gt;
-&lt;li&gt;:tex[I am reflecting whether I should give up the postgraduate entrance examination.] （我正在思考我是否应该放弃考研。）&lt;/li&gt;
-&lt;li&gt;:tex[Many people think that success means making a lot of money at all costs.] （很多人认为成功就是不惜任何代价挣到很多钱。）&lt;/li&gt;
-&lt;li&gt;:tex[Happiness is that a person can live his life in the way he wants.] （幸福就是一个人可以按照自己想要的方式过完这一生。）&lt;/li&gt;
-&lt;li&gt;:tex[The decision whether it is right or wrong depends on the result.] （这个决定是对还是错，取决于结果。）&lt;/li&gt;
+&lt;li&gt;:tex[I wonder :u[why human beings live on the earth].] （我想知道人类为什么生活在地球上。）&lt;/li&gt;
+&lt;li&gt;:tex[:u[Whether aliens exist] is really vital.] （外星人存在与否真的很重要。）&lt;/li&gt;
+&lt;li&gt;:tex[:u[That people are quite indifferent to you when you are at a low point] is self-evident.] （当你身处低谷时，周围的人会对你很冷漠是显而易见的。）&lt;/li&gt;
+&lt;li&gt;:tex[:u[Why they left Henan for Xinjiang] at the beginning is a secret.] （他们当初为什么离开河南去新疆是一个秘密。）&lt;/li&gt;
+&lt;li&gt;:tex[:u[That reading can purify our souls] is beyond dispute.] （读书能净化我们的灵魂是毋庸置疑的。）&lt;/li&gt;
+&lt;li&gt;:tex[Someday, you will find :u[that your career, kinship and friendship are more important than love].] （总有一天你会发现，你的事业、亲情和友情都比爱情重要。）&lt;/li&gt;
+&lt;li&gt;:tex[I am reflecting :u[whether I should give up the postgraduate entrance examination].] （我正在思考我是否应该放弃考研。）&lt;/li&gt;
+&lt;li&gt;:tex[Many people think :u[that success means making a lot of money at all costs].] （很多人认为成功就是不惜任何代价挣到很多钱。）&lt;/li&gt;
+&lt;li&gt;:tex[Happiness is :u[that a person can live his life in the way he wants].] （幸福就是一个人可以按照自己想要的方式过完这一生。）&lt;/li&gt;
+&lt;li&gt;:tex[The decision :u[whether it is right or wrong depends on the result].] （这个决定是对还是错，取决于结果。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2&gt;第三节 名词性从句的考点分析&lt;/h2&gt;
 &lt;h3&gt;一、写作&lt;/h3&gt;
@@ -1858,39 +2749,19 @@ $$&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;正常：:tex[That she has succeeded in making friends makes me happy.] （她成功地交到了朋友，这让我很高兴。）&lt;/li&gt;
 &lt;li&gt;后置：:tex[It makes me happy that she has succeeded in making friends.]&lt;/li&gt;
+&lt;li&gt;:tex[It is common knowledge that a positive attitude plays a key role in success.] （积极的心态对于成功至关重要，这是常识。）&lt;/li&gt;
+&lt;li&gt;:tex[It is my belief that the issue of pollution should be brought into the limelight under modern conditions.] （我认为污染这个话题现在应该引起人们的关注。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;strong&gt;高分句式&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;:tex[It has been widely accepted that...] 人们普遍认为……&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;:tex[It is self-evident that...] ……是显而易见的。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;:tex[It is common knowledge that...] ……是常识。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;:tex[It is generally agreed that...] 人们普遍认为……&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;:tex[It is my belief that...] 我认为……&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;:tex[It is universally acknowledged that...] 人们普遍认为……&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;:tex[It has been found that...] 人们已经发现……&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;:tex[It is beyond dispute that...] ……是毋庸置疑的。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;:tex[It is common knowledge that a positive attitude plays a key role in success.] （积极的心态对于成功至关重要，这是常识。）&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;:tex[It is my belief that the issue of pollution should be brought into the limelight under modern conditions.] （我认为污染这个话题现在应该引起人们的关注。）&lt;/p&gt;
-&lt;/li&gt;
+&lt;li&gt;:tex[It has been widely accepted that...] 人们普遍认为……&lt;/li&gt;
+&lt;li&gt;:tex[It is self-evident that...] ……是显而易见的。&lt;/li&gt;
+&lt;li&gt;:tex[It is common knowledge that...] ……是常识。&lt;/li&gt;
+&lt;li&gt;:tex[It is generally agreed that...] 人们普遍认为……&lt;/li&gt;
+&lt;li&gt;:tex[It is my belief that... = I think that...] 我认为……&lt;/li&gt;
+&lt;li&gt;:tex[It is universally acknowledged that...] 人们普遍认为……&lt;/li&gt;
+&lt;li&gt;:tex[It has been found that...] 人们已经发现……&lt;/li&gt;
+&lt;li&gt;:tex[It is beyond dispute that...] ……是毋庸置疑的。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;strong&gt;it 作形式主语的其他情况&lt;/strong&gt;&lt;/p&gt;
 &lt;blockquote&gt;
