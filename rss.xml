@@ -1247,6 +1247,920 @@ int main() {
 &lt;li&gt;菱形继承带来的主要问题是子类继承两份相同的数据，导致资源浪费以及毫无意义&lt;/li&gt;
 &lt;li&gt;利用虚继承可以解决菱形继承问题&lt;/li&gt;
 &lt;/ul&gt;
+</content:encoded></item><item><title>3.4.7多态</title><link>https://www.atsuko.top/posts/dark-horse/c++/core/347-polymorphism/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/core/347-polymorphism/</guid><pubDate>Sun, 07 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h4&gt;4.7.1 多态的基本概念&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;多态是C++面向对象三大特性之一&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;多态分为两类&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;静态多态: 函数重载 和 运算符重载属于静态多态，复用函数名&lt;/li&gt;
+&lt;li&gt;动态多态: 派生类和虚函数实现运行时多态&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;静态多态和动态多态区别：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;静态多态的函数地址早绑定  -  编译阶段确定函数地址&lt;/li&gt;
+&lt;li&gt;动态多态的函数地址晚绑定  -  运行阶段确定函数地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;下面通过案例进行讲解多态&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Animal1
+{
+public:
+    //Speak函数就是虚函数
+    //函数前面加上virtual关键字，变成虚函数，那么编译器在编译的时候就不能确定函数调用了。
+    virtual void speak()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;动物在说话&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+
+class Cat1 :public Animal1
+{
+public:
+    void speak()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;小猫在说话&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+
+class Dog1 :public Animal1
+{
+public:
+
+    void speak()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;小狗在说话&quot; &amp;lt;&amp;lt; std::endl;
+    }
+
+};
+//我们希望传入什么对象，那么就调用什么对象的函数
+//如果函数地址在编译阶段就能确定，那么静态联编
+//如果函数地址在运行阶段才能确定，就是动态联编
+
+void DoSpeak1(Animal1&amp;amp; animal)
+{
+    animal.speak();
+}
+//
+//多态满足条件： 
+//1、有继承关系
+//2、子类重写父类中的虚函数
+//多态使用：
+//父类指针或引用指向子类对象
+
+void test1()
+{
+    Cat1 cat;
+    DoSpeak1(cat);
+
+    Dog1 dog;
+    DoSpeak1(dog);
+}
+
+int main() {
+
+    test1();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;总结：&lt;/p&gt;
+&lt;p&gt;多态满足条件&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;有继承关系&lt;/li&gt;
+&lt;li&gt;子类重写父类中的虚函数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;多态使用条件&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;父类指针或引用指向子类对象&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;重写：函数返回值类型  函数名 参数列表 完全一致称为重写&lt;/p&gt;
+&lt;h4&gt;4.7.2 多态案例一-计算器类&lt;/h4&gt;
+&lt;p&gt;案例描述：&lt;/p&gt;
+&lt;p&gt;分别利用普通写法和多态技术，设计实现两个操作数进行运算的计算器类&lt;/p&gt;
+&lt;p&gt;多态的优点：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;代码组织结构清晰&lt;/li&gt;
+&lt;li&gt;可读性强&lt;/li&gt;
+&lt;li&gt;利于前期和后期的扩展以及维护&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+//普通实现
+class Calculator2 {
+public:
+    int getResult(std::string oper)
+    {
+        if (oper == &quot;+&quot;) {
+            return m_Num1 + m_Num2;
+        }
+        else if (oper == &quot;-&quot;) {
+            return m_Num1 - m_Num2;
+        }
+        else if (oper == &quot;*&quot;) {
+            return m_Num1 * m_Num2;
+        }
+        else {
+            return 0;
+        }
+        //如果要提供新的运算，需要修改源码
+    }
+public:
+    int m_Num1;
+    int m_Num2;
+};
+
+void test21()
+{
+    //普通实现测试
+    Calculator2 c;
+    c.m_Num1 = 10;
+    c.m_Num2 = 10;
+    std::cout &amp;lt;&amp;lt; c.m_Num1 &amp;lt;&amp;lt; &quot; + &quot; &amp;lt;&amp;lt; c.m_Num2 &amp;lt;&amp;lt; &quot; = &quot; &amp;lt;&amp;lt; c.getResult(&quot;+&quot;) &amp;lt;&amp;lt; std::endl;
+
+    std::cout &amp;lt;&amp;lt; c.m_Num1 &amp;lt;&amp;lt; &quot; - &quot; &amp;lt;&amp;lt; c.m_Num2 &amp;lt;&amp;lt; &quot; = &quot; &amp;lt;&amp;lt; c.getResult(&quot;-&quot;) &amp;lt;&amp;lt; std::endl;
+
+    std::cout &amp;lt;&amp;lt; c.m_Num1 &amp;lt;&amp;lt; &quot; * &quot; &amp;lt;&amp;lt; c.m_Num2 &amp;lt;&amp;lt; &quot; = &quot; &amp;lt;&amp;lt; c.getResult(&quot;*&quot;) &amp;lt;&amp;lt; std::endl;
+}
+
+//多态实现
+//抽象计算器类
+//多态优点：代码组织结构清晰，可读性强，利于前期和后期的扩展以及维护
+class AbstractCalculator2
+{
+public:
+
+    virtual int getResult()
+    {
+        return 0;
+    }
+
+    int m_Num1;
+    int m_Num2;
+};
+
+//加法计算器
+class AddCalculator2 :public AbstractCalculator2
+{
+public:
+    int getResult()
+    {
+        return m_Num1 + m_Num2;
+    }
+};
+
+//减法计算器
+class SubCalculator2 :public AbstractCalculator2
+{
+public:
+    int getResult()
+    {
+        return m_Num1 - m_Num2;
+    }
+};
+
+//乘法计算器
+class MulCalculator2 :public AbstractCalculator2
+{
+public:
+    int getResult()
+    {
+        return m_Num1 * m_Num2;
+    }
+};
+
+void test22()
+{
+    //创建加法计算器
+    AbstractCalculator2* abc = new AddCalculator2;
+    abc-&amp;gt;m_Num1 = 10;
+    abc-&amp;gt;m_Num2 = 10;
+    std::cout &amp;lt;&amp;lt; abc-&amp;gt;m_Num1 &amp;lt;&amp;lt; &quot; + &quot; &amp;lt;&amp;lt; abc-&amp;gt;m_Num2 &amp;lt;&amp;lt; &quot; = &quot; &amp;lt;&amp;lt; abc-&amp;gt;getResult() &amp;lt;&amp;lt; std::endl;
+    delete abc;  //用完了记得销毁
+
+    //创建减法计算器
+    abc = new SubCalculator2;
+    abc-&amp;gt;m_Num1 = 10;
+    abc-&amp;gt;m_Num2 = 10;
+    std::cout &amp;lt;&amp;lt; abc-&amp;gt;m_Num1 &amp;lt;&amp;lt; &quot; - &quot; &amp;lt;&amp;lt; abc-&amp;gt;m_Num2 &amp;lt;&amp;lt; &quot; = &quot; &amp;lt;&amp;lt; abc-&amp;gt;getResult() &amp;lt;&amp;lt; std::endl;
+    delete abc;
+
+    //创建乘法计算器
+    abc = new MulCalculator2;
+    abc-&amp;gt;m_Num1 = 10;
+    abc-&amp;gt;m_Num2 = 10;
+    std::cout &amp;lt;&amp;lt; abc-&amp;gt;m_Num1 &amp;lt;&amp;lt; &quot; * &quot; &amp;lt;&amp;lt; abc-&amp;gt;m_Num2 &amp;lt;&amp;lt; &quot; = &quot; &amp;lt;&amp;lt; abc-&amp;gt;getResult() &amp;lt;&amp;lt; std::endl;
+    delete abc;
+}
+
+int main() {
+
+    //test21();
+
+    test22();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总结：C++开发提倡利用多态设计程序架构，因为多态优点很多&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4&gt;4.7.3 纯虚函数和抽象类&lt;/h4&gt;
+&lt;p&gt;在多态中，通常父类中虚函数的实现是毫无意义的，主要都是调用子类重写的内容&lt;/p&gt;
+&lt;p&gt;因此可以将虚函数改为&lt;strong&gt;纯虚函数&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;纯虚函数语法：&lt;code&gt;virtual 返回值类型 函数名 （参数列表）= 0 ;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;当类中有了纯虚函数，这个类也称为&lt;strong&gt;抽象类&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;抽象类特点&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;无法实例化对象&lt;/li&gt;
+&lt;li&gt;子类必须重写抽象类中的纯虚函数，否则也属于抽象类&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+class Base3
+{
+public:
+    //纯虚函数
+    //类中只要有一个纯虚函数就称为抽象类
+    //抽象类无法实例化对象
+    //子类必须重写父类中的纯虚函数，否则也属于抽象类
+    virtual void func() = 0;
+};
+
+class Son3 :public Base3
+{
+public:
+    void func()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;func调用&quot; &amp;lt;&amp;lt; std::endl;
+    };
+};
+
+void test31()
+{
+    Base3* base = NULL;
+    //base = new Base3; // 错误，抽象类无法实例化对象
+    base = new Son3;
+    base-&amp;gt;func();
+    delete base;//记得销毁
+}
+
+int main() {
+
+    test31();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.7.4 多态案例二-制作饮品&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;案例描述&lt;/strong&gt; ：&lt;/p&gt;
+&lt;p&gt;制作饮品的大致流程为：煮水 -  冲泡 - 倒入杯中 - 加入辅料&lt;/p&gt;
+&lt;p&gt;利用多态技术实现本案例，提供抽象制作饮品基类，提供子类制作咖啡和茶叶&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;assets/1545985945198.png&quot; alt=&quot;1545985945198&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+
+//抽象制作饮品
+class AbstractDrinking {
+public:
+    //烧水
+    virtual void Boil() = 0;
+    //冲泡
+    virtual void Brew() = 0;
+    //倒入杯中
+    virtual void PourInCup() = 0;
+    //加入辅料
+    virtual void PutSomething() = 0;
+    //规定流程
+    void MakeDrink() {
+        Boil();
+        Brew();
+        PourInCup();
+        PutSomething();
+    }
+};
+
+//制作咖啡
+class Coffee : public AbstractDrinking {
+public:
+    //烧水
+    virtual void Boil() {
+        std::cout &amp;lt;&amp;lt; &quot;煮农夫山泉!&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    //冲泡
+    virtual void Brew() {
+        std::cout &amp;lt;&amp;lt; &quot;冲泡咖啡!&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    //倒入杯中
+    virtual void PourInCup() {
+        std::cout &amp;lt;&amp;lt; &quot;将咖啡倒入杯中!&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    //加入辅料
+    virtual void PutSomething() {
+        std::cout &amp;lt;&amp;lt; &quot;加入牛奶!&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+
+//制作茶水
+class Tea : public AbstractDrinking {
+public:
+    //烧水
+    virtual void Boil() {
+        std::cout &amp;lt;&amp;lt; &quot;煮自来水!&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    //冲泡
+    virtual void Brew() {
+        std::cout &amp;lt;&amp;lt; &quot;冲泡茶叶!&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    //倒入杯中
+    virtual void PourInCup() {
+        std::cout &amp;lt;&amp;lt; &quot;将茶水倒入杯中!&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    //加入辅料
+    virtual void PutSomething() {
+        std::cout &amp;lt;&amp;lt; &quot;加入枸杞!&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+
+//业务函数
+void DoWork(AbstractDrinking* drink) {
+    drink-&amp;gt;MakeDrink();
+    delete drink;
+}
+
+void test41() {
+    DoWork(new Coffee);
+    std::cout &amp;lt;&amp;lt; &quot;--------------&quot; &amp;lt;&amp;lt; std::endl;
+    DoWork(new Tea);
+}
+
+int main() {
+
+    test41();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;4.7.5 虚析构和纯虚析构&lt;/h4&gt;
+&lt;p&gt;多态使用时，如果子类中有属性开辟到堆区，那么父类指针在释放时无法调用到子类的析构代码&lt;/p&gt;
+&lt;p&gt;解决方式：将父类中的析构函数改为&lt;strong&gt;虚析构&lt;/strong&gt;或者&lt;strong&gt;纯虚析构&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;虚析构和纯虚析构共性：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;可以解决父类指针释放子类对象&lt;/li&gt;
+&lt;li&gt;都需要有具体的函数实现&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;虚析构和纯虚析构区别：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果是纯虚析构，该类属于抽象类，无法实例化对象&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;虚析构语法：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;virtual ~类名(){}&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;纯虚析构语法：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt; virtual ~类名() = 0;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;类名::~类名(){}&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+class Animal {
+public:
+
+    Animal()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Animal 构造函数调用！&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    virtual void Speak() = 0;
+
+    //析构函数加上virtual关键字，变成虚析构函数
+    //virtual ~Animal()
+    //{
+    //	std::cout &amp;lt;&amp;lt; &quot;Animal虚析构函数调用！&quot; &amp;lt;&amp;lt; std::endl;
+    //}
+
+    virtual ~Animal() = 0;
+};
+
+Animal::~Animal()
+{
+    std::cout &amp;lt;&amp;lt; &quot;Animal 纯虚析构函数调用！&quot; &amp;lt;&amp;lt; std::endl;
+}
+
+//和包含普通纯虚函数的类一样，包含了纯虚析构函数的类也是一个抽象类。不能够被实例化。
+
+class Cat : public Animal {
+public:
+    Cat(std::string name)
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Cat构造函数调用！&quot; &amp;lt;&amp;lt; std::endl;
+        m_Name = new std::string(name);
+    }
+    virtual void Speak()
+    {
+        std::cout &amp;lt;&amp;lt; *m_Name &amp;lt;&amp;lt; &quot;小猫在说话!&quot; &amp;lt;&amp;lt; std::endl;
+    }
+    ~Cat()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Cat析构函数调用!&quot; &amp;lt;&amp;lt; std::endl;
+        if (this-&amp;gt;m_Name != NULL) {
+            delete m_Name;
+            m_Name = NULL;
+        }
+    }
+
+public:
+    std::string* m_Name;
+};
+
+void test51()
+{
+    Animal* animal = new Cat(&quot;Tom&quot;);
+    animal-&amp;gt;Speak();
+
+    //通过父类指针去释放，会导致子类对象可能清理不干净，造成内存泄漏
+    //怎么解决？给基类增加一个虚析构函数
+    //虚析构函数就是用来解决通过父类指针释放子类对象
+    delete animal;
+}
+
+int main() {
+
+    test51();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;总结：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;虚析构或纯虚析构就是用来解决通过父类指针释放子类对象&lt;/li&gt;
+&lt;li&gt;如果子类中没有堆区数据，可以不写为虚析构或纯虚析构&lt;/li&gt;
+&lt;li&gt;拥有纯虚析构函数的类也属于抽象类&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;4.7.6 多态案例三-电脑组装&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;案例描述&lt;/strong&gt; ：&lt;/p&gt;
+&lt;p&gt;电脑主要组成部件为 CPU（用于计算），显卡（用于显示），内存条（用于存储）&lt;/p&gt;
+&lt;p&gt;将每个零件封装出抽象基类，并且提供不同的厂商生产不同的零件，例如Intel厂商和Lenovo厂商&lt;/p&gt;
+&lt;p&gt;创建电脑类提供让电脑工作的函数，并且调用每个零件工作的接口&lt;/p&gt;
+&lt;p&gt;测试时组装三台不同的电脑进行工作&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+using namespace std;
+
+//抽象CPU类
+class CPU
+{
+public:
+    //抽象的计算函数
+    virtual void calculate() = 0;
+};
+
+//抽象显卡类
+class VideoCard
+{
+public:
+    //抽象的显示函数
+    virtual void display() = 0;
+};
+
+//抽象内存条类
+class Memory
+{
+public:
+    //抽象的存储函数
+    virtual void storage() = 0;
+};
+
+//电脑类
+class Computer
+{
+public:
+    Computer(CPU* cpu, VideoCard* vc, Memory* mem)
+    {
+        m_cpu = cpu;
+        m_vc = vc;
+        m_mem = mem;
+    }
+
+    //提供工作的函数
+    void work()
+    {
+        //让零件工作起来，调用接口
+        m_cpu-&amp;gt;calculate();
+
+        m_vc-&amp;gt;display();
+
+        m_mem-&amp;gt;storage();
+    }
+
+    //提供析构函数 释放3个电脑零件
+    ~Computer()
+    {
+
+        //释放CPU零件
+        if (m_cpu != NULL)
+        {
+            delete m_cpu;
+            m_cpu = NULL;
+        }
+
+        //释放显卡零件
+        if (m_vc != NULL)
+        {
+            delete m_vc;
+            m_vc = NULL;
+        }
+
+        //释放内存条零件
+        if (m_mem != NULL)
+        {
+            delete m_mem;
+            m_mem = NULL;
+        }
+    }
+
+private:
+
+    CPU* m_cpu; //CPU的零件指针
+    VideoCard* m_vc; //显卡零件指针
+    Memory* m_mem; //内存条零件指针
+};
+
+//具体厂商
+//Intel厂商
+class IntelCPU :public CPU
+{
+public:
+    virtual void calculate()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Intel的CPU开始计算了！&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+
+class IntelVideoCard :public VideoCard
+{
+public:
+    virtual void display()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Intel的显卡开始显示了！&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+
+class IntelMemory :public Memory
+{
+public:
+    virtual void storage()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Intel的内存条开始存储了！&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+
+//Lenovo厂商
+class LenovoCPU :public CPU
+{
+public:
+    virtual void calculate()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Lenovo的CPU开始计算了！&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+
+class LenovoVideoCard :public VideoCard
+{
+public:
+    virtual void display()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Lenovo的显卡开始显示了！&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+
+class LenovoMemory :public Memory
+{
+public:
+    virtual void storage()
+    {
+        std::cout &amp;lt;&amp;lt; &quot;Lenovo的内存条开始存储了！&quot; &amp;lt;&amp;lt; std::endl;
+    }
+};
+
+void test01()
+{
+    //第一台电脑零件
+    CPU* intelCpu = new IntelCPU;
+    VideoCard* intelCard = new IntelVideoCard;
+    Memory* intelMem = new IntelMemory;
+
+    std::cout &amp;lt;&amp;lt; &quot;第一台电脑开始工作：&quot; &amp;lt;&amp;lt; std::endl;
+    //创建第一台电脑
+    Computer* computer1 = new Computer(intelCpu, intelCard, intelMem);
+    computer1-&amp;gt;work();
+    delete computer1;
+
+    std::cout &amp;lt;&amp;lt; &quot;-----------------------&quot; &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;第二台电脑开始工作：&quot; &amp;lt;&amp;lt; std::endl;
+    //第二台电脑组装
+    Computer* computer2 = new Computer(new LenovoCPU, new LenovoVideoCard, new LenovoMemory);;
+    computer2-&amp;gt;work();
+    delete computer2;
+
+    std::cout &amp;lt;&amp;lt; &quot;-----------------------&quot; &amp;lt;&amp;lt; std::endl;
+    std::cout &amp;lt;&amp;lt; &quot;第三台电脑开始工作：&quot; &amp;lt;&amp;lt; std::endl;
+    //第三台电脑组装
+    Computer* computer3 = new Computer(new LenovoCPU, new IntelVideoCard, new LenovoMemory);;
+    computer3-&amp;gt;work();
+    delete computer3;
+
+}
+
+int main() {
+
+    test01();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>3.5文件操作</title><link>https://www.atsuko.top/posts/dark-horse/c++/core/35-file-operations/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/core/35-file-operations/</guid><pubDate>Sun, 07 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;5 文件操作&lt;/h2&gt;
+&lt;p&gt;程序运行时产生的数据都属于临时数据，程序一旦运行结束都会被释放&lt;/p&gt;
+&lt;p&gt;通过&lt;strong&gt;文件可以将数据持久化&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;C++中对文件操作需要包含头文件 &lt;code&gt;&amp;lt;fstream&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;文件类型分为两种：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;文本文件&lt;/strong&gt; - 文件以文本的&lt;strong&gt;ASCII码&lt;/strong&gt;形式存储在计算机中&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;二进制文件&lt;/strong&gt; - 文件以文本的&lt;strong&gt;二进制&lt;/strong&gt;形式存储在计算机中，用户一般不能直接读懂它们&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;操作文件的三大类:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;std::ofstream：写操作&lt;/li&gt;
+&lt;li&gt;ifstream： 读操作&lt;/li&gt;
+&lt;li&gt;fstream ： 读写操作&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;5.1文本文件&lt;/h3&gt;
+&lt;h4&gt;5.1.1写文件&lt;/h4&gt;
+&lt;p&gt;写文件步骤如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;包含头文件&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;#include &amp;lt;fstream&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;创建流对象&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;std::ofstream ofs;&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;打开文件&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ofs.open(&quot;文件路径&quot;,打开方式);&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;写数据&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ofs &amp;lt;&amp;lt; &quot;写入的数据&quot;;&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;关闭文件&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ofs.close();&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;文件打开方式：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;打开方式&lt;/th&gt;
+&lt;th&gt;解释&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;ios::in&lt;/td&gt;
+&lt;td&gt;为读文件而打开文件&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ios::out&lt;/td&gt;
+&lt;td&gt;为写文件而打开文件&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ios::ate&lt;/td&gt;
+&lt;td&gt;初始位置：文件尾&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ios::app&lt;/td&gt;
+&lt;td&gt;追加方式写文件&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ios::trunc&lt;/td&gt;
+&lt;td&gt;如果文件存在先删除，再创建&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ios::binary&lt;/td&gt;
+&lt;td&gt;二进制方式&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;: 文件打开方式可以配合使用，利用|操作符&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;例如&lt;/strong&gt;:用二进制方式写文件 &lt;code&gt;ios::binary |  ios:: out&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;fstream&amp;gt;
+
+void test01()
+{
+	std::ofstream ofs;
+	ofs.open(&quot;test.txt&quot;, std::ios::out);
+
+	ofs &amp;lt;&amp;lt; &quot;姓名：张三&quot; &amp;lt;&amp;lt; std::endl;
+	ofs &amp;lt;&amp;lt; &quot;性别：男&quot; &amp;lt;&amp;lt; std::endl;
+	ofs &amp;lt;&amp;lt; &quot;年龄：18&quot; &amp;lt;&amp;lt; std::endl;
+
+	ofs.close();
+}
+
+int main() {
+
+	test01();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;总结：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;文件操作必须包含头文件 fstream&lt;/li&gt;
+&lt;li&gt;读文件可以利用 std::ofstream  ，或者fstream类&lt;/li&gt;
+&lt;li&gt;打开文件时候需要指定操作文件的路径，以及打开方式&lt;/li&gt;
+&lt;li&gt;利用&amp;lt;&amp;lt;可以向文件中写数据&lt;/li&gt;
+&lt;li&gt;操作完毕，要关闭文件&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;5.1.2读文件&lt;/h4&gt;
+&lt;p&gt;读文件与写文件步骤相似，但是读取方式相对于比较多&lt;/p&gt;
+&lt;p&gt;读文件步骤如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;包含头文件&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;#include &amp;lt;fstream&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;创建流对象&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ifstream ifs;&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;打开文件并判断文件是否打开成功&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ifs.open(&quot;文件路径&quot;,打开方式);&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;读数据&lt;/p&gt;
+&lt;p&gt;四种方式读取&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;关闭文件&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ifs.close();&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;fstream&amp;gt;
+#include&amp;lt;iostream&amp;gt;
+#include&amp;lt;string&amp;gt;
+
+void test2()
+{
+	std::ifstream ifs;
+	ifs.open(&quot;test.txt&quot;, std::ios::in);
+
+	if (!ifs.is_open())
+	{
+		std::cout &amp;lt;&amp;lt; &quot;文件打开失败&quot; &amp;lt;&amp;lt; std::endl;
+		return;
+	}
+
+	//第一种方式
+	char buf[1024] = { 0 };
+	while (ifs &amp;gt;&amp;gt; buf)
+	{
+		std::cout &amp;lt;&amp;lt; buf &amp;lt;&amp;lt; std::endl;
+	}
+
+	//第二种
+	//char buf[1024] = { 0 };
+	//while (ifs.getline(buf,sizeof(buf)))
+	//{
+	//	std::cout &amp;lt;&amp;lt; buf &amp;lt;&amp;lt; std::endl;
+	//}
+
+	//第三种
+	//std::string buf;
+	//while (getline(ifs, buf))
+	//{
+	//	std::cout &amp;lt;&amp;lt; buf &amp;lt;&amp;lt; std::endl;
+	//}
+
+	//第四种
+	//char c;
+	//while ((c = ifs.get()) != EOF)
+	//{
+	//	std::cout &amp;lt;&amp;lt; c;
+	//}
+
+	//ifs.close();
+
+}
+
+int main() {
+
+	test2();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;总结：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;读文件可以利用 ifstream  ，或者fstream类&lt;/li&gt;
+&lt;li&gt;利用is_open函数可以判断文件是否打开成功&lt;/li&gt;
+&lt;li&gt;close 关闭文件&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;5.2 二进制文件&lt;/h3&gt;
+&lt;p&gt;以二进制的方式对文件进行读写操作&lt;/p&gt;
+&lt;p&gt;打开方式要指定为 &lt;code&gt;ios::binary&lt;/code&gt;&lt;/p&gt;
+&lt;h4&gt;5.2.1 写文件&lt;/h4&gt;
+&lt;p&gt;二进制方式写文件主要利用流对象调用成员函数write&lt;/p&gt;
+&lt;p&gt;函数原型 ：&lt;code&gt;ostream&amp;amp; write(const char * buffer,int len);&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;参数解释：字符指针buffer指向内存中一段存储空间。len是读写的字节数&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;fstream&amp;gt;
+#include &amp;lt;string&amp;gt;
+
+class Person3
+{
+public:
+	char m_Name[64];
+	int m_Age;
+};
+
+//二进制文件  写文件
+void test3()
+{
+	//1、包含头文件
+
+	//2、创建输出流对象
+	std::ofstream ofs(&quot;person.txt&quot;, std::ios::out | std::ios::binary);
+
+	//3、打开文件
+	//ofs.open(&quot;person.txt&quot;, std::ios::out | std::ios::binary);
+
+	Person3 p = { &quot;张三&quot;  , 18 };
+
+	//4、写文件
+	ofs.write((const char*)&amp;amp;p, sizeof(p));
+
+	//5、关闭文件
+	ofs.close();
+}
+
+int main() {
+
+	test3();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;总结：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;文件输出流对象 可以通过write函数，以二进制方式写数据&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;5.2.2 读文件&lt;/h4&gt;
+&lt;p&gt;二进制方式读文件主要利用流对象调用成员函数read&lt;/p&gt;
+&lt;p&gt;函数原型：&lt;code&gt;istream&amp;amp; read(char *buffer,int len);&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;参数解释：字符指针buffer指向内存中一段存储空间。len是读写的字节数&lt;/p&gt;
+&lt;p&gt;示例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;fstream&amp;gt;
+#include&amp;lt;string&amp;gt;
+#include&amp;lt;iostream&amp;gt;
+
+class Person
+{
+public:
+	char m_Name[64];
+	int m_Age;
+};
+
+void test4()
+{
+	std::ifstream ifs(&quot;person.txt&quot;, std::ios::in | std::ios::binary);
+	if (!ifs.is_open())
+	{
+		std::cout &amp;lt;&amp;lt; &quot;文件打开失败&quot; &amp;lt;&amp;lt; std::endl;
+	}
+
+	Person p;
+	ifs.read((char*)&amp;amp;p, sizeof(p));
+
+	std::cout &amp;lt;&amp;lt; &quot;姓名： &quot; &amp;lt;&amp;lt; p.m_Name &amp;lt;&amp;lt; &quot; 年龄： &quot; &amp;lt;&amp;lt; p.m_Age &amp;lt;&amp;lt; std::endl;
+}
+
+int main() {
+
+	test4();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;文件输入流对象 可以通过read函数，以二进制方式读数据&lt;/li&gt;
+&lt;/ul&gt;
 </content:encoded></item><item><title>1.1计算机网络概述</title><link>https://www.atsuko.top/posts/408/computer-network/11-overview-of-computer-networks/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/computer-network/11-overview-of-computer-networks/</guid><pubDate>Sat, 06 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;1.1 计算机网络概述&lt;/h1&gt;
 &lt;h3&gt;1.1.1 计算机网络的概念&lt;/h3&gt;
 &lt;p&gt;一般认为，计算机网络是将众多分散的、自治的计算机系统，通过通信设备与线路连接起来，并由功能完善的软件实现资源共享和信息传递的系统。&lt;/p&gt;
@@ -1892,6 +2806,150 @@ $$&lt;/p&gt;
 &lt;li&gt;&lt;code&gt;分贝形式&lt;/code&gt;(单位 dB)：此时信噪比为 $10\log_{10}(S/N)=10\log_{10}100=20\text{dB}$。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;两者在数学上&lt;strong&gt;等价&lt;/strong&gt;，但&lt;strong&gt;分贝形式更实用&lt;/strong&gt;。因为在通信中，信号与噪声的功率差异往往极大，例如信号可能是噪声的10亿倍。若用线性值表示，则1后面有9个0，不仅冗长，还容易数错；而用分贝表示仅为90dB，简洁且不易出错。因此，分贝能高效、清晰地表达极大或极小的比值。&lt;/p&gt;
+</content:encoded></item><item><title>3.1数据链路层的功能</title><link>https://www.atsuko.top/posts/408/computer-network/31-functions-of-the-data-link-layer/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/computer-network/31-functions-of-the-data-link-layer/</guid><pubDate>Sat, 06 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;3.1 数据链路层的功能&lt;/h3&gt;
+&lt;p&gt;数据链路层的主要任务是让帧在一段链路或一个网络中传输。尽管数据链路层协议种类繁多，但它们都需解决三个基本问题：&lt;code&gt;封装成帧&lt;/code&gt;、&lt;code&gt;透明传输&lt;/code&gt;和&lt;code&gt;差错检测&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;数据链路层使用的信道主要有两种：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;点对点信道&lt;/code&gt;：一对一通信，通常通过一条专用物理链路连接两个节点。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;广播信道&lt;/code&gt;：一对多通信，单个节点发送的数据可被连接在同信道上的所有节点接收。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;3.1.1 数据链路层所处的地位&lt;/h4&gt;
+&lt;p&gt;以两台主机通过互联网通信为例：局域网1中的主机H1经路由器R1、广域网及路由器R2，连接到局域网2中的主机H2。&lt;/p&gt;
+&lt;p&gt;主机 H1 和 H2 均具备完整的五层协议栈；路由器在转发分组时仅使用协议栈的下三层。当 H1 向 H2 发送数据时，数据在各节点的协议栈中&lt;strong&gt;多次上下流动&lt;/strong&gt;：进入路由器后，先从物理层上至网络层，在转发表中确定下一跳地址，再下至物理层转发出去。&lt;/p&gt;
+&lt;p&gt;然而，在学习数据链路层时，我们通常&lt;strong&gt;聚焦于水平方向的数据链路层交互&lt;/strong&gt;。此时可将通信过程简化为：H1 的链路层→R1 的链路层→R2 的链路层→H2 的链路层。这三段链路可能采用&lt;strong&gt;不同的数据链路层协议&lt;/strong&gt;，但每一段都独立完成帧的传输任务。&lt;/p&gt;
+&lt;p&gt;下面介绍点对点信道的基本概念，其中部分也适用于广播信道。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;链路&lt;/code&gt;。指从一个节点到相邻节点的一段&lt;strong&gt;物理线路&lt;/strong&gt;，是通信路径的组成部分。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;数据链路&lt;/code&gt;。在物理链路上添加实现通信协议的软硬件后所形成的&lt;strong&gt;逻辑通信通道&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;帧&lt;/code&gt;。数据链路层对等实体间通信的&lt;strong&gt;协议数据单元&lt;/strong&gt;。发送方将网络层交下的数据封装为帧发送；接收方从帧中提取数据并上交网络层。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;3.1.2 链路管理&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;链路管理&lt;/code&gt;是指数据链路层层连接的&lt;strong&gt;建立&lt;/strong&gt;、&lt;strong&gt;维持&lt;/strong&gt;和&lt;strong&gt;释放&lt;/strong&gt;过程，主要用于面向连接的服务。&lt;/p&gt;
+&lt;p&gt;通信双方必须首先确认对方处于就绪状态，并交换必要信息(如初始化帧序号)，才能建立连接：传输过程中需维持连接状态；通信结束后则释放连接。&lt;/p&gt;
+&lt;h4&gt;3.1.3 封装成帧与透明传输&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;封装成帧&lt;/code&gt;是指在数据前后分别添加首部和尾部，构成一个完整的帧。&lt;code&gt;帧长&lt;/code&gt;等于帧的数据部分长度加上首部和尾部的长度。首部和尾部包含控制信息，其核心作用是&lt;code&gt;帧定界&lt;/code&gt;——帮助接收方从比特流中准确识别帧的起始与结束。例如，在 HDLC 协议中，使用&lt;strong&gt;标识字段 F&lt;/strong&gt; (0111110)标识帧的开始和结束。接收方将&lt;strong&gt;第一个 F 视为帧的开始&lt;/strong&gt;，&lt;strong&gt;下一个 F 标志该帧的结束&lt;/strong&gt;。为提高传输效率，应使数据部分尽可能长，但帧过长会增加差错概率和重传开销。因此，各类链路层协议均规定了&lt;code&gt;最大传送单元&lt;/code&gt;(MTU)，即帧数据部分的长度上限。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;透明&lt;/code&gt;是计算机领域的一个重要概念，意指某事物虽存在，但对上层不可见。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;透明传输&lt;/code&gt;是数据链路层的重要特性。“&lt;code&gt;透明&lt;/code&gt;”在此意为：即使数据中恰好出现与帧定界符相同的比特组合，也不会被误判为帧边界。若不处理此问题，接收方可能提前结束帧解析，导致后续数据丢失。实现透明传输后，接收方能将帧完整恢复为原始SDU(服务数据单元)，使网络层“感知不到”底层的帧封装过程——即&lt;strong&gt;数据链路层对上层是透明的&lt;/strong&gt;。&lt;/p&gt;
+&lt;h4&gt;3.1.4 流量控制&lt;/h4&gt;
+&lt;p&gt;由于链路两端节点的处理速率或缓存能力存在差异，若发送方速率过高，接收方可能因来不及处理而导致帧丢失。因此，流量控制旨在&lt;strong&gt;限制发送方的发送速率&lt;/strong&gt;，使其&lt;strong&gt;不超过接收方的接收能力&lt;/strong&gt;。该过程通常依赖反馈机制：发送方根据接收方的确认或窗口信息，决定是否继续发送。&lt;/p&gt;
+&lt;p&gt;在 OSI 模型中，流量控制由数据链路层实现，用于调节相邻节点间的流量；而在 TCP/IP 模型中，该功能主要由传输层(如 TCP)承担，负责端到端的流量控制。&lt;/p&gt;
+&lt;h4&gt;3.1.5 差错检测与可靠传输&lt;/h4&gt;
+&lt;p&gt;由于信道噪声等因素，帧在传输过程中可能出现两类错误。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;位错&lt;/code&gt;：帧中某些比特发生翻转，通常通过&lt;strong&gt;循环冗余检验&lt;/strong&gt;检测。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;帧错&lt;/code&gt;：包括帧丢失、重复或失序等，属于更高层的传输差错。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;早期 OSI 模型认为，数据链路层必须向上提供可靠传输服务。因此，在 CRC 检错基础上，引入了帧编号、确认与重传机制：接收方收到正确帧后需发送确认；发送方若在规定时间内未收到确认，则判定为出错并重传，直至收到确认为止。&lt;/p&gt;
+&lt;p&gt;如今，是否采用可靠传输机制取决于信道质量：在&lt;strong&gt;通信质量较差的无线链路&lt;/strong&gt;中，数据链路层仍使用确认与重传机制，以提供可靠服务；而在&lt;strong&gt;高质量的有线链路&lt;/strong&gt;中，数据链路层仅进行 CRC 检错，将出错帧直接丢弃，不再负责重传。此时，重传任务由高层协议(如传输层 TCP)完成。核心原则是，数据链路层确保&lt;strong&gt;上交的帧无差错&lt;/strong&gt;，但不保证所有帧都被成功交付。&lt;/p&gt;
+</content:encoded></item><item><title>3.2组帧</title><link>https://www.atsuko.top/posts/408/computer-network/32-frame-grouping/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/computer-network/32-frame-grouping/</guid><pubDate>Sat, 06 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;3.2 组帧&lt;/h3&gt;
+&lt;p&gt;发送方依据特定规则，将网络层递交的分组&lt;code&gt;封装成帧&lt;/code&gt;(也称&lt;code&gt;组帧&lt;/code&gt;)。数据链路层以帧为单位传输数据，主要目的是：&lt;strong&gt;一旦出错，只需重发出错的帧，而不必重传全部数据&lt;/strong&gt;，从而提高传输效率。组帧需解决帧定界、帧同步和透明传输等问题。常见的组帧方法主要有以下四种。&lt;/p&gt;
+&lt;p&gt;:::note
+组帧时通常:u[既要添加首部，也要添加尾部]。原因在于，网络中信息以帧为最小传输单位，接收方必须能准确识别一帧在比特流中的:u[起始与结束位置]，否则无法正确解析帧内容。
+:::&lt;/p&gt;
+&lt;h4&gt;3.2.1 字符计数法&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;字符计数法&lt;/code&gt;在帧首部设置一个&lt;strong&gt;计数字段&lt;/strong&gt;，用于记录该帧包含的总字节数(包括计数字段自身占用的1B)。接收方读取该计数值后，即可确定后续数据的长度，从而定位帧的结束位置；由于帧是连续传输的，下一帧的起始位置也随之确定。&lt;/p&gt;
+&lt;p&gt;字符计数法的&lt;strong&gt;主要缺陷&lt;/strong&gt;是：当计数字段在传输过程中出错时，接收方将无法正确识别帧的边界，导致收发双方失去同步，可能引发灾难性后果。&lt;/p&gt;
+&lt;h4&gt;3.2.2 字节填充法&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;字节填充法&lt;/code&gt;通过特定控制字符实现帧定界。控制字符SOH表示帧的起始，EOT表示帧的结束。为避免数据中出现的SOH或EOT被误判为帧的定界符，发送方会在这些特殊字符前&lt;strong&gt;插入一个ESC字符&lt;/strong&gt;(注意，ESC是ASCII码中的一个单字节控制字符)，以实现&lt;strong&gt;透明传输&lt;/strong&gt;。若数据中原本就包含ESC，则同样在其前再插入一个ESC。接收方收到ESC后，会将其丢弃，并将紧随其后的字符视为普通数据(而非控制字符)，从而&lt;strong&gt;还原出原始数据&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;当帧的数据部分中出现 ESC、EOT 或 SOH 时，发送方在每个 ESC、EOT 或 SOH 之前插入一个 ESC 字符，接收方处理后恢复原数据。&lt;/p&gt;
+&lt;h4&gt;3.2.3 零比特填充法&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;零比特填充法&lt;/code&gt;允许数据帧包含任意数量的比特，并用固定比特串01111110作为帧的起始和结束标志。为防止数据字段中出现与标志相同的比特序列，发送方在扫描数据时，每遇到5个连续的“1”，就在其后自动插入一个“0”，确保数据字段中&lt;strong&gt;不会出现6个连续的“1”&lt;/strong&gt;，避免与帧标志混淆。接收方执行逆操作：每收到5个连续的“1”，就自动删除其后的“0”，以恢复原始数据。早期的HDLC协议正是采用这种方法来实现透明传输。&lt;/p&gt;
+&lt;p&gt;零比特填充法易于硬件实现，性能优于字节填充法。&lt;/p&gt;
+&lt;h4&gt;3.2.4 违规编码法&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;违规编码法&lt;/code&gt;利用物理层编码的冗余特性实现帧定界。例如，在曼彻斯特编码中：比特“1”编码为“高-低”电平对，比特“0”编码为“低-高”电平对。而“高-高”或“低-低”电平对在数据比特中是&lt;strong&gt;违规的&lt;/strong&gt;(未被采用)，因此可借用这些违规编码序列来标识帧的起始或终止。局域网IEEE 802标准采用了这种方法(更多介绍见3.6.2节)。违规编码法&lt;strong&gt;无须任何填充技术即可实现透明传输&lt;/strong&gt;，但仅适用于采用&lt;strong&gt;冗余编码&lt;/strong&gt;的特殊编码环境。&lt;/p&gt;
+&lt;p&gt;由于字符计数法对计数字段错误极为敏感，而字节填充法在实现上较为复杂且存在兼容性问题，因此目前更常用的组帧方法是零比特填充法和违规编码法。&lt;/p&gt;
+</content:encoded></item><item><title>3.3差错控制</title><link>https://www.atsuko.top/posts/408/computer-network/33-error-control/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/computer-network/33-error-control/</guid><pubDate>Sat, 06 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;3.3 差错控制&lt;/h3&gt;
+&lt;p&gt;实际的通信链路并非理想，比特在传输过程中可能产生差错：1 可能变为 0，0 也可能变成 1，这种现象称为&lt;code&gt;比特差错&lt;/code&gt;。比特差错是传输差错的一种，本节仅讨论此类差错。&lt;/p&gt;
+&lt;p&gt;通常采用&lt;strong&gt;编码技术&lt;/strong&gt;进行差错控制，主要分为两类：检错编码和纠错编码。采用&lt;code&gt;检错编码&lt;/code&gt;时，接收方若检测到差错，会设法通知发送方重传，直到收到正确的数据为止；采用&lt;code&gt;纠错编码&lt;/code&gt;时，接收方不仅能发现差错，还能确定错误位置并加以纠正。在探讨具体的编码技术之前，需先引入&lt;strong&gt;码距&lt;/strong&gt;(也称&lt;code&gt;海明距离&lt;/code&gt;)的概念——它是衡量编码检错能力与纠错能力的重要参数。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;码距&lt;/code&gt;是指两个码字在对应位上取值不同的比特数量。计算码距的一种方法是对两个位串进行&lt;strong&gt;异或&lt;/strong&gt;(xor)运算，结果中&lt;strong&gt;1的个数即为码距&lt;/strong&gt;。例如，0110⊕0011=0101，结果中有两个1，说明这两个码字有2位不同，因此其码距为2。在一个编码集中，&lt;strong&gt;任意两个有效码字之间码距的最小值&lt;/strong&gt;称为&lt;code&gt;该编码集的码距&lt;/code&gt;。例如，对于编码集{10011,01011,11110,00001}，虽然11110与00001的码距为5，但10011与01011的码距仅为2，取各码距中的最小值，求得该编码集的码距为2。&lt;/p&gt;
+&lt;p&gt;根据差错控制理论，编码方案的检错能力和纠错能力与码距 l 的关系如下：&lt;/p&gt;
+&lt;p&gt;$$
+l=d+c+1, \text{且 } d\geqslant c
+$$&lt;/p&gt;
+&lt;p&gt;即码距 l 越大，其&lt;strong&gt;检错的位数 d 就越大，纠错的位数 c 也越大&lt;/strong&gt;，且&lt;strong&gt;纠错能力恒不超过检错能力&lt;/strong&gt;(能纠错必然能检错)。例如，当码距 l=3 时，该编码最多可检测 2 位错误，或纠正 1 位错误。此外，进一步考虑 c=0 或 d=c 的两种边界情况，还可得出以下&lt;strong&gt;两个重要结论&lt;/strong&gt;：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;为检测 d 位错误&lt;/strong&gt;，编码方案的码距至少应为 $d+1$。任何发生 d 位错误的有效码字不可能变成另一个有效码字，以确保差错可被发现。例如，码距为 1 的编码无法检测任何错误。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;为纠正c位错误&lt;/strong&gt;，编码方案的码距至少应为 $2c+1$。即使一个有效码字发生c位错误，其仍然离原始码字最近，接收方可据此唯一确定原始码字，实现纠错。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;3.3.1 检错编码&lt;/h4&gt;
+&lt;p&gt;检错编码均采用&lt;code&gt;冗余编码技术&lt;/code&gt;，其核心思想是：在有效数据(&lt;code&gt;信息位&lt;/code&gt;)发送前，按照特定规则附加若干冗余位(&lt;code&gt;检验位&lt;/code&gt;)，构成一个符合预设编码规则的&lt;strong&gt;码字&lt;/strong&gt;后再发送。当信息位发生变化时，冗余位也会相应调整，以确保整个码字始终满足该编码规则。接收方通过校验收到的码字是否仍符合这一规则，来判断是否发生了差错。若某些比特在传输中出错，则可能违反原有的编码规则，进而使差错被有效检测出来。常见的检错编码包括&lt;code&gt;奇偶检验码&lt;/code&gt;和&lt;code&gt;循环冗余码&lt;/code&gt;。&lt;/p&gt;
+&lt;h5&gt;1. 奇偶检验码&lt;/h5&gt;
+&lt;p&gt;奇偶检验码是&lt;code&gt;奇检验码&lt;/code&gt;和&lt;code&gt;偶检验码&lt;/code&gt;的统称，是最基本的检错码。它由 n 位数据和 l 位检验位组成，检验位的取值(0 或 1)使得整个码字中“1”的个数为&lt;strong&gt;奇数&lt;/strong&gt;(奇校验)或&lt;strong&gt;偶数&lt;/strong&gt;(偶校验)。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;奇检验码&lt;/code&gt;：附加检验位后，码字中“1”的总数为奇数。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;偶检验码&lt;/code&gt;：附加检验位后，码字中“1”的总数为偶数。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;例如，7位数据1001101中有4个“1”(偶数)，因此：对应的奇检验码为$1001101\underline{1}$(加1使“1”的总数为奇数)，对应的偶检验码为$1001101\underline{0}$(加0使“1”的总数保持为偶数)。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;奇偶检验码只能检测奇数位错误&lt;/strong&gt;，无法发现偶数位错误，也无法定位错误位置。由于任意两个合法码字之间至少有2位不同，其码距为2。根据码距理论，此类编码最多可检测1位错误。而实际上，只要发生奇数位错误，“1”的总数奇偶性必然改变，因此能检测所有奇数位错误。&lt;/p&gt;
+&lt;h5&gt;2. 循环冗余码&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;循环冗余码&lt;/code&gt;(Cyclic Redundancy Code，CRC)是数据链路层广泛采用的一种高效检错技术，具有检错能力强、实现简单、硬件支持成熟等显著优势，其基本原理如下。&lt;/p&gt;
+&lt;p&gt;CRC 的核心思想: 将待发送的数据视为一个二进制多项式, 通过与一个预定义的&lt;strong&gt;生成多项式&lt;/strong&gt; $G(x)$ 进行特定运算, 生成一段&lt;strong&gt;冗余校验信息&lt;/strong&gt; (称为帧检验序列, FCS), 并将其附加在原始数据之后。接收方则使用相同的 $G(x)$ 对整个接收到的帧进行验证, 从而判断传输过程中是否出现差错。&lt;/p&gt;
+&lt;p&gt;CRC 校验过程的具体描述如下。&lt;/p&gt;
+&lt;h6&gt;约定生成多项式 $G(x)$&lt;/h6&gt;
+&lt;p&gt;收发双方事先约定一个 $r+1$ 阶的生成多项式 $G(x)$，其对应的二进制系数串长度为 $r+1$ 位，且&lt;strong&gt;最高位和最低位必须为 1&lt;/strong&gt;。例如，位串 1101 对应多项式 $x^{3}+x^{2}+1$，其阶数 r=3。&lt;/p&gt;
+&lt;h6&gt;发送方生成FCS&lt;/h6&gt;
+&lt;p&gt;假设待发送数据为 $m$ 位，记作位串 $M$；在 $M$ 后面添加 $r$ 个 0，得到长度为 $m+r$ 的扩展串(相当于将 $M$ 左移 $r$ 位，即乘以 $2^r$)；用 $G(x)$ 对应的位串对该扩展串进行&lt;strong&gt;模 2 除法&lt;/strong&gt;(不进位的二进制除法，其减法操作由异或实现)；所得余数(共 $r$ 位，不足时补前导 0)即为 &lt;strong&gt;FCS&lt;/strong&gt;；将原扩展串末尾的 $r$ 个 0 替换为 FCS，形成&lt;strong&gt;最终发送帧&lt;/strong&gt;($2^rM + FCS$)，总长度为 $m+r$ 位。&lt;/p&gt;
+&lt;h6&gt;接收方校验&lt;/h6&gt;
+&lt;p&gt;接收方收到整个帧(可能出错)后，用相同的 $G(x)$ 对其进行模2除法：若&lt;strong&gt;余数为0，则认为传输无差错&lt;/strong&gt;，接受该帧；&lt;strong&gt;若余数非0，则认为存在差错&lt;/strong&gt;，丢弃该帧。&lt;/p&gt;
+&lt;p&gt;以数据 M=101001(m=6)生成多项式 $G(x)=1101$(对应 r=3)为例。&lt;/p&gt;
+&lt;p&gt;CRC 校验码的计算步骤如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;左移补零&lt;/strong&gt;：在M后加3个0，即101001000。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;模2除法&lt;/strong&gt;：用1101去除101001000，如图3.8所示。模2除法规则：减法不借位，等价于按位异或；从最高位开始，每次对齐除数进行异或，直到处理完所有位。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;取余数&lt;/strong&gt;：最终余数为001(必须保留为3位)。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;构造发送帧&lt;/strong&gt;：将余数作为 FCS 附加到原始数据后，即 101001001(共 9 位)。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;CRC 的生成与校验通常由专用硬件电路实现，速度极快，几乎不会引入额外的延迟。若传输过程中无差错，则 CRC 检验所得余数必定为 0；若出现误码，余数仍为 0 的概率极低。因此，在工程实践中通常认为 “&lt;strong&gt;凡是被数据链路层接受的帧，几乎可以确定在传输过程中未发生差错&lt;/strong&gt;”。而那些被丢弃的帧，尽管物理上曾被收到，却因 CRC 校验失败而未被上层接受。&lt;/p&gt;
+&lt;h4&gt;3.3.2 纠错编码&lt;/h4&gt;
+&lt;p&gt;最常见的纠错编码是&lt;code&gt;海明码&lt;/code&gt;。其基本原理是在原始信息位中插入若干&lt;strong&gt;检验位&lt;/strong&gt;，构成具有检错与纠错能力的海明码。每个检验位对应一个&lt;strong&gt;校验组&lt;/strong&gt;(通常采用偶校验)，用于校验海明码中的若干信息位。通过将每个信息位分配到多个检验组中，当某一位出错时，会引发其所属的多个检验组同时出现校验错误，从而不仅能&lt;strong&gt;检测出错误，还能确定错误位置&lt;/strong&gt;，实现&lt;strong&gt;单比特纠错&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;下面以信息位 1010 为例，详细介绍海明码的构造与纠错过程。&lt;/p&gt;
+&lt;h5&gt;(1) 确定海明码的总位数&lt;/h5&gt;
+&lt;p&gt;设信息位有 n 位，检验位有 k 位。k 个检验位可表示 $2^{k}$ 种状态：信息位和检验位共有 $n + k$ 种单比特出错的位置，此外还需 1 种表示无错状态。因此，n 与 k 需满足&lt;/p&gt;
+&lt;p&gt;$$
+2^{k}\geq n+k+1
+$$&lt;/p&gt;
+&lt;p&gt;本例中 n=4，尝试 $k=3:2^{3} \geqslant 4+3+1$ 成立。故取 k=3，海明码共 $n+k=7$ 位。记信息位为 $D_{4}D_{3}D_{2}D_{1}=1010$，检验位为 $P_{3}P_{2}P_{1}$，海明码位号从右至左依次为 $H_{7}H_{6}H_{5}H_{4}H_{3}H_{2}H_{1}$。&lt;/p&gt;
+&lt;h5&gt;(2) 确定检验位的分布&lt;/h5&gt;
+&lt;p&gt;规定：&lt;strong&gt;检验位 $P_i$ 放在海明位号为 $2^{i-1}$ 的位置上&lt;/strong&gt;，其余各位放置信息位，因此：&lt;/p&gt;
+&lt;p&gt;$P_{1}$的海明码位号为 $2^{i-1}=2^{0}=1$，即 $H_{1}$为 $P_{1}$。&lt;/p&gt;
+&lt;p&gt;$P_{2}$ 的海明码位号为 $2^{i-1}=2^{1}=2$，即 $H_{2}$ 为 $P_{2}$。&lt;/p&gt;
+&lt;p&gt;$P_{3}$ 的海明码位号为 $2^{i-1}=2^{2}=4$，即 $H_{4}$ 为 $P_{3}$。&lt;/p&gt;
+&lt;p&gt;将信息位按原顺序放在剩余位置，得到海明码的分布如下：&lt;/p&gt;
+&lt;p&gt;$$
+\begin{array}{c c c c c c c}{H_{7}}&amp;amp;{H_{6}}&amp;amp;{H_{5}}&amp;amp;{H_{4}}&amp;amp;{H_{3}}&amp;amp;{H_{2}}&amp;amp;{H_{1}}\ {D_{4}}&amp;amp;{D_{3}}&amp;amp;{D_{2}}&amp;amp;{P_{3}}&amp;amp;{D_{1}}&amp;amp;{P_{2}}&amp;amp;{P_{1}}\ \end{array}
+$$&lt;/p&gt;
+&lt;h5&gt;(3) 分组以形成检验关系&lt;/h5&gt;
+&lt;p&gt;每个信息位由多个检验位共同校验，需满足条件：&lt;strong&gt;信息位所在位号 = 其所参与的所有检验位位号之和&lt;/strong&gt;。另外，检验位不需要再被检验。分组形成的检验关系如下。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{aligned}&amp;amp;D_{1} \text{ 位于 } H_{3}, \text{ 由 } H_{2}H_{1}(P_{2}P_{1}) \text{ 检验：}\quad&amp;amp; \text{因为 } 3(011)=\&amp;amp;D_{2} \text{ 位于 } H_{5}, \text{ 由 } H_{4}H_{1}(P_{3}P_{1}) \text{ 检验：}\quad&amp;amp; \text{因为 } 5(101)=\&amp;amp;D_{3} \text{ 位于 } H_{6}, \text{ 由 } H_{4}H_{2}(P_{3}P_{2}) \text{ 检验：}\quad&amp;amp; \text{因为 } 6(110)=\&amp;amp;D_{4} \text{ 位于 } H_{7}, \text{ 由 } H_{4}H_{2}H_{1}(P_{3}P_{2}P_{1}) \text{ 检验：}\quad&amp;amp; \text{因为 } 7(111)=&amp;amp;\begin{bmatrix}H_{4}(P_{3})\&amp;amp;&amp;amp;+\&amp;amp;&amp;amp;\4&amp;amp;&amp;amp;\4&amp;amp;&amp;amp;+\4&amp;amp;&amp;amp;\\end{bmatrix}+\begin{bmatrix}H_{2}(P_{2})\&amp;amp;2\&amp;amp;&amp;amp;+\&amp;amp;&amp;amp;\2&amp;amp;&amp;amp;+\2&amp;amp;&amp;amp;+\\end{bmatrix}\begin{matrix}H_{1}(P_{1})\&amp;amp;1\&amp;amp;&amp;amp;+\&amp;amp;&amp;amp;\2&amp;amp;&amp;amp;+\2&amp;amp;&amp;amp;+\\end{matrix}
+\end{aligned}
+$$&lt;/p&gt;
+&lt;h5&gt;(4) 检验位取值&lt;/h5&gt;
+&lt;p&gt;检验位 $P_{i}$ 的值为其对应校验组中所有位(含信息位)求异或(&lt;strong&gt;偶校验结果&lt;/strong&gt;)。&lt;/p&gt;
+&lt;p&gt;根据(3)中的分组有&lt;/p&gt;
+&lt;p&gt;$$
+P_{1} \text{ 校验 } D_{1},D_{2},D_{4}\quad\rightarrow\quad P_{1}=D_{1}\oplus D_{2}\oplus D_{4}=0\oplus1\oplus1=0
+$$&lt;/p&gt;
+&lt;p&gt;$$
+P_{2} \text{ 校验 } D_{1},D_{3},D_{4}\quad\rightarrow\quad P_{2}=D_{1}\oplus D_{3}\oplus D_{4}=0\oplus0\oplus1=1
+$$&lt;/p&gt;
+&lt;p&gt;$$
+P_{3} \text{ 校验 } D_{2},D_{3},D_{4}\quad\rightarrow\quad P_{3}=D_{2}\oplus D_{3}\oplus D_{4}=1\oplus0\oplus1=0
+$$&lt;/p&gt;
+&lt;p&gt;因此，1010 对应的海明码为 $101\underline{0}0\underline{1}\underline{0}$ (下划线为检验位，其余为信息位)。&lt;/p&gt;
+&lt;h5&gt;(5) 海明码的检验原理&lt;/h5&gt;
+&lt;p&gt;每个检验组分别利用检验位和参与形成该检验位的信息位进行奇偶检验检查，构成 k 个检验方程：&lt;/p&gt;
+&lt;p&gt;$$
+S_{1}=P_{1}\oplus D_{1}\oplus D_{2}\oplus D_{4}
+$$&lt;/p&gt;
+&lt;p&gt;$$
+S_{2}=P_{2}\oplus D_{1}\oplus D_{3}\oplus D_{4}
+$$&lt;/p&gt;
+&lt;p&gt;$$
+S_{3}=P_{3}\oplus D_{2}\oplus D_{3}\oplus D_{4}
+$$&lt;/p&gt;
+&lt;p&gt;若 $S_{3}S_{2}S_{1}$ 的值为“000”，表示无错误；否则表示出错，且这个数就是错误位的位号，如 $S_{3}S_{2}S_{1}=001$，表示第1位出错，即 $H_{1}$ 出错，直接将其取反即可达到纠错的目的。&lt;/p&gt;
+&lt;p&gt;海明码的优势在于：通过少量冗余检验位，可实现单比特错误的自动定位与纠正。&lt;/p&gt;
 </content:encoded></item><item><title>1.简单句</title><link>https://www.atsuko.top/posts/english/grammar/1-simple-sentence/</link><guid isPermaLink="true">https://www.atsuko.top/posts/english/grammar/1-simple-sentence/</guid><pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;第一章 奋斗的开始——简单句&lt;/h1&gt;
 &lt;h2&gt;第一节 汉英句子比较&lt;/h2&gt;
 &lt;blockquote&gt;
@@ -2939,40 +3997,40 @@ $$&lt;/p&gt;
 &lt;h2&gt;第二节 定语的成分&lt;/h2&gt;
 &lt;h3&gt;1. 形容词（短语）作定语&lt;/h3&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[That kind-hearted nightingale lost its life.] （那只善良的夜莺失去了它的生命。）&lt;/li&gt;
-&lt;li&gt;:tex[This extraordinary rose turns dark red.] （这朵非凡的玫瑰花变成了深红色。）&lt;/li&gt;
+&lt;li&gt;:tex[That :u[kind-hearted] nightingale lost its life.] （那只善良的夜莺失去了它的生命。）&lt;/li&gt;
+&lt;li&gt;:tex[This :u[extraordinary] rose turns dark red.] （这朵非凡的玫瑰花变成了深红色。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;2. 名词（短语）作定语&lt;/h3&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[The nightingale&apos;s singing can make the rose bloom.] 或 :tex[The singing of the nightingale can make the rose bloom.] （夜莺的歌声能使这朵玫瑰花开放。）&lt;/li&gt;
-&lt;li&gt;:tex[The student fell in love with the professor&apos;s daughter.] 或 :tex[The student fell in love with the daughter of the professor.] （学生爱上了教授的女儿。）&lt;/li&gt;
+&lt;li&gt;:tex[:u[The nightingale&apos;s] singing can make the rose bloom.] 或 :tex[The singing :u[of the nightingale] can make the rose bloom.] （夜莺的歌声能使这朵玫瑰花开放。）&lt;/li&gt;
+&lt;li&gt;:tex[The student fell in love with :u[the professor&apos;s] daughter.] 或 :tex[The student fell in love with the daughter :u[of the professor].] （学生爱上了教授的女儿。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;3. 介词短语作定语&lt;/h3&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[The nightingale out of the window heard the sighs of the young man.] （窗外的夜莺听到了年轻人的叹息。）&lt;/li&gt;
-&lt;li&gt;:tex[I only have roses as white as foam.] （我只有和浪花沫一样白的玫瑰花。）&lt;/li&gt;
+&lt;li&gt;:tex[The nightingale :u[out of the window] heard the sighs of the young man.] （窗外的夜莺听到了年轻人的叹息。）&lt;/li&gt;
+&lt;li&gt;:tex[I only have roses :u[as white as foam].] （我只有和浪花沫一样白的玫瑰花。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;4. 非谓语动词（短语）作定语&lt;/h3&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[The singing nightingale died pitifully.] （那只唱歌的夜莺死得很可怜。）&lt;/li&gt;
-&lt;li&gt;:tex[The innocent nightingale must have fallen in love with the student deceived by the girl.] （单纯的夜莺一定是爱上了那个被女孩欺骗的学生。）&lt;/li&gt;
+&lt;li&gt;:tex[The :u[singing] nightingale died pitifully.] （那只唱歌的夜莺死得很可怜。）&lt;/li&gt;
+&lt;li&gt;:tex[The innocent nightingale must have fallen in love with the student :u[deceived by the girl].] （单纯的夜莺一定是爱上了那个被女孩欺骗的学生。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;5. 从句作定语&lt;/h3&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[The rose which the nightingale exchanged its life for was discarded.] （夜莺用生命换来的玫瑰花被扔掉了。）&lt;/li&gt;
-&lt;li&gt;:tex[I like the jewelry that the prince gave me.] （我喜欢王子送给我的珠宝。）&lt;/li&gt;
+&lt;li&gt;:tex[The rose :u[which the nightingale exchanged its life for] was discarded.] （夜莺用生命换来的玫瑰花被扔掉了。）&lt;/li&gt;
+&lt;li&gt;:tex[I like the jewelry :u[that the prince gave me].] （我喜欢王子送给我的珠宝。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;blockquote&gt;
 &lt;p&gt;定语位置规律：“前短后长”。一个单词作定语通常前置，两个以上单词作定语通常后置。&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;&lt;strong&gt;翻译练习&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;:tex[This is a story about a nightingale and a rose.] （这是一个关于夜莺与玫瑰的故事。）&lt;/li&gt;
-&lt;li&gt;:tex[At the party of the prince, the youngster understanding love was rejected.] （在王子的舞会上，那个懂爱的年轻人被拒绝了。）&lt;/li&gt;
-&lt;li&gt;:tex[The dumped boy looks pitiful.] 或 :tex[The boy dumped looks pitiful.] （那个被抛弃的男孩看起来很可怜。）&lt;/li&gt;
-&lt;li&gt;:tex[The dream of the stockbroker is to become a painter.] （这个证券经纪人的梦想是成为一名画家。）&lt;/li&gt;
-&lt;li&gt;:tex[The hero without any painting foundation dreams of becoming a painter.] （没有任何画画基础的男主人公却梦想成为一名画家。）&lt;/li&gt;
-&lt;li&gt;:tex[The man abandoning his family and his job went to Paris.] （抛弃了家人和工作的这个男人去了巴黎。）&lt;/li&gt;
+&lt;li&gt;:tex[This is a story :u[about a nightingale and a rose].] （这是一个关于夜莺与玫瑰的故事。）&lt;/li&gt;
+&lt;li&gt;:tex[At the party :u[of the prince], the youngster :u[understanding love] was rejected.] （在王子的舞会上，那个懂爱的年轻人被拒绝了。）&lt;/li&gt;
+&lt;li&gt;:tex[The :u[dumped] boy looks pitiful.] 或 :tex[The boy :u[dumped] looks pitiful.] （那个被抛弃的男孩看起来很可怜。）&lt;/li&gt;
+&lt;li&gt;:tex[The dream :u[of the stockbroker] is to become a painter.] （这个证券经纪人的梦想是成为一名画家。）&lt;/li&gt;
+&lt;li&gt;:tex[The hero :u[without any painting foundation] dreams of becoming a painter.] （没有任何画画基础的男主人公却梦想成为一名画家。）&lt;/li&gt;
+&lt;li&gt;:tex[The man :u[abandoning his family and his job] went to Paris.] （抛弃了家人和工作的这个男人去了巴黎。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2&gt;第三节 细讲定语从句&lt;/h2&gt;
 &lt;h3&gt;一、定语从句的构成&lt;/h3&gt;
@@ -3018,21 +4076,21 @@ $$&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;&lt;strong&gt;引导词按词性分类：&lt;/strong&gt;&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;代词（在从句中充当主语、宾语或表语）：who, whom, that, which&lt;/li&gt;
+&lt;li&gt;代词（在从句中充当主语、宾语或表语）：who, whom（在从句中仅充当宾语）, that, which&lt;/li&gt;
 &lt;li&gt;副词（在从句中不能充当主干成分）：where, when, why&lt;/li&gt;
 &lt;li&gt;形容词（在从句中只能充当定语，修饰名词）：whose&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;&lt;strong&gt;练习&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;先行词是人，从句缺主语：that/who。:tex[Tiechui is the millionaire who falls in love with Dayan.] （铁锤是爱着大雁的百万富翁。）&lt;/li&gt;
-&lt;li&gt;先行词是人，从句缺宾语：that/who/whom。:tex[Tiechui is the millionaire whom Dayan falls in love with.] （铁锤是大雁爱着的百万富翁。）&lt;/li&gt;
-&lt;li&gt;先行词是人，从句缺定语：whose。:tex[Tiechui is the millionaire whose father is impoverished.] （铁锤是百万富翁，他的父亲很贫困。）&lt;/li&gt;
-&lt;li&gt;先行词是时间，从句主谓完整：when。:tex[I might never forget the day when we met each other.] （我永远忘不了我们遇见彼此的那一天。）&lt;/li&gt;
-&lt;li&gt;先行词是时间，从句缺宾语：which/that。:tex[I might never forget the day that we spent.] （我永远忘不了我们度过的那一天。）&lt;/li&gt;
-&lt;li&gt;先行词是原因，从句主系表完整：why。:tex[You had better offer some reasons why you are late.] （你最好给出一些你迟到的理由。）&lt;/li&gt;
-&lt;li&gt;先行词是原因，从句缺主语：which/that。:tex[You had better offer some reasons that sound perfect.] （你最好给出一些听上去完美的理由。）&lt;/li&gt;
-&lt;li&gt;先行词是物 the house，从句缺定语：whose。:tex[Watch out! Don&apos;t get too close to the house whose roof is under repair.] （小心！不要靠近这所房子，房顶正在维修。）&lt;/li&gt;
-&lt;li&gt;先行词是地点 the small town，从句不缺主干成分：where。:tex[After living in Beijing for sixty years, she returned to the small town where she grew up as a child.] （在北京生活了60年以后，她回到了她儿时长大的小城镇。）&lt;/li&gt;
+&lt;li&gt;先行词是人，从句缺主语：that/who。:tex[Tiechui is the millionaire :u[who] falls in love with Dayan.] （铁锤是爱着大雁的百万富翁。）&lt;/li&gt;
+&lt;li&gt;先行词是人，从句缺宾语：that/who/whom。:tex[Tiechui is the millionaire :u[whom] Dayan falls in love with.] （铁锤是大雁爱着的百万富翁。）&lt;/li&gt;
+&lt;li&gt;先行词是人，从句缺定语：whose。:tex[Tiechui is the millionaire :u[whose] father is impoverished.] （铁锤是百万富翁，他的父亲很贫困。）&lt;/li&gt;
+&lt;li&gt;先行词是时间，从句主谓完整：when。:tex[I might never forget the day :u[when] we met each other.] （我永远忘不了我们遇见彼此的那一天。）&lt;/li&gt;
+&lt;li&gt;先行词是时间，从句缺宾语：which/that。:tex[I might never forget the day :u[that] we spent.] （我永远忘不了我们度过的那一天。）&lt;/li&gt;
+&lt;li&gt;先行词是原因，从句主系表完整：why。:tex[You had better offer some reasons :u[why] you are late.] （你最好给出一些你迟到的理由。）&lt;/li&gt;
+&lt;li&gt;先行词是原因，从句缺主语：which/that。:tex[You had better offer some reasons :u[that] sound perfect.] （你最好给出一些听上去完美的理由。）&lt;/li&gt;
+&lt;li&gt;先行词是物 the house，从句缺定语：whose。:tex[Watch out! Don&apos;t get too close to the house :u[whose] roof is under repair.] （小心！不要靠近这所房子，房顶正在维修。）&lt;/li&gt;
+&lt;li&gt;先行词是地点 the small town，从句不缺主干成分：where。:tex[After living in Beijing for sixty years, she returned to the small town :u[where] she grew up as a child.] （在北京生活了60年以后，她回到了她儿时长大的小城镇。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;三、定语从句的先行词&lt;/h3&gt;
 &lt;blockquote&gt;
@@ -3040,10 +4098,10 @@ $$&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;&lt;strong&gt;真题例句&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;先行词是 reactions 而非 listener：:tex[The words used by the speaker may stir up unfavorable reactions in the listener which interfere with his comprehension.] （说话人所使用的语言会激起听者不好的反应，这些反应会干扰听者的理解。）&lt;/li&gt;
-&lt;li&gt;which 指代前面整句内容：:tex[The Greeks assumed that the structure of language had some connection with the process of thought, which took root in Europe long before people realized how diverse languages could be.] （希腊人认为语言的结构和思维的过程有某种联系，这种观点早在人们意识到语言的多样性之前就在欧洲扎根了。）&lt;/li&gt;
-&lt;li&gt;which 指代前面主句内容：:tex[My husband enjoys talking with other ladies, which drives me crazy.] （我的丈夫喜欢和别的女性聊天，这让我很抓狂。）&lt;/li&gt;
-&lt;li&gt;定语从句与先行词被隔开：:tex[As a linguist, he acknowledges that all varieties of human language, including non-standard ones like Black English, can be powerfully expressive—there exists no language or dialect in the world that cannot convey complex ideas.] （作为一名语言学家，他承认各种各样的人类语言都具有强大的表现力——世界上没有传达不了复杂思想的语言或方言。）&lt;/li&gt;
+&lt;li&gt;先行词是 reactions 而非 listener：:tex[The words used by the speaker may stir up unfavorable reactions in the listener :u[which] interfere with his comprehension.] （说话人所使用的语言会激起听者不好的反应，这些反应会干扰听者的理解。）&lt;/li&gt;
+&lt;li&gt;which 指代前面整句内容：:tex[The Greeks assumed that the structure of language had some connection with the process of thought, :u[which] took root in Europe long before people realized how diverse languages could be.] （希腊人认为语言的结构和思维的过程有某种联系，这种观点早在人们意识到语言的多样性之前就在欧洲扎根了。）&lt;/li&gt;
+&lt;li&gt;which 指代前面主句内容：:tex[My husband enjoys talking with other ladies, :u[which] drives me crazy.] （我的丈夫喜欢和别的女性聊天，这让我很抓狂。）&lt;/li&gt;
+&lt;li&gt;定语从句与先行词被隔开：:tex[As a linguist, he acknowledges that all varieties of human language, including non-standard ones like Black English, can be powerfully expressive—there exists no language or dialect in the world :u[that] cannot convey complex ideas.] （作为一名语言学家，他承认各种各样的人类语言都具有强大的表现力——世界上没有传达不了复杂思想的语言或方言。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;四、定语从句的特殊用法&lt;/h3&gt;
 &lt;h4&gt;1. 限制性和非限制性定语从句&lt;/h4&gt;
@@ -3103,6 +4161,7 @@ $$&lt;/p&gt;
 &lt;h4&gt;2. 省略 that 的情况&lt;/h4&gt;
 &lt;blockquote&gt;
 &lt;p&gt;在限制性定语从句中，that 作宾语时可省略。&lt;/p&gt;
+&lt;p&gt;如果看到两个名词（短语），或者一个名词（短语）与一个代词直接在一起，很可能是省略了that的定语从句&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;ul&gt;
 &lt;li&gt;:tex[I enjoy the movie we saw yesterday.] （我很喜欢我们昨天看的电影。）— movie 后省略 that&lt;/li&gt;
@@ -3111,7 +4170,7 @@ $$&lt;/p&gt;
 &lt;/ul&gt;
 &lt;h4&gt;3. as 和 which 引导的非限制性定语从句&lt;/h4&gt;
 &lt;blockquote&gt;
-&lt;p&gt;as 位置灵活（前/中/后），常译为“正如”；which 只能后置。as 后常接 be 动词。&lt;/p&gt;
+&lt;p&gt;as 引导非限制性定语从句，位置灵活（前/中/后），常译为“正如”；which 只能后置。as 后常接 be 动词。&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;ul&gt;
 &lt;li&gt;:tex[As is known to us all, without efforts nothing can be achieved.] （众所周知，不努力就会一事无成。）&lt;/li&gt;
@@ -3215,11 +4274,11 @@ $$&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;ul&gt;
 &lt;li&gt;素颜版：:tex[Keeping pets can relieve loneliness.] （养宠物可以缓解孤独。）&lt;/li&gt;
-&lt;li&gt;定妆版：:tex[Keeping those pets that look so cute and smart can relieve loneliness of some senior citizens who stay at home alone.] （养那些看起来很可爱聪明的宠物可以缓解一些独自待在家里的老年人的孤独感。）&lt;/li&gt;
+&lt;li&gt;定妆版：:tex[Keeping those pets :u[that look so cute and smart] can relieve loneliness :u[of some senior citizens who stay at home alone].] （养那些看起来很可爱聪明的宠物可以缓解一些独自待在家里的老年人的孤独感。）&lt;/li&gt;
 &lt;li&gt;素颜版：:tex[Worshipping stars blindly will waste time.] （盲目追星将会浪费时间。）&lt;/li&gt;
-&lt;li&gt;定妆版：:tex[Worshipping stars who are good at singing and dancing blindly will waste time of young people who should have spent more energy on their studies.] （盲目崇拜那些擅长唱歌跳舞的明星，会浪费年轻人的时间，他们本应该把更多的精力花在学业上。）&lt;/li&gt;
+&lt;li&gt;定妆版：:tex[Worshipping stars :u[who are good at singing and dancing] blindly will waste time :u[of young people who should have spent more energy on their studies].] （盲目崇拜那些擅长唱歌跳舞的明星，会浪费年轻人的时间，他们本应该把更多的精力花在学业上。）&lt;/li&gt;
 &lt;li&gt;素颜版：:tex[Reading books can broaden horizons.] （读书能够开拓视野。）&lt;/li&gt;
-&lt;li&gt;定妆版：:tex[Reading books which are beneficial to our mental and physical health can broaden the horizons of teenagers.] （阅读有益于我们身心健康的书籍可以开阔我们青少年的视野。）&lt;/li&gt;
+&lt;li&gt;定妆版：:tex[Reading books :u[which are beneficial to our mental and physical health] can broaden the horizons :u[of teenagers].] （阅读有益于我们身心健康的书籍可以开阔我们青少年的视野。）&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;二、长难句分析&lt;/h3&gt;
 &lt;blockquote&gt;
