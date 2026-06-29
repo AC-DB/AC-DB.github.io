@@ -1,0 +1,1 @@
+import{G as e}from"./client.m8Yw173H.js";e();
