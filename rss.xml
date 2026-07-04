@@ -563,6 +563,105 @@ typedef struct{         //静态链表的结构类型定义
 &lt;p&gt;一个长度为 $n$ 的整型数组 $A[1...n]$，给定整数 $x$，设计一个时间复杂度不超过 $O(n \log_2 n)$ 的算法，查找出这个数组中所有两两之和等于 $x$ 的整数对(每个元素只输出一次)。&lt;/p&gt;
 &lt;p&gt;提示：本题若想到排序，则问题便迎刃而解。先用一种时间复杂度为 $O(n\log_2n)$ 的排序算法将 $A[1..n]$ 从小到大排序，然后分别从数组的小端 $(i=1)$ 和大端 $(j=n)$ 开始查找：若 $A[i]+A[j]&amp;lt;x$，$i++$；若 $A[i]+A[j]&amp;gt;x$，$j--$；否则输出 $A[i]$、$A[j]$，然后 $i++$，$j--$；直到 $i&amp;gt;=j$ 时停止。&lt;/p&gt;
 &lt;p&gt;请读者思考本题是否有其他求解算法。&lt;/p&gt;
+</content:encoded></item><item><title>3.1栈</title><link>https://www.atsuko.top/posts/408/data-structure/31-stack/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/data-structure/31-stack/</guid><pubDate>Mon, 29 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;3.1.1 栈的基本概念&lt;/h3&gt;
+&lt;h4&gt;1. 栈的定义&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;栈&lt;/code&gt;(Stack)是仅允许在一端进行插入和删除操作的线性表。作为一种特殊的线性表，栈的插入(入栈)和删除(出栈)操作被限制在表的一端进行。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;栈顶&lt;/code&gt;(Top)：允许进行插入和删除操作的一端。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;栈底&lt;/code&gt;(Bottom)：固定不变、不允许进行插入和删除操作的另一端。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;空栈&lt;/code&gt;：不含任何元素的栈。&lt;/p&gt;
+&lt;p&gt;假设某栈 $S=(a_{1}, a_{2}, a_{3}, a_{4}, a_{5})$，其中 $a_{1}$ 为栈底元素，$a_{5}$ 为栈顶元素。栈的入栈和出栈操作只能在栈顶进行。若元素按顺序 $a_{1}, a_{2}, a_{3}, a_{4}, a_{5}$ 入栈，则出栈顺序为 $a_{5}, a_{4}, a_{3}, a_{2}, a_{1}$。由此可见，栈的操作特性可概括为&lt;strong&gt;后进先出&lt;/strong&gt;(Last In First Out，LIFO)。&lt;/p&gt;
+&lt;p&gt;:::note
+每接触一种新的数据结构，都应从其逻辑结构、存储结构和基本运算三方面进行系统理解。
+:::&lt;/p&gt;
+&lt;h4&gt;2. 栈的基本操作&lt;/h4&gt;
+&lt;p&gt;不同教材对基本操作的命名略有差异，但含义基本一致，本文采用严蔚敏教材的命名规范。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;InitStack(&amp;amp;S)&lt;/code&gt;: 初始化一个空栈 S。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;StackEmpty(S)&lt;/code&gt;：判断栈是否为空。若栈 S 为空，返回 true；否则返回 false。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Push(&amp;amp;S,x)&lt;/code&gt;: 入栈操作；若栈未满，则x成为新的栈顶元素。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Pop(&amp;amp;S,&amp;amp;x)&lt;/code&gt;：出栈操作；若栈非空，则弹出栈顶元素，并通过x返回该值。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;GetTop(S, &amp;amp;x)&lt;/code&gt;：读取栈顶元素但不出栈；若栈非空，则通过 x 返回栈顶元素。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;DestroyStack(&amp;amp;S)&lt;/code&gt;：销毁栈 S，并释放其所占用的存储空间(&amp;amp;表示引用调用)。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在解答算法题时，若题目未作特殊限制，可直接使用上述基本操作函数。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;栈的数学性质&lt;/strong&gt;：当 n 个不同元素按固定次序入栈时，可能的出栈序列总数为 $\frac{1}{n+1}C_{2n}^{n}$。该数列称为&lt;code&gt;卡特兰(Catalan)数&lt;/code&gt;，可通过数学归纳法证明，有兴趣的读者可参考组合数学教材。&lt;/p&gt;
+&lt;h3&gt;3.1.2 栈的顺序存储结构&lt;/h3&gt;
+&lt;p&gt;与线性表类似，栈也有两种基本的存储方式：顺序存储和链式存储。&lt;/p&gt;
+&lt;h4&gt;1. 顺序栈的实现&lt;/h4&gt;
+&lt;p&gt;采用顺序存储的栈称为&lt;code&gt;顺序栈&lt;/code&gt;，它利用一组地址连续的存储单元存放从栈底到栈顶的数据元素，并附设一个整型&lt;code&gt;指针&lt;/code&gt;(top)指示当前栈顶元素的位置。&lt;/p&gt;
+&lt;p&gt;顺序栈的类型可定义如下&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#define MaxSize 50          //定义栈中元素的最大个数
+typedef struct{
+    Elemtype data[MaxSize]; //存放栈中元素
+    int top;                //栈顶指针
+}SqStack;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;栈顶指针&lt;/strong&gt;：S.top，初始时设为 S.top=-1；&lt;strong&gt;栈顶元素&lt;/strong&gt;：S.data[S.top]。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;入栈操作&lt;/strong&gt;：当栈未满时，先将栈顶指针加1，再将元素存入栈顶。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;出栈操作&lt;/strong&gt;：当栈非空时，先取出栈顶元素，再将栈顶指针减1。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;栈空条件&lt;/strong&gt;：S.top==-1；&lt;strong&gt;栈满条件&lt;/strong&gt;：S.top==MaxSize-1；&lt;strong&gt;栈长&lt;/strong&gt;：S.top+1。&lt;/p&gt;
+&lt;p&gt;另一种常见的方式是：栈顶指针初始化为 $S.top=0$；入栈时先将元素存入栈顶，再将栈顶指针加 1；出栈时先将栈顶指针减 1，再取出栈顶元素；栈空条件为 $S.top==0$；栈满条件为 S.top==MaxSize。&lt;/p&gt;
+&lt;p&gt;顺序栈的入栈操作受数组上界约束。若对栈的最大使用空间估计不足，则可能发生栈上溢，此时，应向用户报告错误信息，以便及时处理，避免程序异常。&lt;/p&gt;
+&lt;p&gt;:::note
+栈和队列的判空、判满条件，会因实际给出的条件不同而变化，下面的代码实现是在栈顶指针初始化为-1的条件下的相应方法，而其他情况则需具体问题具体分析。
+:::&lt;/p&gt;
+&lt;h4&gt;2. 顺序栈的基本操作&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;栈顶指针的作用&lt;/strong&gt;：它标识了栈中有效元素的边界。&lt;/p&gt;
+&lt;p&gt;以下是顺序栈常用基本操作的实现(基于 top=-1 初始化)。&lt;/p&gt;
+&lt;p&gt;(1) 初始化&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;void InitStack(SqStack &amp;amp;S) {
+    S.top=-1;   //初始化栈顶指针
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(2) 判栈空&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bool StackEmpty(SqStack S){
+    if(S.top==-1)   //栈空
+        return true;
+    else            //不空
+    return false;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(3) 入栈&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bool Push(SqStack &amp;amp;S,ElemType x){
+    if(S.top==MaxSize-1)    //栈满，报错
+        return false;
+    S.data[++S.top]=x;      //指针先加1，再入栈
+    return true;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(4) 出栈&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bool Pop(SqStack &amp;amp;S,ElemType &amp;amp;x){
+    if(S.top==-1)       //栈空，报错
+        return false;
+    x=S.data[S.top--];  //先出栈，指针再减1
+    return true;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(5) 读栈顶元素&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bool GetTop(SqStack S,ElemType &amp;amp;x){
+    if(S.top==-1)       //栈空，报错
+        return false;
+    x=S.data[S.top];    //x记录栈顶元素
+    return true;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;该操作不改变栈的状态，栈顶元素依然保留在栈中。&lt;/p&gt;
+&lt;p&gt;:::note
+此处，top指向栈顶元素本身。因此入栈为S.data[++S.top]=x，出栈为x=S.data[S.top--]。若top初始化为0(指向栈顶元素的下一个位置)，则入栈变为S.data[S.top++]=x，出栈变为x=S.data[--S.top]，相应的判空、判满条件也随之改变。请读者仔细体会差异，做题时务必根据题目设定灵活应对。
+:::&lt;/p&gt;
+&lt;h4&gt;3. 共享栈&lt;/h4&gt;
+&lt;p&gt;利用栈底位置相对固定的特性，可让两个顺序栈共享同一段一维数组空间，将两个栈的栈底分别置于数组两端，栈顶向中间延伸。&lt;/p&gt;
+&lt;p&gt;0号栈栈顶指针为top0，1号栈栈顶指针为top1，均指向各自的栈顶元素；初始时top0=-1(0号栈空)，top1=MaxSize(1号栈空)；栈满条件为top1-top0==1(两栈顶相邻)。当0号栈入栈时，top0先加1，再赋值；当1号栈入栈时，top1先减1，再赋值；出栈操作的顺序相反。&lt;/p&gt;
+&lt;p&gt;共享栈能更高效地利用存储空间，两个栈的空间可动态调节，仅当整个数组被占满时，才发生栈溢出。其存取数据的时间复杂度均为 $O(1)$，对存取效率无影响。&lt;/p&gt;
+&lt;h3&gt;3.1.3 栈的链式存储结构&lt;/h3&gt;
+&lt;p&gt;采用链式存储的栈称为&lt;code&gt;链栈&lt;/code&gt;。其优点是便于动态分配存储空间，不存在栈满溢出的问题，且在多栈共存的场景下能更灵活地利用内存。通常使用单链表实现链栈，并且规定所有操作均在链表的表头进行。此处约定链栈不带头结点，栈顶指针 Lhead 直接指向栈顶元素。&lt;/p&gt;
+&lt;p&gt;链栈的类型可定义为&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;typedef struct LinkNode{
+    ElemType data;          //数据域
+    struct LinkNode *next;  //指针域
+} LiStack;                  //链栈类型定义
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;由于采用链式存储，结点的插入与删除操作非常高效。链栈的操作与单链表类似，入栈和出栈均在表头进行。注意，对于带头结点的链栈，其初始化、判空及操作细节会有所不同；而本节所述实现基于无头结点的设计，读者应根据实际需求灵活调整实现方式。&lt;/p&gt;
 </content:encoded></item><item><title>5.1.1_2模板概念和函数模板</title><link>https://www.atsuko.top/posts/dark-horse/c++/improve/511-2-template-concept-and-function-template/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/improve/511-2-template-concept-and-function-template/</guid><pubDate>Sun, 14 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;C++提高编程&lt;/h1&gt;
 &lt;ul&gt;
 &lt;li&gt;本阶段主要针对C++ &lt;strong&gt;泛型编程&lt;/strong&gt; 和 &lt;strong&gt;STL&lt;/strong&gt; 技术做详细讲解，探讨C++更深层的使用&lt;/li&gt;
