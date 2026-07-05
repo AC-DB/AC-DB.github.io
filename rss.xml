@@ -662,6 +662,255 @@ typedef struct{
 } LiStack;                  //链栈类型定义
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;由于采用链式存储，结点的插入与删除操作非常高效。链栈的操作与单链表类似，入栈和出栈均在表头进行。注意，对于带头结点的链栈，其初始化、判空及操作细节会有所不同；而本节所述实现基于无头结点的设计，读者应根据实际需求灵活调整实现方式。&lt;/p&gt;
+</content:encoded></item><item><title>3.2队列</title><link>https://www.atsuko.top/posts/408/data-structure/32-queue/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/data-structure/32-queue/</guid><pubDate>Mon, 29 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h3&gt;3.2.1 队列的基本概念&lt;/h3&gt;
+&lt;h4&gt;1. 队列的定义&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;队列&lt;/code&gt;(Queue)简称&lt;code&gt;队&lt;/code&gt;，也是一种操作受限的线性表，仅允许在表的一端进行插入，而在另一端进行删除。向队列中插入元素称为&lt;code&gt;入队&lt;/code&gt;(或&lt;code&gt;进队&lt;/code&gt;)，删除元素称为&lt;code&gt;出队&lt;/code&gt;(或&lt;code&gt;离队&lt;/code&gt;)。这一规则符合日常排队“先到先服务”的原则，因此队列的操作特性为&lt;strong&gt;先进先出&lt;/strong&gt;(First In First Out，FIFO)。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;队头&lt;/code&gt;(Front)：允许删除的一端，也称队首。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;队尾&lt;/code&gt;(Rear)：允许插入的一端。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;空队列&lt;/code&gt;：不含任何元素的队列。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;2. 队列常见的基本操作&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;InitQueue(&amp;amp;Q)&lt;/code&gt;：初始化队列，构造一个空队列Q。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;QueueEmpty(Q)&lt;/code&gt;：判队列空；若队列Q为空，返回true，否则返回false。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;EnQueue(&amp;amp;Q,x)&lt;/code&gt;：入队操作；若队列Q未满，将x加入队尾。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;DeQueue(&amp;amp;Q, &amp;amp;x)&lt;/code&gt;：出队操作；若队列Q非空，删除队首元素，并通过x返回其值。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;GetHead(Q, &amp;amp;x)&lt;/code&gt;：读队首元素但不出队；若队列Q非空，将队首元素赋值给x。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;需要注意的是，栈和队列均为操作受限的线性表，因此并非所有线性表的操作都适用于它们。例如，&lt;strong&gt;不允许直接访问或修改栈或队列中间的元素&lt;/strong&gt;，这是由其逻辑特性所决定的。&lt;/p&gt;
+&lt;h3&gt;3.2.2 队列的顺序存储结构&lt;/h3&gt;
+&lt;h4&gt;1. 队列的顺序存储&lt;/h4&gt;
+&lt;p&gt;队列的顺序实现是指分配一块连续的存储单元存放队列元素，并附设两个指针：&lt;code&gt;队首指针&lt;/code&gt;front指向队首元素，&lt;code&gt;队尾指针&lt;/code&gt;rear指向队尾元素的下一个位置。不同教材对front和rear指针含义的约定可能不同(例如，rear可能指向队尾元素或其下一位置)，这会导致入队和出队操作的具体实现不同。本节后附有相关习题，建议读者结合练习深入理解。&lt;/p&gt;
+&lt;p&gt;队列的顺序存储类型可定义为&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#define MaxSize 50          //定义队列中元素的最大个数
+typedef struct{
+    ElemType data[MaxSize]; //用数组存放队列元素
+    int front, rear;        //队首指针和队尾指针
+} SqQueue;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;初始状态&lt;/strong&gt;：&lt;code&gt;Q.front=Q.rear=0&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;入队操作&lt;/strong&gt;：当队列未满时，先将元素存入队尾，再将队尾指针加1。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;出队操作&lt;/strong&gt;：当队列非空时，先取出队首元素，再将队首指针加1。&lt;/p&gt;
+&lt;p&gt;初始时空队列满足 &lt;code&gt;Q.front == Q.rear == 0&lt;/code&gt;，该条件可作为&lt;strong&gt;判空依据&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;然而，能否以&lt;code&gt;Q.rear==MaxSize&lt;/code&gt;作为队满条件呢？显然不能。队列中仅剩一个元素，但&lt;code&gt;rear&lt;/code&gt;已达&lt;code&gt;MaxSize&lt;/code&gt;，若此时继续入队，则会出现“&lt;strong&gt;上溢&lt;/strong&gt;”。但这种溢出并非真正溢出，实际上数组中仍有空闲单元，因此称此现象为&lt;code&gt;假溢出&lt;/code&gt;。&lt;/p&gt;
+&lt;h4&gt;2. 循环队列&lt;/h4&gt;
+&lt;p&gt;为了解决顺序队列的假溢出问题，引入&lt;strong&gt;循环队列&lt;/strong&gt;：将顺序存储空间在逻辑上组织为环状结构。当指针到达数组末尾时，自动回到起始位置，这可通过取模运算(%)实现。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;初始状态&lt;/strong&gt;：&lt;code&gt;Q.front=Q.rear=0&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;队首指针进1&lt;/strong&gt;：&lt;code&gt;Q.front=(Q.front+1) %MaxSize&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;队尾指针进1&lt;/strong&gt;：&lt;code&gt;Q.rear=(Q.rear+1)%MaxSize&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;队列长度&lt;/strong&gt;：&lt;code&gt;(Q.rear+MaxSize-Q.front)%MaxSize&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;出入队操作&lt;/strong&gt;：指针均按顺时针方向移动。&lt;/p&gt;
+&lt;p&gt;那么，循环队列判空和判满的条件是什么呢？队空条件显然为 $Q.front == Q.rear$。但当入队速度远快于出队时，rear 会追上 front，此时同样满足 $Q.front == Q.rear$，却表示队满。因此，仅凭 $front == rear$ 无法区分队空与队满。&lt;/p&gt;
+&lt;p&gt;为解决这一问题，常用以下三种方法：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;牺牲一个存储单元&lt;/strong&gt;：入队时少用一个存储单元，这是一种较为普遍的做法，约定以“队尾指针的下一位置为队首”作为队满标志。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;队满条件&lt;/strong&gt;：$(Q.rear+1)%MaxSize==Q.front$。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;队空条件&lt;/strong&gt;：Q.front==Q.rear。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;队列中元素个数&lt;/strong&gt;：(Q.rear-Q.front+MaxSize)%MaxSize。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;增设 size 成员&lt;/strong&gt;: 记录当前元素个数。若入队成功, 则 size++, 若出队成功, 则 size--。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;队空条件&lt;/strong&gt;: Q.size==0。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;队满条件&lt;/strong&gt;：Q.size==MaxSize。&lt;/p&gt;
+&lt;p&gt;两种情形均有 Q.front == Q.rear，由 size 区分队空与队满。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;增设 tag 标志位：&lt;/p&gt;
+&lt;p&gt;出队后置 tag=0，若此时 Q.front==Q.rear，&lt;strong&gt;则为队空&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;入队后置 tag=1，若此时 Q.front==Q.rear，&lt;strong&gt;则为队满&lt;/strong&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;3. 循环队列的操作(基于牺牲一个单元法)&lt;/h4&gt;
+&lt;p&gt;(1) 初始化&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;void InitQueue(SqQueue &amp;amp;Q) {
+    Q.rear=Q.front=0;       //初始化队首、队尾指针
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(2) 判队空&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bool QueueEmpty(SqQueue Q) {
+    if (Q.rear==Q.front)    //队空条件
+        return true;
+    else
+        return false;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(3) 入队&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bool EnQueue(SqQueue &amp;amp;Q, ElemType x) {
+    if ((Q.rear+1) % MaxSize == Q.front)    //队满则报错
+        return false;
+    Q.data[Q.rear]=x;
+    Q.rear=(Q.rear+1) % MaxSize;            //队尾指针加1取模
+    return true;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(4) 出队&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bool DeQueue(SqQueue &amp;amp;Q, ElemType &amp;amp;x) {
+    if (Q.rear==Q.front)                //队空则报错
+        return false;
+    x=Q.data[Q.front];
+
+Q.front=(Q.front+1) %MaxSize;           //队首指针加1取模
+return true;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;3.2.3 队列的链式存储结构&lt;/h3&gt;
+&lt;h4&gt;1. 队列的链式存储&lt;/h4&gt;
+&lt;p&gt;队列的链式表示称为&lt;code&gt;链式队列&lt;/code&gt;，本质上是一个同时带有队首指针和队尾指针的单链表。&lt;code&gt;队首指针&lt;/code&gt;指向队头结点，&lt;code&gt;队尾指针&lt;/code&gt;指向队尾结点，即单链表的最后一个结点。&lt;/p&gt;
+&lt;p&gt;链式队列的类型可定义为&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;typedef struct LinkNode{    //链式队列结点
+    ElemType data;
+    struct LinkNode *next;
+} LinkNode;
+typedef struct{             //链式队列
+    LinkNode *front, *rear; //队列的队头和队尾指针
+} LinkQueue;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;当不带头结点时，若 Q.front == NULL 且 Q.rear == NULL，则链式队列为空队列。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;入队操作&lt;/strong&gt;：创建一个新结点，将其插入链表尾部，并令Q.rear指向该结点；若原队列为空，则同时令Q.front也指向该结点。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;出队操作&lt;/strong&gt;：先判断队列是否为空；若非空，则取出队首元素，删除对应结点，并令Q.front指向下一个结点；若被删结点是最后一个元素，则将Q.front和Q.rear均置为NULL。&lt;/p&gt;
+&lt;p&gt;不难发现，不带头结点的链式队列在边界处理上较为烦琐。因此，通常将链式队列设计为带头结点的单链表，从而使插入与删除操作逻辑统一。&lt;/p&gt;
+&lt;p&gt;链式队列特别适用于元素数量频繁变化的场景，且不存在队满或溢出问题。此外，若程序中需使用多个队列(如同多个栈的情形)，优先选用链式队列可避免存储分配不合理或溢出等问题。&lt;/p&gt;
+&lt;h4&gt;2. 链式队列的基本操作&lt;/h4&gt;
+&lt;p&gt;(1) 初始化&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;void InitQueue(LinkQueue &amp;amp;Q){ //初始化带头结点的链式队列
+    Q.front=Q.rear=(LinkNode*)malloc(sizeof(LinkNode)); //建立头结点
+    Q.front-&amp;gt;next=NULL; //初始为空
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(2) 判队空&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bool QueueEmpty(LinkQueue Q){
+
+if (Q.front==Q.rear) //判空条件
+    return true;
+else
+    return false;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(3) 入队&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;void EnQueue(LinkQueue &amp;amp;Q,ElemType x) {
+    LinkNode *s=(LinkNode *)malloc(sizeof(LinkNode)); //创建新结点
+    s-&amp;gt;data=x;
+    s-&amp;gt;next=NULL;
+    Q.rear-&amp;gt;next=s; //插入链尾
+    Q.rear=s; //修改尾指针
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(4) 出队&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bool DeQueue(LinkQueue &amp;amp;Q,ElemType &amp;amp;x) {
+    if (Q.front==Q.rear)
+        return false; //空队
+    LinkNode *p=Q.front-&amp;gt;next;
+    x=p-&amp;gt;data;
+    Q.front-&amp;gt;next=p-&amp;gt;next;
+    if (Q.rear==p)
+        Q.rear=Q.front; //若原队列中只有一个结点，删除后变空
+    free(p);
+    return true;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;3.2.4 双端队列&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;双端队列&lt;/code&gt;是一种允许在两端进行插入和删除操作的线性表。双端队列两端的地位是平等的，为便于理解，可将左端视为&lt;code&gt;前端&lt;/code&gt;，右端视为&lt;code&gt;后端&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;在&lt;strong&gt;双端队列入队&lt;/strong&gt;时：前端插入的元素排列在队列中后端插入的元素之前；后端插入的元素排列在队列中前端插入的元素之后。在&lt;strong&gt;双端队列出队&lt;/strong&gt;时：无论是从前端还是后端出队，先出的元素总是排列在后出的元素之前。&lt;strong&gt;思考&lt;/strong&gt;：如何由入队序列 $a, b, c, d$ 得到出队序列 $d, c, a, b$?&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;输出受限&lt;/strong&gt;的双端队列：允许在一端进行插入和删除，但在另一端仅允许插入的双端队列称为&lt;code&gt;输出受限的双端队列&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;输入受限&lt;/strong&gt;的双端队列：允许在一端进行插入和删除，但在另一端仅允许删除的双端队列称为&lt;code&gt;输入受限的双端队列&lt;/code&gt;。若限定双端队列从某个端点插入的元素只能从该端点删除，则该双端队列就蜕变为两个栈底相邻接的栈。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;例&lt;/strong&gt; 设有一个双端队列，输入序列为 1,2,3,4，试分别求出以下条件的输出序列。&lt;/p&gt;
+&lt;p&gt;(1) 能由输入受限的双端队列得到，但不能由输出受限的双端队列得到的输出序列。&lt;/p&gt;
+&lt;p&gt;(2) 能由输出受限的双端队列得到，但不能由输入受限的双端队列得到的输出序列。&lt;/p&gt;
+&lt;p&gt;(3) 既不能由输入受限的双端队列得到，又不能由输出受限的双端队列得到的输出序列。&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;解&lt;/em&gt;：先看&lt;strong&gt;输入受限&lt;/strong&gt;的双端队列。假设 end1 端输入 1, 2, 3, 4，则 end2 端的输出相当于普通队列的输出，即 1, 2, 3, 4；而 end1 端的输出相当于栈的输出，n=4 时仅通过 end1 端有 14 种输出序列(由 Catalan 公式得出)，仅通过 end1 端不能得到的输出序列有 4!-14=10 种：&lt;/p&gt;
+&lt;p&gt;$$
+\begin{matrix}
+1,4,2,3 &amp;amp; 2,4,1,3 &amp;amp; 3,4,1,2 &amp;amp; 3,1,4,2 &amp;amp; 3,1,2,4\
+4,3,1,2 &amp;amp; 4,1,3,2 &amp;amp; 4,2,3,1 &amp;amp; 4,2,1,3 &amp;amp; 4,1,2,3
+\end{matrix}
+$$&lt;/p&gt;
+&lt;p&gt;通过 end1 和 end2 端混合输出，可以输出这 10 种中的 8 种，参见下表。其中，$S_{L}, X_{L}$ 分别代表 end1 端的入队和出队，$X_{R}$ 代表 end2 端的出队。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;输出序列&lt;/th&gt;
+&lt;th&gt;入队出队顺序&lt;/th&gt;
+&lt;th&gt;输出序列&lt;/th&gt;
+&lt;th&gt;入队出队顺序&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1, 4, 2, 3&lt;/td&gt;
+&lt;td&gt;$S_{L}X_{R}S_{L}S_{L}X_{L}X_{R}X_{R}$&lt;/td&gt;
+&lt;td&gt;3, 1, 2, 4&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{L}S_{L}X_{L}S_{L}X_{R}X_{R}X_{R}$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2, 4, 1, 3&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{L}X_{L}S_{L}X_{L}X_{R}X_{R}$&lt;/td&gt;
+&lt;td&gt;4, 1, 2, 3&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{L}S_{L}S_{L}X_{L}X_{R}X_{R}X_{R}$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3, 4, 1, 2&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{L}S_{L}X_{L}S_{L}X_{L}X_{R}X_{R}$&lt;/td&gt;
+&lt;td&gt;4, 1, 3, 2&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{L}S_{L}S_{L}X_{L}X_{R}X_{L}X_{R}$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3, 1, 4, 2&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{L}S_{L}X_{L}X_{R}S_{L}X_{L}X_{R}$&lt;/td&gt;
+&lt;td&gt;4, 3, 1, 2&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{L}S_{L}S_{L}X_{L}X_{L}X_{R}X_{R}$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;剩下的两种是不能通过输入受限的双端队列输出的，即4,2,3,1和4,2,1,3。&lt;/p&gt;
+&lt;p&gt;再看&lt;strong&gt;输出受限&lt;/strong&gt;的双端队列。假设 end1 和 end2 端都能输入，仅 end2 端可以输出。若都从 end2 端输入，则就是一个栈。当输入序列为 1, 2, 3, 4 时，输出序列有 14 种。对于其余 10 种不能得到的输出序列，通过交替从 end1 和 end2 端输入，还可以输出其中 8 种。设 $S_{L}$ 代表 end1 端的输入，$S_{R}$、$X_{R}$ 分别代表 end2 端的输入和输出，则可能的输出序列见下表。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;输出序列&lt;/th&gt;
+&lt;th&gt;入队出队顺序&lt;/th&gt;
+&lt;th&gt;输出序列&lt;/th&gt;
+&lt;th&gt;入队出队顺序&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1, 4, 2, 3&lt;/td&gt;
+&lt;td&gt;$S_{L}X_{R}S_{L}S_{L}S_{R}X_{R}X_{R}X_{R}$&lt;/td&gt;
+&lt;td&gt;3, 1, 2, 4&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{L}S_{R}X_{R}X_{R}S_{L}X_{R}X_{R}$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2, 4, 1, 3&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{R}X_{R}S_{L}S_{R}X_{R}X_{R}X_{R}$&lt;/td&gt;
+&lt;td&gt;4, 1, 2, 3&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{L}S_{L}S_{R}X_{R}X_{R}X_{R}X_{R}$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3, 4, 1, 2&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{L}S_{R}X_{R}S_{R}X_{R}X_{R}X_{R}$&lt;/td&gt;
+&lt;td&gt;4, 2, 1, 3&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{R}S_{L}S_{R}X_{R}X_{R}X_{R}X_{R}$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3, 1, 4, 2&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{L}S_{R}X_{R}X_{R}S_{R}X_{R}X_{R}$&lt;/td&gt;
+&lt;td&gt;4, 3, 1, 2&lt;/td&gt;
+&lt;td&gt;$S_{L}S_{L}S_{R}S_{R}X_{R}X_{R}X_{R}X_{R}$&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;通过输出受限的双端队列不能得到的两种输出序列是4,1,3,2和4,2,3,1。&lt;/p&gt;
+&lt;p&gt;综上所述：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;能由输入受限的双端队列得到，但不能由输出受限的双端队列得到的是4,1,3,2。&lt;/li&gt;
+&lt;li&gt;能由输出受限的双端队列得到，但不能由输入受限的双端队列得到的是4,2,1,3。&lt;/li&gt;
+&lt;li&gt;既不能由输入受限的双端队列得到，又不能由输出受限的双端队列得到的是4,2,3,1。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;:::tip
+实际双端队列的考题不会如此复杂，通常只需判断序列是否满足题设条件，代入验证即可。
+:::&lt;/p&gt;
 </content:encoded></item><item><title>5.1.1_2模板概念和函数模板</title><link>https://www.atsuko.top/posts/dark-horse/c++/improve/511-2-template-concept-and-function-template/</link><guid isPermaLink="true">https://www.atsuko.top/posts/dark-horse/c++/improve/511-2-template-concept-and-function-template/</guid><pubDate>Sun, 14 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;C++提高编程&lt;/h1&gt;
 &lt;ul&gt;
 &lt;li&gt;本阶段主要针对C++ &lt;strong&gt;泛型编程&lt;/strong&gt; 和 &lt;strong&gt;STL&lt;/strong&gt; 技术做详细讲解，探讨C++更深层的使用&lt;/li&gt;
