@@ -4160,6 +4160,27 @@ typedef struct{
 &lt;li&gt;Set_edge_value(G, x, y, v): 设置图 G 中边 (x, y) 或 &amp;lt;x, y&amp;gt; 对应的权值为 v。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;此外，还有图的遍历算法：按照某种顺序访问图中的每个顶点且仅访问一次。常见的图遍历算法包括深度优先遍历(DFS)和广度优先遍历(BFS)，具体内容将在下一节详细讨论。&lt;/p&gt;
+</content:encoded></item><item><title>7.1查找的基本概念</title><link>https://www.atsuko.top/posts/408/data-structure/71-basic-concepts-of-search/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/data-structure/71-basic-concepts-of-search/</guid><pubDate>Mon, 29 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;查找&lt;/code&gt;。在数据集合中寻找满足某种条件的数据元素的过程称为&lt;code&gt;查找&lt;/code&gt;。查找的结果一般分为两种：一是&lt;code&gt;查找成功&lt;/code&gt;，即在数据集合中找到了满足条件的数据元素；二是&lt;code&gt;查找失败&lt;/code&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;查找表&lt;/code&gt;。用于查找的数据集合称为&lt;code&gt;查找表&lt;/code&gt;，它由同一类型的数据元素(或记录)组成。对查找表的常见操作有：1. 查询符合条件的数据元素；2. 插入或删除数据元素。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;静态查找表&lt;/code&gt;。若一个查找表的操作仅涉及查找，无须动态修改，则称为&lt;code&gt;静态查找表&lt;/code&gt;；反之，需要支持插入或删除操作的查找表称为&lt;code&gt;动态查找表&lt;/code&gt;。适合静态查找表的查找方法包括顺序查找、折半查找等；适合动态查找表的查找方法包括二叉排序树查找等。散列查找既可用于静态表，也可用于动态表(取决于具体实现)。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;关键字&lt;/code&gt;。数据元素中唯一标识该元素的某个数据项的值，基于关键字的查找应返回唯一结果。例如，在学生记录集合中，“学号”这一数据项可唯一标识一名学生。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;平均查找长度&lt;/code&gt;。在查找过程中，一次查找的长度是指该次查找中关键字的比较次数，而平均查找长度则是所有查找操作中关键字比较次数的加权平均值，其数学定义为&lt;/p&gt;
+&lt;p&gt;$$
+ASL=\sum_{i=1}^{n}P_{i}C_{i}
+$$&lt;/p&gt;
+&lt;p&gt;式中，n 是查找表的长度；$P_{i}$ 是查找第 i 个数据元素的概率，若为等概率则 $P_{i} = 1/n$；$C_{i}$ 是找到第 i 个数据元素所需进行的比较次数。&lt;strong&gt;ASL 是衡量查找算法效率的核心指标。&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
 </content:encoded></item><item><title>6.4图的应用</title><link>https://www.atsuko.top/posts/408/data-structure/application-of-figure-64/</link><guid isPermaLink="true">https://www.atsuko.top/posts/408/data-structure/application-of-figure-64/</guid><pubDate>Mon, 29 Jun 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;本节是历年考查的重点，但直接考查算法设计题的概率偏小，更多是结合具体的图实例，考查算法的具体操作过程。读者必须掌握如何手工模拟各类图算法在给定图上的执行过程。此外，还需要具备将实际问题抽象为图模型，并据此构建合适的图结构以解决问题的能力。&lt;/p&gt;
 &lt;h4&gt;6.4.1 最小生成树&lt;/h4&gt;
 &lt;p&gt;一个&lt;code&gt;连通图的生成树&lt;/code&gt;包含了图的所有顶点，并且仅包含尽可能少的边。对生成树来说，若移除一条边，则会使该生成树变成非连通图；若增加一条边，则会在图中形成一条回路。&lt;/p&gt;
